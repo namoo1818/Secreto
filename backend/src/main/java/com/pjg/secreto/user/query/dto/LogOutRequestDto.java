@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class LogOutRequestDto {
     private String email;
-    private String logout;
+    private String provider;
 }
