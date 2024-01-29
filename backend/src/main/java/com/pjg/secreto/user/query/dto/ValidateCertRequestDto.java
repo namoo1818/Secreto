@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class ValidateCertRequestDto {
     private String userId;
+    private String validateCode;
 }
