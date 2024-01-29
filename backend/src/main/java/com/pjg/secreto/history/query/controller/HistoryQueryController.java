@@ -142,7 +142,7 @@ public class HistoryQueryController {
     }
 
 
-    @GetMapping("/history/{roomId}/manito/{userId}")
+    @GetMapping("/{roomId}/manito/{userId}")
     public ResponseEntity<?> collectManitoResult(@PathVariable Long roomId,
                                                  @PathVariable String userId) {
 
@@ -201,7 +201,7 @@ public class HistoryQueryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/history/{roomId}/maniti/{userId}")
+    @GetMapping("/{roomId}/maniti/{userId}")
     public ResponseEntity<?> collectManitiResult(@PathVariable Long roomId,
                                                  @PathVariable String userId) {
 
