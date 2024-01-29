@@ -5,11 +5,14 @@ import com.pjg.secreto.board.command.dto.WriteReplyRequestDto;
 import com.pjg.secreto.board.command.dto.WriterBoardRequestDto;
 import com.pjg.secreto.board.command.repository.BoardCommandRepository;
 import com.pjg.secreto.board.command.repository.LikedCommandRepository;
+import com.pjg.secreto.board.command.repository.ReplyCommandRepository;
 import com.pjg.secreto.board.common.entity.Board;
 import com.pjg.secreto.board.common.entity.BoardCategory;
 import com.pjg.secreto.board.common.entity.Liked;
+import com.pjg.secreto.board.common.entity.Reply;
 import com.pjg.secreto.board.query.repository.BoardQueryRepository;
 import com.pjg.secreto.board.query.repository.LikedQueryRepository;
+import com.pjg.secreto.board.query.repository.ReplyQueryRepository;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,8 @@ import java.util.Optional;
 public class BoardCommandServiceImpl implements BoardCommandService {
     private BoardQueryRepository boardQueryRepository;
     private BoardCommandRepository boardCommandRepository;
+    private ReplyQueryRepository replyQueryRepository;
+    private ReplyCommandRepository replyCommandRepository;
     private LikedQueryRepository likedQueryRepository;
     private LikedCommandRepository likedCommandRepository;
     private RoomUserQueryRepository roomUserQueryRepository;
@@ -85,11 +90,15 @@ public class BoardCommandServiceImpl implements BoardCommandService {
 
     @Override
     public void writeReply(WriteReplyRequestDto writeReplyRequestDto) {
-
+        Reply reply = writeReplyRequestDto.toEntity();
+        replyCommandRepository.save(reply);
     }
 
     @Override
     public void deleteReply(Long replyNo) {
-
+        Reply reply = replyQueryRepository.findById(replyNo)
+                .orElseThrow(()->new IllegalArgumentException("해당 댓글이 없습니다. id="+replyNo));
+        replyCommandRepository.delete(reply);
+                
     }
 }
