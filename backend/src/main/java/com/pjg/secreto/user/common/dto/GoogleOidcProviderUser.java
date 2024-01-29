@@ -3,6 +3,7 @@ package com.pjg.secreto.user.common.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @Builder
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class GoogleOidcProviderUser extends AbstractOAuth2Provider {
     private Map<String, Object> attributes;
     private OAuth2User oAuth2User;
@@ -28,27 +30,27 @@ public class GoogleOidcProviderUser extends AbstractOAuth2Provider {
 
     @Override
     public String getId() {
-        return null;
+        return (String) attributes.get("email");
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return (String) attributes.get("name");
     }
 
     @Override
     public String getEmail() {
-        return null;
+        return (String) attributes.get("email");
     }
 
     @Override
     public String getProvider() {
-        return null;
+        return clientRegistration.getRegistrationId();
     }
 
     @Override
     public String getProfileUrl() {
-        return null;
+        return (String) attributes.get("profile");
     }
 
     @Override
@@ -57,7 +59,7 @@ public class GoogleOidcProviderUser extends AbstractOAuth2Provider {
     }
 
     @Override
-    public Long getSub() {
-        return (Long) attributes.get("sub");
+    public String getSub() {
+        return (String) attributes.get("sub");
     }
 }

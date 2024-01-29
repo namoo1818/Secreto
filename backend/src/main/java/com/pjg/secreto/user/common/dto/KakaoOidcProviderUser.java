@@ -2,6 +2,8 @@ package com.pjg.secreto.user.common.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -11,6 +13,7 @@ import java.util.Map;
 
 @Data
 @Builder
+@EqualsAndHashCode(callSuper=false)
 public class KakaoOidcProviderUser extends AbstractOAuth2Provider {
     private Map<String, Object> attributes;
     private OAuth2User oAuth2User;
@@ -27,32 +30,27 @@ public class KakaoOidcProviderUser extends AbstractOAuth2Provider {
 
     @Override
     public String getId() {
-        return null;
+        return (String)getAttributes().get("id");
     }
 
     @Override
     public String getUsername() {
-        return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return null;
-    }
-
-    @Override
-    public String getEmail() {
-        return null;
-    }
-
-    @Override
-    public String getProvider() {
-        return null;
+        return (String)getAttributes().get("nickname");
     }
 
     @Override
     public String getProfileUrl() {
-        return null;
+        return (String)getAttributes().get("profile_image_url");
+    }
+
+    @Override
+    public String getEmail() {
+        return (String) getAttributes().get("email");
+    }
+
+    @Override
+    public String getProvider() {
+        return clientRegistration.getRegistrationId();
     }
 
     @Override
@@ -62,16 +60,16 @@ public class KakaoOidcProviderUser extends AbstractOAuth2Provider {
 
     @Override
     public Map<String, Object> getAttributes() {
-        return null;
+        return attributes;
     }
 
     @Override
     public OAuth2User getOAuth2User() {
-        return null;
+        return oAuth2User;
     }
 
     @Override
-    public Long getSub() {
-        return (Long) attributes.get("sub");
+    public String getSub() {
+        return (String) attributes.get("sub");
     }
 }

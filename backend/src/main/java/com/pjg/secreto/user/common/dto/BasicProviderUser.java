@@ -68,7 +68,7 @@ public class BasicProviderUser implements ProviderUser{
     }
 
     @Override
-    public Long getSub() {
-        return null;
+    public String getSub() {
+        return "";
     }
 }
