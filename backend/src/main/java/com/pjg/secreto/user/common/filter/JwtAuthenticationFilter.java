@@ -60,18 +60,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        String accessToken = authorization.split(" ")[1];
 
 
-        final String tokenType = request.getHeader("Type");
-        final String accessToken = request.getHeader("AccessToken");
+        final String accessTokenType = request.getHeader("AccessToken").split(" ")[0];
+        final String accessToken = request.getHeader("AccessToken").split(" ")[1];
+
+        final String refreshTokenType = request.getHeader("RefreshToken").split(" ")[0];
+        final String refreshToken = request.getHeader("RefreshToken").split(" ")[1];
+
         final String email;
 
         // 만약 타입이 Baarer 토큰타입 체크
-        if (tokenType == null || !tokenType.equals("bearer")) {
+        if (!(isBearerType(accessTokenType) && isBearerType(refreshTokenType))) {
             filterChain.doFilter(request, response);
             return;
         }
 
         // 액세스토큰이 만료되었는지 여부 체크
-        if (!jwtService.validateToken(accessToken)){
+        if (!(jwtService.validateToken(accessToken)) && jwtService.validateToken(refreshToken)){
             filterChain.doFilter(request, response);
             return;
         }
@@ -88,6 +92,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println(authToken);
         }
         filterChain.doFilter(request, response);
+    }
+
+    private static boolean isBearerType(String accessTokenType) {
+        return accessTokenType == null || !accessTokenType.equals("bearer");
     }
 
     private boolean isNotAuthenticated() {

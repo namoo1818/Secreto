@@ -1,13 +1,16 @@
 package com.pjg.secreto.user.query.service;
 
+import com.pjg.secreto.user.command.repository.RefreshTokenCommandRepository;
 import com.pjg.secreto.user.common.dto.PrincipalUser;
 import com.pjg.secreto.user.common.dto.ProviderUser;
 import com.pjg.secreto.user.common.dto.UserInfo;
+import com.pjg.secreto.user.common.entity.RefreshToken;
 import com.pjg.secreto.user.common.entity.User;
 import com.pjg.secreto.user.common.exception.UserException;
 import com.pjg.secreto.user.common.service.JwtService;
 import com.pjg.secreto.user.query.dto.LoginRequestDto;
 import com.pjg.secreto.user.query.dto.LoginResponseDto;
+import com.pjg.secreto.user.query.repository.RefreshTokenQueryRepository;
 import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,8 @@ public class UserQueryServiceImpl implements UserQueryService {
     private final UserQueryRepository userQueryRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RefreshTokenQueryRepository refreshTokenQueryRepository;
+    private final RefreshTokenCommandRepository refreshTokenCommandRepository;
 
 
     @Override
@@ -59,6 +64,9 @@ public class UserQueryServiceImpl implements UserQueryService {
                                     providerUser.getEmail(),
                                     providerUser.getUsername(),
                                     providerUser.getProfileUrl());
+        RefreshToken redisRefreshToken = new RefreshToken(providerUser.getEmail(), refreshToken);
+
+        refreshTokenCommandRepository.save(redisRefreshToken);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
