@@ -45,6 +45,7 @@ public class Board {
 
     private Long hit;
 
+    @Convert(converter = BoardCategoryConverter.class)
     private BoardCategory boardCategory;
 
     private Boolean publicYn;

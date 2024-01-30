@@ -2,10 +2,11 @@ package com.pjg.secreto.board.command.dto;
 
 import com.pjg.secreto.board.common.entity.Board;
 import com.pjg.secreto.board.common.entity.Reply;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-
+@Builder
 @Data
 public class WriteReplyRequestDto {
     private Board board;

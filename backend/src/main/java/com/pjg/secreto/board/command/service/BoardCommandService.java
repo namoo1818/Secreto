@@ -2,14 +2,14 @@ package com.pjg.secreto.board.command.service;
 
 import com.pjg.secreto.board.command.dto.UpdateBoardRequestDto;
 import com.pjg.secreto.board.command.dto.WriteReplyRequestDto;
-import com.pjg.secreto.board.command.dto.WriterBoardRequestDto;
+import com.pjg.secreto.board.command.dto.WriteBoardRequestDto;
 
 public interface BoardCommandService {
     public Long updatePost(UpdateBoardRequestDto updateBoardRequestDto);
 
     public void deletePost(Long boardNo);
 
-    public void writePost(WriterBoardRequestDto writerBoardRequestDto);
+    public void writePost(WriteBoardRequestDto writeBoardRequestDto);
 
     public void updateLike(Long boardNo, Long roomUserNo);
 

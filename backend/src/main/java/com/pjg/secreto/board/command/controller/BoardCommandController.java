@@ -2,7 +2,7 @@ package com.pjg.secreto.board.command.controller;
 
 import com.pjg.secreto.board.command.dto.UpdateBoardRequestDto;
 import com.pjg.secreto.board.command.dto.WriteReplyRequestDto;
-import com.pjg.secreto.board.command.dto.WriterBoardRequestDto;
+import com.pjg.secreto.board.command.dto.WriteBoardRequestDto;
 import com.pjg.secreto.board.command.service.BoardCommandService;
 import com.pjg.secreto.common.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +20,7 @@ public class BoardCommandController {
 
     private final BoardCommandService boardCommandService;
 
+    // 게시판 수정
     @PutMapping(value="/post")
     public ResponseEntity<?> updatePost(@RequestBody UpdateBoardRequestDto updateBoardRequestDto){
 
@@ -31,6 +32,7 @@ public class BoardCommandController {
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "게시글 수정 성공", result));
     }
 
+    // 게시글 삭제
     @DeleteMapping(value="/post/{boardNo}")
     public ResponseEntity<?> deletePost(@PathVariable Long boardNo){
         HttpHeaders headers = new HttpHeaders();
@@ -41,8 +43,9 @@ public class BoardCommandController {
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "게시글 삭제 성공"));
     }
 
+    // 게시글 작성
     @PostMapping(value="/post")
-    public ResponseEntity<?> createPost(@RequestBody WriterBoardRequestDto writerBoardRequestDto){
+    public ResponseEntity<?> createPost(@RequestBody WriteBoardRequestDto writerBoardRequestDto){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
@@ -51,6 +54,7 @@ public class BoardCommandController {
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "게시글 작성 성공"));
     }
 
+    // 게시글에 좋아요 
     @PostMapping(value="/post/{boardNo}/like")
     public ResponseEntity<?> likePost(@PathVariable Long boardNo){
         Long roomUserNo = 1L;
@@ -63,6 +67,7 @@ public class BoardCommandController {
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "좋아요 성공"));
     }
 
+    // 게시글에 좋아요 취소
     @DeleteMapping(value="/post/{boardNo}/unlike")
     public ResponseEntity<?> unlikePost(@PathVariable Long boardNo){
         Long roomUserNo = 1L;
@@ -75,6 +80,7 @@ public class BoardCommandController {
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "좋아요 취소 성공"));
     }
 
+    // 댓글 작성
     @PostMapping(value="/reply/{boardNo}")
     public ResponseEntity<?> createReply(@RequestBody WriteReplyRequestDto writeReplyRequestDto){
         HttpHeaders headers = new HttpHeaders();
@@ -85,6 +91,7 @@ public class BoardCommandController {
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "댓글 작성 성공"));
     }
 
+    // 댓글 삭제
     @DeleteMapping(value="/reply/{replyNo}")
     public ResponseEntity<?> deleteReply(@PathVariable Long replyNo){
         HttpHeaders headers = new HttpHeaders();
