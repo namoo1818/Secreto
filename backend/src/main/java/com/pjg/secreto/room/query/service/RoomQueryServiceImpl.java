@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -47,109 +48,52 @@ public class RoomQueryServiceImpl implements RoomQueryService{
     @Override
     public List<SearchRoomUserListResponseDto> searchRoomUserList(Long roomNo) {
 
-//        try {
-//
-//            Room findRoom = roomQueryRepository.findById(roomNo)
-//                    .orElseThrow(() -> new RoomException("해당 방이 없습니다."));
-//
-//            List<SearchRoomUserListResponseDto> result = roomUserQueryRepository.findAllWithMatching();
-//
-//            for(SearchRoomUserListResponseDto rr : result) {
-//                System.out.println("result = " + rr);
-//            }
-//
-////            List<RoomUser> roomUsers = roomUserQueryRepository.findRoomUserByRoom(findRoom);
-////
-////            List<SearchRoomUserListResponseDto> roomUsers = roomUsers.stream()
-////                    .map(ru -> new SearchRoomUserListResponseDto(ru.getRoomUserNO(),
-////                            ru.getUserNo(),
-////                            ru.getRoomNo(),
-////                            ru.getUserRole(),
-////                            ru.getUserEntryAt(),
-////                            ru.getUserLeaveAt(),
-////                            ru.getStandbyYn(),
-////                            ru.getNickname()))
-////                    .toList();
-//
-//
-//            return null;
-//        } catch (Exception e) {
-//
-//            throw new RoomException(e.getMessage());
-//        }
+        try {
 
-        List<SearchRoomUserListResponseDto> resultList = new ArrayList<>();
+            Room findRoom = roomQueryRepository.findById(roomNo)
+                    .orElseThrow(() -> new RoomException("해당 방이 없습니다."));
 
-        SearchRoomUserListResponseDto result1 = SearchRoomUserListResponseDto.builder()
-                .roomUserNO(1L).userNo(4L).roomNo(2L)
-                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
-                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("상하악").build();
+            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(roomNo);
 
-        SearchRoomUserListResponseDto result2 = SearchRoomUserListResponseDto.builder()
-                .roomUserNO(1L).userNo(4L).roomNo(2L)
-                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
-                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("현차앙").build();
+            List<SearchRoomUserListResponseDto> result = roomUsers.stream()
+                    .map(SearchRoomUserListResponseDto::of).toList();
 
-        SearchRoomUserListResponseDto result3 = SearchRoomUserListResponseDto.builder()
-                .roomUserNO(1L).userNo(4L).roomNo(2L)
-                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
-                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("승우우").build();
+            return result;
 
-        SearchRoomUserListResponseDto result4 = SearchRoomUserListResponseDto.builder()
-                .roomUserNO(1L).userNo(4L).roomNo(2L)
-                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
-                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("인서엉").build();
+        } catch (Exception e) {
 
-        SearchRoomUserListResponseDto result5 = SearchRoomUserListResponseDto.builder()
-                .roomUserNO(1L).userNo(4L).roomNo(2L)
-                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
-                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("시워언").build();
-
-        SearchRoomUserListResponseDto result6 = SearchRoomUserListResponseDto.builder()
-                .roomUserNO(1L).userNo(4L).roomNo(2L)
-                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
-                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("민지이").build();
-
-        resultList.add(result1);
-        resultList.add(result2);
-        resultList.add(result3);
-        resultList.add(result4);
-        resultList.add(result5);
-        resultList.add(result6);
-
-        return resultList;
-
-
+            throw new RoomException(e.getMessage());
+        }
     }
 
     @Override
     public List<SearchRoomListResponseDto> searchRoomList() {
 
-        List<SearchRoomListResponseDto> resultList = new ArrayList<>();
+        try {
 
-        SearchRoomListResponseDto result1 = SearchRoomListResponseDto.builder()
-                .roomNo(1L).roomName("싸피 10기 방").entryCode("3DFSas")
-                .roomStartAt("2024/01/15 00:00:00").roomEndAt("2024/01/22 00:00:00")
-                .hostParticipantYn(true).commonYn(false).missionSubmitTime("12:00:00")
-                .missionStartAt("2024/01/16").roomStartYn(false).standbyYn(false).build();
+            Long userNo = 1L;
 
-        SearchRoomListResponseDto result2 = SearchRoomListResponseDto.builder()
-                .roomNo(1L).roomName("싸피 9기 방").entryCode("3DFSas")
-                .roomStartAt("2024/01/15 00:00:00").roomEndAt("2024/01/22 00:00:00")
-                .hostParticipantYn(true).commonYn(false).missionSubmitTime("12:00:00")
-                .missionStartAt("2024/01/16").roomStartYn(false).standbyYn(false).build();
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllWithRoom(userNo);
 
-        SearchRoomListResponseDto result3 = SearchRoomListResponseDto.builder()
-                .roomNo(1L).roomName("싸피 8기 방").entryCode("3DFSas")
-                .roomStartAt("2024/01/15 00:00:00").roomEndAt("2024/01/22 00:00:00")
-                .hostParticipantYn(true).commonYn(false).missionSubmitTime("12:00:00")
-                .missionStartAt("2024/01/16").roomStartYn(false).standbyYn(false).build();
+            List<SearchRoomListResponseDto> result = findRoomUsers.stream()
+                    .map(r -> new SearchRoomListResponseDto(
+                            r.getRoom().getId(),
+                            r.getRoom().getRoomName(),
+                            r.getRoom().getEntryCode(),
+                            r.getRoom().getRoomStartAt(),
+                            r.getRoom().getRoomEndAt(),
+                            r.getRoom().getHostParticipantYn(),
+                            r.getRoom().getCommonYn(),
+                            r.getRoom().getMissionSubmitTime(),
+                            r.getRoom().getMissionStartAt(),
+                            r.getRoom().getRoomStartYn(),
+                            r.getStandbyYn())).toList();
 
-        resultList.add(result1);
-        resultList.add(result2);
-        resultList.add(result3);
+            return result;
+        } catch (Exception e) {
+            throw new RoomException(e.getMessage());
+        }
 
-        return resultList;
     }
 
     @Override

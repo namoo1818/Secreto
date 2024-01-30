@@ -36,8 +36,6 @@ public class User {
 
     private String joinAt;
 
-    private String refreshToken;
-
     private String profileUrl;
 
     private String provider;

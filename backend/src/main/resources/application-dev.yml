@@ -16,10 +16,10 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-    generate-ddl: true
+#    generate-ddl: true
   data:
     redis:
-      host: localhost
+      host: i10a805.p.ssafy.io
       port: 6379
 logging:
   level:
