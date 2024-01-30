@@ -24,4 +24,9 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
-
+server:
+  port: 443
+  ssl:
+    key-store: classpath:ssl/keystore.p12
+    key-store-type: PKCS12
+    key-store-password: 031266dltkdg!
