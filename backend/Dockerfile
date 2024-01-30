@@ -1,7 +1,3 @@
-#FROM openjdk:17
-#ARG JAR_FILE=/build/libs/*.jar
-#COPY ${JAR_FILE} app.jar
-#ENTRYPOINT ["java","-jar","/app.jar"]
 
 FROM gradle:7.4-jdk17 as builder
 WORKDIR /build

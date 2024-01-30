@@ -6,7 +6,6 @@ import lombok.Data;
 public class EnterRoomRequestDto {
 
     private String entryCode;
-
-    private Long roomNo;
+    private String nickname;
 
 }

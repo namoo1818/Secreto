@@ -6,6 +6,5 @@ import lombok.Data;
 public class ChangeRoomNameRequestDto {
 
     private String roomName;
-
     private Long roomNo;
 }

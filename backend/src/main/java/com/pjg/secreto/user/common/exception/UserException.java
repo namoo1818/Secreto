@@ -2,11 +2,9 @@ package com.pjg.secreto.user.common.exception;
 
 public class UserException extends RuntimeException {
 
-    public UserException() {
-        super();
-    }
+    public UserException() {}
 
-    public UserException(String message) {
-        super(message);
+    public UserException(String msg) {
+        super(msg);
     }
 }

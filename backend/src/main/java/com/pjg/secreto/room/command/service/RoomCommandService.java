@@ -7,11 +7,11 @@ public interface RoomCommandService {
 
     void changeRoomName(ChangeRoomNameRequestDto changeRoomNameRequestDto);
 
-    SetRoomResponseDto setRoom(Long roomNo);
+    SetRoomResponseDto setRoom(SetRoomRequestDto setRoomRequestDto);
 
-    void enterRoom(EnterRoomRequestDto enterRoomRequestDto);
+    Long enterRoom(EnterRoomRequestDto enterRoomRequestDto);
 
-    void setNickname(SetNicknameRequestDto setNicknameRequestDto);
+//    void setNickname(SetNicknameRequestDto setNicknameRequestDto);
 
     void acceptUser(AcceptUserRequestDto acceptUserRequestDto);
 
@@ -20,4 +20,8 @@ public interface RoomCommandService {
     void bookmarkRoom(BookmarkRoomRequestDto bookmarkRoomRequestDto);
 
     void terminateRoom(TerminateRoomRequestDto terminateRoomRequestDto);
+
+    void denyUser(DenyUserRequestDto denyUserRequestDto);
+
+    void exitRoom(ExitRoomRequestDto exitRoomRequestDto);
 }

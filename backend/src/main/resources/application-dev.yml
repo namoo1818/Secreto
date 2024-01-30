@@ -1,13 +1,13 @@
 spring:
   datasource:
-    url: jdbc:mariadb://i10a805.p.ssafy.io:3306/manitodb
-    driver-class-name: org.mariadb.jdbc.Driver
-    username: manito
-    password: manito
-#    url: jdbc:mysql://localhost:3306/manitodb?serverTimezone=UTC&characterEncoding=UTF-8
+#    url: jdbc:mariadb://i10a805.p.ssafy.io:3306/manitodb
+#    driver-class-name: org.mariadb.jdbc.Driver
 #    username: manito
 #    password: manito
-#    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/manitodb?serverTimezone=UTC&characterEncoding=UTF-8
+    username: manito
+    password: manito
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
@@ -20,10 +20,8 @@ spring:
   data:
     redis:
       host: localhost
-      port : 6379
+      port: 6379
 logging:
   level:
     org.hibernate.SQL: debug
-
-
 

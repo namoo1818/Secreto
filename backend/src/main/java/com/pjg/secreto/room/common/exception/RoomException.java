@@ -1,8 +1,9 @@
 package com.pjg.secreto.room.common.exception;
 
-public class RoomException extends RuntimeException {
+import lombok.NoArgsConstructor;
 
-    public RoomException(){}
+@NoArgsConstructor
+public class RoomException extends RuntimeException {
 
     public RoomException(String msg) {
 
