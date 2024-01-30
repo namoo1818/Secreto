@@ -1,5 +1,6 @@
 package com.pjg.secreto.user.common.handler;
 
+import com.pjg.secreto.common.Util.AuthUtils;
 import com.pjg.secreto.user.command.repository.RefreshTokenCommandRepository;
 import com.pjg.secreto.user.common.config.SecurityUtilConfig;
 import com.pjg.secreto.user.common.dto.PrincipalUser;
@@ -12,6 +13,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -26,6 +28,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final String redirectUrl = SecurityUtilConfig.RESPONSE_REDIRECT_URL;
     private final JwtService jwtService;
@@ -40,12 +43,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
         ProviderUser providerUser = principal.providerUser();
 
+        String id = AuthUtils.getAuthenticatedUserId(authentication);
+        log.info(id);
+
         String userEmail = providerUser.getEmail();
 
         String message = "ok";
         // 원래 요청 주소 가져오기
 
         System.out.println(redirectUrl);
+        System.out.println(providerUser.getId());
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl)
                 .queryParam("accessToken", jwtService.generateAccessToken(providerUser))
                 .queryParam("refreshToken", jwtService.generateRefreshToken(providerUser))

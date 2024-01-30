@@ -24,7 +24,7 @@ public class BasicProviderUser implements ProviderUser{
 
     @Override
     public String getId() {
-        return null;
+        return this.id;
     }
 
     @Override
