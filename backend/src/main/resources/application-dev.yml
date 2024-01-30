@@ -19,7 +19,7 @@ spring:
 #    generate-ddl: true
   data:
     redis:
-      host: i10a805.p.ssafy.io
+      host: localhost
       port: 6379
 logging:
   level:
