@@ -19,8 +19,10 @@ spring:
 #    generate-ddl: true
   data:
     redis:
-      host: localhost
+      host: i10a805.p.ssafy.io
       port: 6379
 logging:
   level:
     org.hibernate.SQL: debug
+
+
