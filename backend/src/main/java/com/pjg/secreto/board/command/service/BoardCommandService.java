@@ -1,21 +1,21 @@
 package com.pjg.secreto.board.command.service;
 
-import com.pjg.secreto.board.common.entity.Board;
-import com.pjg.secreto.board.common.entity.Liked;
-import com.pjg.secreto.board.common.entity.Reply;
+import com.pjg.secreto.board.command.dto.UpdateBoardRequestDto;
+import com.pjg.secreto.board.command.dto.WriteReplyRequestDto;
+import com.pjg.secreto.board.command.dto.WriterBoardRequestDto;
 
 public interface BoardCommandService {
-    public void updatePost(Board board) throws Exception;
+    public Long updatePost(UpdateBoardRequestDto updateBoardRequestDto);
 
-    public void deletePost(long postNo) throws Exception;
+    public void deletePost(Long boardNo);
 
-    public void writePost(Board board) throws Exception;
+    public void writePost(WriterBoardRequestDto writerBoardRequestDto);
 
-    public void updateLike(Liked liked) throws Exception;
+    public void updateLike(Long boardNo, Long roomUserNo);
 
-    public void deleteLike(long likedNo) throws Exception;
+    public void deleteLike(Long boardNo, Long roomUserNo);
 
-    public void updateReply(Reply reply) throws Exception;
+    public void writeReply(WriteReplyRequestDto writeReplyRequestDto);
 
-    public void deleteReply(long replyNo) throws Exception;
+    public void deleteReply(Long replyNo);
 }

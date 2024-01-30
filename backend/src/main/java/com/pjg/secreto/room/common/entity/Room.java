@@ -33,6 +33,7 @@ public class Room {
     @OneToOne(mappedBy = "room", fetch = FetchType.LAZY)
     private TotalResult totalResult;
 
+
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     private List<MissionSchedule> missionSchedules = new ArrayList<>();
 
