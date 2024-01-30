@@ -8,6 +8,7 @@ import com.pjg.secreto.user.common.dto.PrincipalUser;
 import com.pjg.secreto.user.common.dto.ProviderUser;
 import com.pjg.secreto.user.common.entity.User;
 import com.pjg.secreto.user.query.repository.UserQueryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class CustomOidcUserService extends AbstractOAuth2UserService
         implements OAuth2UserService<OidcUserRequest, OidcUser> {
 
+    @Autowired
     public CustomOidcUserService(UserQueryRepository userQueryRepository, UserCommandService userCommandService, ProviderUserConverter<ProviderUserRequest, ProviderUser> providerUserConverter) {
         super(userQueryRepository, userCommandService, providerUserConverter);
     }
