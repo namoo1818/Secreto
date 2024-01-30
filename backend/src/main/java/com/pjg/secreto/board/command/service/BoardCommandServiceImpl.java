@@ -1,8 +1,8 @@
 package com.pjg.secreto.board.command.service;
 
 import com.pjg.secreto.board.command.dto.UpdateBoardRequestDto;
+import com.pjg.secreto.board.command.dto.WriteBoardRequestDto;
 import com.pjg.secreto.board.command.dto.WriteReplyRequestDto;
-import com.pjg.secreto.board.command.dto.WriterBoardRequestDto;
 import com.pjg.secreto.board.command.repository.BoardCommandRepository;
 import com.pjg.secreto.board.command.repository.LikedCommandRepository;
 import com.pjg.secreto.board.command.repository.ReplyCommandRepository;
@@ -16,14 +16,14 @@ import com.pjg.secreto.board.query.repository.ReplyQueryRepository;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-
+@RequiredArgsConstructor
 @Transactional
 @Service
-@RequiredArgsConstructor
 public class BoardCommandServiceImpl implements BoardCommandService {
     private BoardQueryRepository boardQueryRepository;
     private BoardCommandRepository boardCommandRepository;
@@ -32,6 +32,17 @@ public class BoardCommandServiceImpl implements BoardCommandService {
     private LikedQueryRepository likedQueryRepository;
     private LikedCommandRepository likedCommandRepository;
     private RoomUserQueryRepository roomUserQueryRepository;
+
+    @Autowired
+    public BoardCommandServiceImpl(BoardQueryRepository boardQueryRepository, BoardCommandRepository boardCommandRepository, ReplyQueryRepository replyQueryRepository, ReplyCommandRepository replyCommandRepository, LikedQueryRepository likedQueryRepository, LikedCommandRepository likedCommandRepository, RoomUserQueryRepository roomUserQueryRepository) {
+        this.boardQueryRepository = boardQueryRepository;
+        this.boardCommandRepository = boardCommandRepository;
+        this.replyQueryRepository = replyQueryRepository;
+        this.replyCommandRepository = replyCommandRepository;
+        this.likedQueryRepository = likedQueryRepository;
+        this.likedCommandRepository = likedCommandRepository;
+        this.roomUserQueryRepository = roomUserQueryRepository;
+    }
 
     @Override
     public Long updatePost(UpdateBoardRequestDto updateBoardRequestDto) {
@@ -57,8 +68,8 @@ public class BoardCommandServiceImpl implements BoardCommandService {
     }
 
     @Override
-    public void writePost(WriterBoardRequestDto writerBoardRequestDto) {
-        Board board = writerBoardRequestDto.toEntity();
+    public void writePost(WriteBoardRequestDto writeBoardRequestDto) {
+        Board board = writeBoardRequestDto.toEntity();
         boardCommandRepository.save(board);
     }
 

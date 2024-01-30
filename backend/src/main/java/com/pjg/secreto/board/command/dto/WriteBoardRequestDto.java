@@ -3,13 +3,14 @@ package com.pjg.secreto.board.command.dto;
 import com.pjg.secreto.board.common.entity.Board;
 import com.pjg.secreto.board.common.entity.BoardCategory;
 import com.pjg.secreto.room.common.entity.RoomUser;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-
+@Builder
 @Data
-public class WriterBoardRequestDto {
+public class WriteBoardRequestDto {
     private RoomUser roomUser;
     private String title;
     private String content;
