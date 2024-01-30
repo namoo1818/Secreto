@@ -10,6 +10,7 @@ import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import com.pjg.secreto.user.query.service.UserQueryService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class CustomUserDetailService
-        extends AbstractOAuth2UserService implements UserDetailsService {
-
-
+public class CustomUserDetailService extends AbstractOAuth2UserService implements UserDetailsService {
     private final UserQueryRepository userQueryRepository;
     private final PasswordEncoder passwordEncoder;
 

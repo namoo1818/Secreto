@@ -7,24 +7,18 @@ import com.pjg.secreto.user.common.dto.PrincipalUser;
 import com.pjg.secreto.user.common.dto.ProviderUser;
 import com.pjg.secreto.user.common.entity.RefreshToken;
 import com.pjg.secreto.user.common.service.JwtService;
-import com.pjg.secreto.user.query.repository.RefreshTokenQueryRepository;
-import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor

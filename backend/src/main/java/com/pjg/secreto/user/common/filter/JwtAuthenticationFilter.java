@@ -28,13 +28,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    public JwtAuthenticationFilter(JwtService jwtService, CustomUserDetailService customUserDetailService) {
-        this.jwtService = jwtService;
-        this.customUserDetailService = customUserDetailService;
-    }
-
     private final JwtService jwtService;
     private final CustomUserDetailService customUserDetailService;
 
