@@ -16,6 +16,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 public class UserCommandController {
+
     private final UserCommandService userCommandService;
     private final JwtService jwtService;
 
@@ -78,9 +79,11 @@ public class UserCommandController {
 
     @GetMapping("/users/refreshAccess")
     public ResponseEntity<?> refreshAccessToken(@RequestHeader String RefreshToken){
-        Map<String, Object> result =new HashMap<>();
-        result.put("AccessToken", "123w1231232afasf");
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "AcessToken이 재발급 되었습니다.", result);
+//        Map<String, Object> result =new HashMap<>();
+//        result.put("AccessToken", "123w1231232afasf");
+//        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "AcessToken이 재발급 되었습니다.", result);
+
+        RefreshTokensResponseDto response = userCommandService.refreshToken(RefreshToken);
 
         return ResponseEntity.ok(response);
     }

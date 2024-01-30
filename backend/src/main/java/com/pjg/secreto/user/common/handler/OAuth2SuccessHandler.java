@@ -33,7 +33,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final String redirectUrl = SecurityUtilConfig.RESPONSE_REDIRECT_URL;
     private final JwtService jwtService;
     private final RefreshTokenCommandRepository refreshTokenCommandRepository;
-    private final RefreshTokenQueryRepository refreshTokenQueryRepository;
 
 
     @Override
@@ -51,11 +50,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String message = "ok";
         // 원래 요청 주소 가져오기
 
-        System.out.println(redirectUrl);
-        System.out.println(providerUser.getId());
+        String accessToken = jwtService.generateAccessToken(providerUser);
+        String refreshToken = jwtService.generateRefreshToken(providerUser);
+
+        refreshTokenCommandRepository.save(new RefreshToken(userEmail, refreshToken));
+
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl)
-                .queryParam("accessToken", jwtService.generateAccessToken(providerUser))
-                .queryParam("refreshToken", jwtService.generateRefreshToken(providerUser))
+                .queryParam("accessToken", accessToken)
+                .queryParam("refreshToken", refreshToken)
                 .queryParam("message", message)
                 .build()
                 .encode(StandardCharsets.UTF_8)
