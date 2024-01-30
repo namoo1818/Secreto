@@ -49,6 +49,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl)
                 .queryParam("accessToken", jwtService.generateAccessToken(providerUser))
                 .queryParam("refreshToken", jwtService.generateRefreshToken(providerUser))
+                .queryParam("message", message)
                 .build()
                 .encode(StandardCharsets.UTF_8)
                 .toUriString();

@@ -25,6 +25,7 @@ public class OAuth2FailHandler extends SimpleUrlAuthenticationFailureHandler {
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl)
                 .queryParam("email", accessToken)
                 .queryParam("name", refreshToken)
+                .queryParam("message", message)
                 .build()
                 .encode(StandardCharsets.UTF_8)
                 .toUriString();
