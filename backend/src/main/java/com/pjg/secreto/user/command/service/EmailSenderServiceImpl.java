@@ -2,6 +2,7 @@ package com.pjg.secreto.user.command.service;
 
 import com.pjg.secreto.history.command.dto.EMailRequestDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailSenderServiceImpl implements EmailSenderService {
     private final MailProperties properties;
     private final JavaMailSender javaMailSender;
@@ -22,6 +24,8 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         message.setText(dto.getContents());
 
         javaMailSender.send(message);
+        log.info("");
+
 
     }
 }

@@ -1,5 +1,6 @@
 package com.pjg.secreto.user.common.dto;
 
+import com.pjg.secreto.user.common.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,9 +20,7 @@ public class GoogleOidcProviderUser extends AbstractOAuth2Provider {
     private OAuth2User oAuth2User;
     private ClientRegistration clientRegistration;
 
-    public GoogleOidcProviderUser (Map<String, Object> attributes,
-                                  OAuth2User oAuth2User,
-                                  ClientRegistration clientRegistration) {
+    public GoogleOidcProviderUser (Map<String, Object> attributes, OAuth2User oAuth2User, ClientRegistration clientRegistration) {
         super(attributes, oAuth2User, clientRegistration);
         this.attributes = attributes;
         this.oAuth2User = oAuth2User;
@@ -30,7 +29,7 @@ public class GoogleOidcProviderUser extends AbstractOAuth2Provider {
 
     @Override
     public String getId() {
-        return (String) attributes.get("email");
+        return super.getId();
     }
 
     @Override
