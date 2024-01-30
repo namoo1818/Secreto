@@ -1,87 +1,268 @@
 package com.pjg.secreto.room.command.service;
 
+import com.pjg.secreto.mission.command.repository.MissionScheduleCommandRepository;
+import com.pjg.secreto.mission.command.repository.RoomMissionCommandRepository;
+import com.pjg.secreto.mission.common.entity.MissionSchedule;
+import com.pjg.secreto.mission.common.entity.RoomMission;
 import com.pjg.secreto.room.command.dto.*;
 import com.pjg.secreto.room.command.repository.RoomCommandRepository;
 import com.pjg.secreto.room.command.repository.RoomUserCommandRepository;
 import com.pjg.secreto.room.common.entity.Room;
 import com.pjg.secreto.room.common.entity.RoomUser;
+import com.pjg.secreto.room.common.exception.RoomException;
+import com.pjg.secreto.room.query.dto.SearchEntryCodesDto;
+import com.pjg.secreto.room.query.repository.RoomQueryRepository;
+import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
+import com.pjg.secreto.user.common.entity.User;
+import com.pjg.secreto.user.common.exception.UserException;
+import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
+import static java.util.stream.Collectors.toList;
+
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 @Service
 public class RoomCommandServiceImpl implements RoomCommandService {
 
+    private final RoomQueryRepository roomQueryRepository;
     private final RoomCommandRepository roomCommandRepository;
     private final RoomUserCommandRepository roomUserCommandRepository;
+    private final MissionScheduleCommandRepository missionScheduleCommandRepository;
+    private final UserQueryRepository userQueryRepository;
+    private final RoomMissionCommandRepository roomMissionCommandRepository;
+    private final RoomUserQueryRepository roomUserQueryRepository;
 
 
     // 방 생성 api (user 개발 완료 시 개발 예정)
     @Override
     public CreateRoomResponseDto createRoom(CreateRoomRequestDto createRoomRequestDto) {
 
-        // 방 생성 유저 id 꺼내기
-        Long userNo = 1L;
+        try {
 
-        // 입장 코드 생성
-        String entryCode = generateRandomCode();
+            // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
+            Long userNo = 1L;
 
-        // 방 생성
-        Room room = Room.builder().roomName(createRoomRequestDto.getRoomName())
-                .hostNo(userNo).entryCode(entryCode).build();
+            List<Room> rooms = roomQueryRepository.findAll();
 
-        roomCommandRepository.save(room);
+            List<SearchEntryCodesDto> codeDto = rooms.stream().map(r -> new SearchEntryCodesDto(r.getEntryCode())).toList();
 
-        // 방 별 유저 생성
+            List<String> existCodes = new ArrayList<>();
 
-//        RoomUser roomUser = RoomUser.builder().user()
+            for (SearchEntryCodesDto ec : codeDto) {
+                existCodes.add(ec.getEntryCodes());
+            }
+
+            // 모든 방의 입장 코드 조회 후 같은 코드가 있으면 다시 돌림
+            boolean isExist = false;
+            String newToken;
+            do {
+                // 입장 코드 생성
+                newToken = generateRandomCode();
+                for (String code : existCodes) {
+                    if (newToken.equals(code)) {
+                        log.info("중복된 코드");
+                        isExist = true;
+                        break;
+                    }
+                }
+
+            } while (isExist);
+            log.info("생성된 입장 코드 : " + newToken);
 
 
-        // 방 별 유저에 방 생성자 추가
+            // 방 생성
+            Room room = Room.builder().roomName(createRoomRequestDto.getRoomName())
+                    .entryCode(newToken).build();
+            roomCommandRepository.save(room);
 
+            log.info("방 식별키 : " + room.getId());
 
+            // 방 별 유저에 방장 추가
+            User user = userQueryRepository.findById(userNo).orElseThrow(() -> new UserException("해당 유저가 없습니다."));
 
+            log.info("룸 유저 생성");
+            RoomUser roomUser = RoomUser.builder().user(user).room(room).userEntryAt(LocalDateTime.now())
+                    .userLeaveAt(null).standByYn(false).nickname(createRoomRequestDto.getHostNickname())
+                    .bookmarkYn(false).build();
+            roomUserCommandRepository.save(roomUser);
 
-        return null;
+            log.info("룸 유저 식별키 : " + roomUser.getId());
+            // room에 방장 id 추가
+            room.changeHost(roomUser.getId());
+
+            // 방 입장 코드 반환
+            CreateRoomResponseDto result = CreateRoomResponseDto.builder().entryCode(newToken).build();
+
+            return result;
+        } catch (Exception e) {
+            throw new RoomException(e.getMessage());
+        }
     }
 
     @Override
     public void changeRoomName(ChangeRoomNameRequestDto changeRoomNameRequestDto) {
 
+        try {
+            Room room = roomQueryRepository.findById(changeRoomNameRequestDto.getRoomNo()).orElseThrow(() -> new UserException("해당 유저가 없습니다."));
 
-
-    }
-
-    @Override
-    public SetRoomResponseDto setRoom(Long roomNo) {
-
-        SetRoomResponseDto result = new SetRoomResponseDto();
-        result.setRoomNo(roomNo);
-
-        return result;
-    }
-
-    @Override
-    public void enterRoom(EnterRoomRequestDto enterRoomRequestDto) {
+            room.changeName(changeRoomNameRequestDto.getRoomName());
+        } catch (Exception e) {
+            throw new RoomException(e.getMessage());
+        }
 
     }
 
     @Override
-    public void setNickname(SetNicknameRequestDto setNicknameRequestDto) {
+    public SetRoomResponseDto setRoom(SetRoomRequestDto setRoomRequestDto) {
+
+        try {
+            Room room = roomQueryRepository.findById(setRoomRequestDto.getRoomNo()).orElseThrow(() -> new RoomException("해당 방이 없습니다."));
+
+            // 현재 날짜
+            LocalDate today = LocalDateTime.now().toLocalDate();
+            LocalTime t = LocalDateTime.now().toLocalTime();
+
+            log.info("현재 날짜 : " + today);
+
+            // 미션 일정 생성 (미션 시작일과 방 끝나는 날짜를 기준으로 주기마다 날짜 생성해야 함)
+            int period = setRoomRequestDto.getPeriod();
+            LocalDate missionStartDate = setRoomRequestDto.getMissionStartAt();
+            LocalDateTime roomEndDate = setRoomRequestDto.getRoomEndAt();
+
+
+
+//            MissionSchedule missionSchedule = MissionSchedule.builder().room(room).missionSubmitAt("dd").build();
+//            missionScheduleCommandRepository.save()
+
+            // 방 미션에 미션 추가
+            List<MissionDto> missionList = setRoomRequestDto.getMissionList();
+
+            for(MissionDto mission : missionList) {
+                RoomMission roomMission = RoomMission.builder().room(room).content(mission.getContent()).build();
+                roomMissionCommandRepository.save(roomMission);
+            }
+
+            // 매칭 정보 추가
+
+
+            // 방 정보 수정
+            room.startRoom(LocalDateTime.now(), setRoomRequestDto.getRoomEndAt(),
+                    setRoomRequestDto.getHostParticipantYn(), setRoomRequestDto.getCommonYn(),
+                    setRoomRequestDto.getMissionSubmitTime(), setRoomRequestDto.getMissionStartAt(), true);
+
+            SetRoomResponseDto result = SetRoomResponseDto.builder().roomNo(setRoomRequestDto.getRoomNo()).build();
+            return result;
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        return null;
 
     }
+
+    @Override
+    public Long enterRoom(EnterRoomRequestDto enterRoomRequestDto) {
+
+        try {
+
+            // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
+            Long userNo = 2L;
+
+            // 사용할 닉네임 입력
+            Room findRoom = roomQueryRepository.findByEntryCode(enterRoomRequestDto.getEntryCode());
+            User findUser = userQueryRepository.findById(userNo).orElseThrow(() -> new UserException("유저가 존재하지 않습니다."));
+
+            RoomUser roomUser = RoomUser.builder()
+                    .nickname(enterRoomRequestDto.getNickname())
+                    .room(findRoom)
+                    .user(findUser)
+                    .userEntryAt(null)
+                    .userLeaveAt(null)
+                    .standByYn(true)
+                    .bookmarkYn(false)
+                    .build();
+
+            roomUserCommandRepository.save(roomUser);
+
+            return findRoom.getId();
+
+        } catch (Exception e) {
+            throw new RoomException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void exitRoom(ExitRoomRequestDto exitRoomRequestDto) {
+
+        try {
+
+            // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
+            Long userNo = 1L;
+
+            // 방 유저 조회
+            Room findRoom = roomQueryRepository.findById(exitRoomRequestDto.getRoomNo())
+                    .orElseThrow(() -> new RoomException("해당 방이 존재하지 않습니다."));
+            User findUser = userQueryRepository.findById(userNo)
+                    .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
+            RoomUser roomUser = roomUserQueryRepository.findRoomUserByRoomAndUser(findRoom, findUser);
+            log.info("방 유저 식별키 : " + roomUser);
+
+            // 방 유저 정보 변경
+            roomUser.leave();
+
+        } catch (Exception e) {
+            throw new RoomException(e.getMessage());
+        }
+    }
+
+//    @Override
+//    public void setNickname(SetNicknameRequestDto setNicknameRequestDto) {
+//
+//    }
 
     @Override
     public void acceptUser(AcceptUserRequestDto acceptUserRequestDto) {
 
+        try {
+
+            RoomUser findRoomUser = roomUserQueryRepository.findById(acceptUserRequestDto.getRoomUserNo())
+                    .orElseThrow(() -> new RoomException("해당 룸 유저가 존재하지 않습니다."));
+
+            // 방 유저 정보 변경
+            findRoomUser.accepted();
+        } catch (Exception e) {
+
+            throw new RoomException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void denyUser(DenyUserRequestDto denyUserRequestDto) {
+
+        try {
+            roomUserCommandRepository.deleteAllByIds(denyUserRequestDto.getRoomUserNos());
+
+        } catch (Exception e) {
+            throw new RoomException(e.getMessage());
+        }
     }
 
     @Override
     public void deligateAdmin(DeligateAdminRequestDto deligateAdminRequestDto) {
+
 
     }
 
@@ -95,6 +276,10 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
     }
 
+
+    /**
+     * 방 입장 코드 생성 메서드
+     */
     public String generateRandomCode() {
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
@@ -108,4 +293,5 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         return generatedCode;
     }
+
 }

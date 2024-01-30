@@ -2,6 +2,7 @@ package com.pjg.secreto.room.query.controller;
 
 import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.room.command.dto.AcceptUserRequestDto;
+import com.pjg.secreto.room.query.dto.CheckCodeDto;
 import com.pjg.secreto.room.query.dto.SearchRoomListResponseDto;
 import com.pjg.secreto.room.query.dto.SearchRoomResponseDto;
 import com.pjg.secreto.room.query.dto.SearchRoomUserListResponseDto;
@@ -23,6 +24,18 @@ import java.util.List;
 public class RoomQueryController {
 
     private final RoomQueryService roomQueryService;
+
+    // 완성
+    @GetMapping("/enter")
+    public ResponseEntity<?> enterRoom(@RequestBody CheckCodeDto checkCodeDto) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        boolean result = roomQueryService.enterRoom(checkCodeDto);
+
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "방을 조회했습니다.", result));
+    }
 
     // 방에 속한 모든 유저 조회
     @GetMapping("/user/{roomNo}")
