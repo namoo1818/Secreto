@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,9 +66,9 @@ public class RoomUser {
     @OneToMany(mappedBy = "roomUser", fetch = FetchType.LAZY)
     private List<BoardEntryLog> boardEntryLogs = new ArrayList<>();
 
-    private String userEntryAt;
+    private LocalDateTime userEntryAt;
 
-    private String userLeaveAt;
+    private LocalDateTime userLeaveAt;
 
     private Boolean standbyYn;
 
@@ -76,7 +77,7 @@ public class RoomUser {
     private Boolean bookmarkYn;
 
     @Builder
-    public RoomUser(User user, Room room, String userEntryAt, String userLeaveAt, Boolean standByYn, String nickname, Boolean bookmarkYn) {
+    public RoomUser(User user, Room room, LocalDateTime userEntryAt, LocalDateTime userLeaveAt, Boolean standByYn, String nickname, Boolean bookmarkYn) {
         this.user = user;
         this.room = room;
         this.userEntryAt = userEntryAt;
@@ -84,6 +85,18 @@ public class RoomUser {
         this.standbyYn = standByYn;
         this.nickname = nickname;
         this.bookmarkYn = bookmarkYn;
+    }
+
+    // 유저가 방을 나갈 때
+    public void leave() {
+        this.userLeaveAt = LocalDateTime.now();
+        this.bookmarkYn = false;
+    }
+
+    // 유저가 방 참여를 수락받았을 때
+    public void accepted() {
+        this.userEntryAt = LocalDateTime.now();
+        this.standbyYn = false;
     }
 
 }

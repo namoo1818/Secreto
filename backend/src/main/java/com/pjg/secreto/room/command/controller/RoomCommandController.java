@@ -43,12 +43,13 @@ public class RoomCommandController {
     }
 
     @PutMapping("/{roomNo}")
-    public ResponseEntity<?> setRoom(@PathVariable Long roomNo) {
+    public ResponseEntity<?> setRoom(@RequestBody SetRoomRequestDto setRoomRequestDto, @PathVariable Long roomNo) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-        SetRoomResponseDto result = roomCommandService.setRoom(roomNo);
+        setRoomRequestDto.setRoomNo(roomNo);
+        SetRoomResponseDto result = roomCommandService.setRoom(setRoomRequestDto);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "방을 시작하였습니다.", result));
     }
@@ -59,21 +60,32 @@ public class RoomCommandController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-        roomCommandService.enterRoom(enterRoomRequestDto);
+        Long result = roomCommandService.enterRoom(enterRoomRequestDto);
 
-        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "방에 입장하였습니다.", null));
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "방에 입장하였습니다.", result));
     }
 
-    @PutMapping("/set_nickname")
-    public ResponseEntity<?> setNickname(@RequestBody SetNicknameRequestDto setNicknameRequestDto) {
+    @PutMapping("/exit")
+    public ResponseEntity<?> exitRoom(@RequestBody ExitRoomRequestDto exitRoomRequestDto) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-        roomCommandService.setNickname(setNicknameRequestDto);
+        roomCommandService.exitRoom(exitRoomRequestDto);
 
-        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "닉네임을 설정하였습니다.", null));
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "방에서 나갔습니다.", null));
     }
+
+//    @PutMapping("/set_nickname")
+//    public ResponseEntity<?> setNickname(@RequestBody SetNicknameRequestDto setNicknameRequestDto) {
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+//
+//        roomCommandService.setNickname(setNicknameRequestDto);
+//
+//        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "닉네임을 설정하였습니다.", null));
+//    }
 
     @PutMapping("/accept")
     public ResponseEntity<?> acceptUser(@RequestBody AcceptUserRequestDto acceptUserRequestDto) {
@@ -84,6 +96,17 @@ public class RoomCommandController {
         roomCommandService.acceptUser(acceptUserRequestDto);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "유저를 수락하였습니다.", null));
+    }
+
+    @DeleteMapping("/deny")
+    public ResponseEntity<?> denyUser(@RequestBody DenyUserRequestDto denyUserRequestDto) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        roomCommandService.denyUser(denyUserRequestDto);
+
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "유저를 거절하였습니다.", null));
     }
 
     @PutMapping("/deligate")

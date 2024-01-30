@@ -1,23 +1,16 @@
-package com.pjg.secreto.room.query.dto;
+package com.pjg.secreto.room.command.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
-@Builder
 @Data
-public class SearchRoomResponseDto {
+public class SetRoomRequestDto {
 
     private Long roomNo;
-
-    private String roomName;
-
-    private String entryCode;
-
-    private LocalDateTime roomStartAt;
 
     private LocalDateTime roomEndAt;
 
@@ -29,6 +22,8 @@ public class SearchRoomResponseDto {
 
     private LocalDate missionStartAt;
 
-    private Boolean roomStartYn;
+    private Integer period;
+
+    private List<MissionDto> missionList;
 
 }

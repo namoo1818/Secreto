@@ -3,6 +3,7 @@ package com.pjg.secreto.mission.common.entity;
 import com.pjg.secreto.room.common.entity.Room;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,4 +24,10 @@ public class MissionSchedule {
 
     private String missionSubmitAt;
 
+    @Builder
+    public MissionSchedule (Room room, String missionSubmitAt) {
+
+        this.room = room;
+        this.missionSubmitAt = missionSubmitAt;
+    }
 }
