@@ -10,6 +10,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,25 +47,26 @@ public class Room {
 
     private String entryCode;
 
-    private String roomStartAt;
+    private LocalDateTime roomStartAt;
 
-    private String roomEndAt;
+    private LocalDateTime roomEndAt;
 
     private Boolean hostParticipantYn;
 
     private Boolean commonYn;
 
-    private String missionSubmitTime;
+    private LocalTime missionSubmitTime;
 
-    private String missionStartAt;
+    private LocalDate missionStartAt;
 
     private Boolean roomStartYn;
 
     private Long hostNo;
 
     @Builder
-    public Room(String roomName, String entryCode, String roomStartAt, String roomEndAt, Boolean hostParticipantYn,
-                Boolean commonYn, String missionSubmitTime, String missionStartAt, Boolean roomStartYn, Long hostNo) {
+    public Room(String roomName, String entryCode, LocalDateTime roomStartAt, LocalDateTime roomEndAt,
+                Boolean hostParticipantYn, Boolean commonYn, LocalTime missionSubmitTime,
+                LocalDate missionStartAt, Boolean roomStartYn, Long hostNo) {
 
         this.roomName = roomName;
         this.entryCode = entryCode;
@@ -74,6 +78,27 @@ public class Room {
         this.missionStartAt = missionStartAt;
         this.roomStartYn = roomStartYn;
         this.hostNo = hostNo;
+    }
+
+    public void changeName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    public void changeHost(Long hostNo) {
+        this.hostNo = hostNo;
+    }
+
+    public void startRoom(LocalDateTime roomStartAt, LocalDateTime roomEndAt, Boolean hostParticipantYn,
+                          Boolean commonYn, LocalTime missionSubmitTime, LocalDate missionStartAt,
+                          Boolean roomStartYn) {
+
+        this.roomStartAt = roomStartAt;
+        this.roomEndAt = roomEndAt;
+        this.hostParticipantYn = hostParticipantYn;
+        this.commonYn = commonYn;
+        this.missionSubmitTime = missionSubmitTime;
+        this.missionStartAt = missionStartAt;
+        this.roomStartYn = roomStartYn;
     }
 
 }

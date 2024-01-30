@@ -17,5 +17,5 @@ public interface ProviderUser {
     Map<String, Object> getAttributes();
     OAuth2User getOAuth2User();
 
-    Long getSub();
+    String getSub();
 }

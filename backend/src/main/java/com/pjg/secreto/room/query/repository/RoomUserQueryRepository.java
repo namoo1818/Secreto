@@ -1,10 +1,16 @@
 package com.pjg.secreto.room.query.repository;
 
+import com.pjg.secreto.room.common.entity.Room;
 import com.pjg.secreto.room.common.entity.RoomUser;
+import com.pjg.secreto.user.common.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.Optional;
+import java.util.List;
 
-public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>  {
-    Optional<RoomUser> findById(Long id);
+public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, RoomUserQueryRepositoryCustom{
+
+    RoomUser findRoomUserByRoomAndUser(Room room, User user);
+
+    List<RoomUser> findRoomUserByRoom(Room findRoom);
 }

@@ -3,6 +3,8 @@ package com.pjg.secreto.room.query.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Data
 public class SearchRoomUserListResponseDto {
@@ -13,13 +15,11 @@ public class SearchRoomUserListResponseDto {
 
     private Long roomNo;
 
-    private String userRole;
+    private LocalDateTime userEntryAt;
 
-    private String userEntryAt;
+    private LocalDateTime userLeaveAt;
 
-    private String userLeaveAt;
-
-    private boolean standbyYn;
+    private Boolean standbyYn;
 
     private Long usersManito;
 

@@ -3,6 +3,7 @@ package com.pjg.secreto.mission.common.entity;
 import com.pjg.secreto.room.common.entity.Room;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,5 +25,10 @@ public class RoomMission {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Builder
+    public RoomMission(Room room, String content) {
+        this.room = room;
+        this.content = content;
+    }
 
 }

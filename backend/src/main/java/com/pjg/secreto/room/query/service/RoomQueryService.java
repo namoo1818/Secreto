@@ -1,5 +1,6 @@
 package com.pjg.secreto.room.query.service;
 
+import com.pjg.secreto.room.query.dto.CheckCodeDto;
 import com.pjg.secreto.room.query.dto.SearchRoomListResponseDto;
 import com.pjg.secreto.room.query.dto.SearchRoomResponseDto;
 import com.pjg.secreto.room.query.dto.SearchRoomUserListResponseDto;
@@ -13,4 +14,6 @@ public interface RoomQueryService {
     List<SearchRoomListResponseDto> searchRoomList();
 
     SearchRoomResponseDto searchRoom(Long roomNo);
+
+    boolean enterRoom(CheckCodeDto checkCodeDto);
 }
