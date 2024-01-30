@@ -1,7 +1,8 @@
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/manitodb
+#    url: jdbc:mysql://localhost:3306/manitodb
+    url: jdbc:mysql://i10a805.p.ssafy.io:3306/manitodb
     username: manito
     password: manito
     driver-class-name: com.mysql.cj.jdbc.Driver

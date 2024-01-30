@@ -3,11 +3,14 @@ package com.pjg.secreto.room.command.controller;
 import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.room.command.dto.*;
 import com.pjg.secreto.room.command.service.RoomCommandService;
+import com.pjg.secreto.user.common.dto.PrincipalUser;
+import com.pjg.secreto.user.common.dto.ProviderUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;

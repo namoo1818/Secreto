@@ -1,9 +1,14 @@
 package com.pjg.secreto.room.query.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-@Builder
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+@AllArgsConstructor
 @Data
 public class SearchRoomListResponseDto {
 
@@ -13,19 +18,21 @@ public class SearchRoomListResponseDto {
 
     private String entryCode;
 
-    private String roomStartAt;
+    private LocalDateTime roomStartAt;
 
-    private String roomEndAt;
+    private LocalDateTime roomEndAt;
 
-    private boolean hostParticipantYn;
+    private Boolean hostParticipantYn;
 
-    private boolean commonYn;
+    private Boolean commonYn;
 
-    private String missionSubmitTime;
+    private LocalTime missionSubmitTime;
 
-    private String missionStartAt;
+    private LocalDate missionStartAt;
 
-    private boolean roomStartYn;
+    private Boolean roomStartYn;
 
-    private boolean standbyYn;
+    private Boolean standbyYn;
+
+
 }
