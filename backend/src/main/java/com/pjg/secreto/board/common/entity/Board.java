@@ -3,6 +3,7 @@ package com.pjg.secreto.board.common.entity;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -51,4 +52,26 @@ public class Board {
     private Long likedCount;
 
     private String writer;
+
+    public Board(String title,
+                 String content,
+                 String registerAt,
+                 Long hit,
+                 BoardCategory boardCategory,
+                 Boolean publicYn,
+                 String missionCategory,
+                 Long likedCount,
+                 String writer,
+                 RoomUser roomUser) {
+        this.title = title;
+        this.content = content;
+        this.registerAt = registerAt;
+        this.hit = hit;
+        this.boardCategory = boardCategory;
+        this.publicYn = publicYn;
+        this.missionCategory = missionCategory;
+        this.likedCount = likedCount;
+        this.writer = writer;
+        this.roomUser = roomUser;
+    }
 }

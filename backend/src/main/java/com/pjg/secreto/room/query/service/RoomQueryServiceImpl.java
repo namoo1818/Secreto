@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,77 +47,77 @@ public class RoomQueryServiceImpl implements RoomQueryService{
     @Override
     public List<SearchRoomUserListResponseDto> searchRoomUserList(Long roomNo) {
 
-        try {
+//        try {
+//
+//            Room findRoom = roomQueryRepository.findById(roomNo)
+//                    .orElseThrow(() -> new RoomException("해당 방이 없습니다."));
+//
+//            List<SearchRoomUserListResponseDto> result = roomUserQueryRepository.findAllWithMatching();
+//
+//            for(SearchRoomUserListResponseDto rr : result) {
+//                System.out.println("result = " + rr);
+//            }
+//
+////            List<RoomUser> roomUsers = roomUserQueryRepository.findRoomUserByRoom(findRoom);
+////
+////            List<SearchRoomUserListResponseDto> roomUsers = roomUsers.stream()
+////                    .map(ru -> new SearchRoomUserListResponseDto(ru.getRoomUserNO(),
+////                            ru.getUserNo(),
+////                            ru.getRoomNo(),
+////                            ru.getUserRole(),
+////                            ru.getUserEntryAt(),
+////                            ru.getUserLeaveAt(),
+////                            ru.getStandbyYn(),
+////                            ru.getNickname()))
+////                    .toList();
+//
+//
+//            return null;
+//        } catch (Exception e) {
+//
+//            throw new RoomException(e.getMessage());
+//        }
 
-            Room findRoom = roomQueryRepository.findById(roomNo)
-                    .orElseThrow(() -> new RoomException("해당 방이 없습니다."));
+        List<SearchRoomUserListResponseDto> resultList = new ArrayList<>();
 
-            List<SearchRoomUserListResponseDto> result = roomUserQueryRepository.findAllWithMatching();
+        SearchRoomUserListResponseDto result1 = SearchRoomUserListResponseDto.builder()
+                .roomUserNO(1L).userNo(4L).roomNo(2L)
+                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
+                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("상하악").build();
 
-            for(SearchRoomUserListResponseDto rr : result) {
-                System.out.println("result = " + rr);
-            }
+        SearchRoomUserListResponseDto result2 = SearchRoomUserListResponseDto.builder()
+                .roomUserNO(1L).userNo(4L).roomNo(2L)
+                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
+                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("현차앙").build();
 
-//            List<RoomUser> roomUsers = roomUserQueryRepository.findRoomUserByRoom(findRoom);
-//
-//            List<SearchRoomUserListResponseDto> roomUsers = roomUsers.stream()
-//                    .map(ru -> new SearchRoomUserListResponseDto(ru.getRoomUserNO(),
-//                            ru.getUserNo(),
-//                            ru.getRoomNo(),
-//                            ru.getUserRole(),
-//                            ru.getUserEntryAt(),
-//                            ru.getUserLeaveAt(),
-//                            ru.getStandbyYn(),
-//                            ru.getNickname()))
-//                    .toList();
+        SearchRoomUserListResponseDto result3 = SearchRoomUserListResponseDto.builder()
+                .roomUserNO(1L).userNo(4L).roomNo(2L)
+                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
+                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("승우우").build();
 
+        SearchRoomUserListResponseDto result4 = SearchRoomUserListResponseDto.builder()
+                .roomUserNO(1L).userNo(4L).roomNo(2L)
+                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
+                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("인서엉").build();
 
-            return null;
-        } catch (Exception e) {
+        SearchRoomUserListResponseDto result5 = SearchRoomUserListResponseDto.builder()
+                .roomUserNO(1L).userNo(4L).roomNo(2L)
+                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
+                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("시워언").build();
 
-            throw new RoomException(e.getMessage());
-        }
+        SearchRoomUserListResponseDto result6 = SearchRoomUserListResponseDto.builder()
+                .roomUserNO(1L).userNo(4L).roomNo(2L)
+                .userEntryAt(LocalDateTime.now()).userLeaveAt(LocalDateTime.now())
+                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("민지이").build();
 
-//        List<SearchRoomUserListResponseDto> resultList = new ArrayList<>();
-//
-//        SearchRoomUserListResponseDto result1 = SearchRoomUserListResponseDto.builder()
-//                .roomUserNO(1L).userNo(4L).roomNo(2L)
-//                .userEntryAt("2024/01/15 00:00:00").userLeaveAt("2024/01/18 00:00:00")
-//                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("상하악").build();
-//
-//        SearchRoomUserListResponseDto result2 = SearchRoomUserListResponseDto.builder()
-//                .roomUserNO(1L).userNo(4L).roomNo(2L)
-//                .userEntryAt("2024/01/15 00:00:00").userLeaveAt("2024/01/18 00:00:00")
-//                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("현차앙").build();
-//
-//        SearchRoomUserListResponseDto result3 = SearchRoomUserListResponseDto.builder()
-//                .roomUserNO(1L).userNo(4L).roomNo(2L)
-//                .userEntryAt("2024/01/15 00:00:00").userLeaveAt("2024/01/18 00:00:00")
-//                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("승우우").build();
-//
-//        SearchRoomUserListResponseDto result4 = SearchRoomUserListResponseDto.builder()
-//                .roomUserNO(1L).userNo(4L).roomNo(2L)
-//                .userEntryAt("2024/01/15 00:00:00").userLeaveAt("2024/01/18 00:00:00")
-//                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("인서엉").build();
-//
-//        SearchRoomUserListResponseDto result5 = SearchRoomUserListResponseDto.builder()
-//                .roomUserNO(1L).userNo(4L).roomNo(2L)
-//                .userEntryAt("2024/01/15 00:00:00").userLeaveAt("2024/01/18 00:00:00")
-//                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("시워언").build();
-//
-//        SearchRoomUserListResponseDto result6 = SearchRoomUserListResponseDto.builder()
-//                .roomUserNO(1L).userNo(4L).roomNo(2L)
-//                .userEntryAt("2024/01/15 00:00:00").userLeaveAt("2024/01/18 00:00:00")
-//                .standbyYn(false).usersManito(2L).usersManiti(3L).nickname("민지이").build();
-//
-//        resultList.add(result1);
-//        resultList.add(result2);
-//        resultList.add(result3);
-//        resultList.add(result4);
-//        resultList.add(result5);
-//        resultList.add(result6);
-//
-//        return resultList;
+        resultList.add(result1);
+        resultList.add(result2);
+        resultList.add(result3);
+        resultList.add(result4);
+        resultList.add(result5);
+        resultList.add(result6);
+
+        return resultList;
 
 
     }

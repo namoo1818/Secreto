@@ -3,53 +3,49 @@ package com.pjg.secreto.user.query.controller;
 import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.user.common.dto.UserInfo;
 import com.pjg.secreto.user.query.dto.*;
+import com.pjg.secreto.user.query.service.UserQueryService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
+@Slf4j
 public class UserQueryController {
+    private final UserQueryService queryService;
 
     @PostMapping("/users/log-in")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto dto){
-        Map<String, Object> result = new HashMap<>();
-        result.put("accessToken", "iasdoifsajndfoidsa");
-        result.put("accessToken", "aposdfjasdpofmjasdf");
-        result.put("tokenType", "bearer");
-        result.put("userInfo", new UserInfo(
-                "",
-                "jdragonkee@naver.com",
-                "이재용",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNdo1B7toUex0AGHmARKlTxFoUzlwRE9nz_6EnunVwnA&s"
-        ));
-
-
+        LoginResponseDto result = queryService.login(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "로그인에 성공하였습니다.", result);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info(authentication.toString());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/users/log-out")
-    public ResponseEntity<?> logout(@RequestHeader String Type,
-                                    @RequestHeader String AccessToken,
-                                    @RequestBody LogOutRequestDto dto){
+    public ResponseEntity<?> logout(@RequestBody LogOutRequestDto dto){
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "로그아웃 하셨습니다.");
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> detail(@RequestHeader String Type,
-                                    @RequestHeader String AccessToken,
-                                    @PathVariable String userId){
+    public ResponseEntity<?> detail(@PathVariable String userId){
 
         Map<String, Object> result = new HashMap<>();
         result.put("userInfo", new UserInfo(
                 "",
-                "jdragonkee@naver.com",
-                "이재용",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNdo1B7toUex0AGHmARKlTxFoUzlwRE9nz_6EnunVwnA&s"
+                "hm_son7@naver.com",
+                "손흥민",
+                "https://i.namu.wiki/i/_BVQ0GmKg_SW5_wWhgZPO1v_A6w7kGGPBww_5HaSQJcxl-QMHqzgqd1143pU8jsvEvD-G03lBPf24ZekZ875NPFyLaeQx6RxPGb-S0GFwkhHS1psHxaK_BkThCl40V-MEY-g2dZp8rHaTCrzA_CD5w.webp"
         ));
 
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 반환하였습니다.", result);
@@ -57,8 +53,7 @@ public class UserQueryController {
     }
 
     @GetMapping("/users/password/{certCode}")
-    public ResponseEntity<?> allowChangePassword(@PathVariable String certCode,
-                                                 @RequestBody AllowChangePaswordRequestDto dto){
+    public ResponseEntity<?> allowChangePassword(@PathVariable String certCode){
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호를 변경하는 페이지로 이동합니다.");
         return ResponseEntity.ok(response);
     }
