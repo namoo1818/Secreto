@@ -1,8 +1,8 @@
 package com.pjg.secreto.user.common.entity;
 
-import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
@@ -17,12 +17,12 @@ public class RefreshToken {
     private Long timeToLive;
 
     @Id
-    private Long id;
-
-    @Indexed
     private String email;
-
 
     private String refreshToken;
 
+    public RefreshToken(String email, String refreshToken) {
+        this.email = email;
+        this.refreshToken = refreshToken;
+    }
 }

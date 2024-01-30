@@ -3,6 +3,7 @@ package com.pjg.secreto.board.common.entity;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,5 +26,9 @@ public class Liked {
     @JoinColumn(name = "room_user_no")
     private RoomUser roomUser;
 
-
+    @Builder
+    public Liked(Board board, RoomUser roomUser){
+        this.board = board;
+        this.roomUser = roomUser;
+    }
 }

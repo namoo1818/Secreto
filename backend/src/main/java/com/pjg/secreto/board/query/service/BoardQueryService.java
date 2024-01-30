@@ -1,15 +1,19 @@
 package com.pjg.secreto.board.query.service;
 
-import com.pjg.secreto.board.common.entity.Board;
-import com.pjg.secreto.board.common.entity.Reply;
+import com.pjg.secreto.board.query.dto.SearchBoardRequestDto;
+import com.pjg.secreto.board.query.dto.SearchBoardResponseDto;
+import com.pjg.secreto.board.query.dto.SearchPostResponseDto;
+import com.pjg.secreto.board.query.dto.SearchReplyResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface BoardQueryService {
-    public List<Board> getBoard() throws Exception;;
+    public Page<SearchBoardResponseDto> getBoardBySpecification(SearchBoardRequestDto serachRequest, Pageable pageable);
 
-    public Board getPost() throws Exception;
+    public SearchPostResponseDto getPost(Long boardNo);
 
-    public List<Reply> getRely() throws Exception;
+    public List<SearchReplyResponseDto> getRely(Long boardNo);
 
 }

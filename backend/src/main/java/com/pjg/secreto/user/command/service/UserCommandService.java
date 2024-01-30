@@ -1,6 +1,7 @@
 package com.pjg.secreto.user.command.service;
 
 import com.pjg.secreto.user.command.dto.JoinRequestDto;
+import com.pjg.secreto.user.command.dto.RefreshTokensResponseDto;
 import com.pjg.secreto.user.common.dto.ProviderUser;
 import com.pjg.secreto.user.common.entity.User;
 import org.springframework.stereotype.Service;
@@ -11,5 +12,5 @@ public interface UserCommandService {
 
     User register(JoinRequestDto dto);
 
-    String refreshToken(String refreshToken);
+    RefreshTokensResponseDto refreshToken(String refreshToken);
 }

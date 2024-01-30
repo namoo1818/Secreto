@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -25,7 +27,7 @@ public class BoardEntryLog {
     @JoinColumn(name = "room_user_no")
     private RoomUser roomUser;
 
-    private String entryAt;
+    private LocalDateTime entryAt;
 
 }
 

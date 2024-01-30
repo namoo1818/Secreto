@@ -3,16 +3,18 @@ package com.pjg.secreto.board.common.entity;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Getter
 @Table(name = "tbl_board")
 public class Board {
 
@@ -39,10 +41,11 @@ public class Board {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private String registerAt;
+    private LocalDateTime registerAt;
 
     private Long hit;
 
+    @Convert(converter = BoardCategoryConverter.class)
     private BoardCategory boardCategory;
 
     private Boolean publicYn;
@@ -53,16 +56,9 @@ public class Board {
 
     private String writer;
 
-    public Board(String title,
-                 String content,
-                 String registerAt,
-                 Long hit,
-                 BoardCategory boardCategory,
-                 Boolean publicYn,
-                 String missionCategory,
-                 Long likedCount,
-                 String writer,
-                 RoomUser roomUser) {
+    @Builder
+    public Board(RoomUser roomUser, String title, String content, LocalDateTime registerAt, Long hit, BoardCategory boardCategory, Boolean publicYn, String missionCategory, Long likedCount, String writer) {
+        this.roomUser = roomUser;
         this.title = title;
         this.content = content;
         this.registerAt = registerAt;
@@ -72,6 +68,13 @@ public class Board {
         this.missionCategory = missionCategory;
         this.likedCount = likedCount;
         this.writer = writer;
-        this.roomUser = roomUser;
+    }
+
+    public void updateBoard(Long id, String title, String content, String boardCategory, Boolean publicYn){
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.boardCategory = BoardCategory.valueOf(boardCategory);
+        this.publicYn = publicYn;
     }
 }
