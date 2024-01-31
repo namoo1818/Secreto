@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class ChangeLegacyPasswordRequestDto {
+    private String email;
     private String old_password;
     private String new_password;
 }

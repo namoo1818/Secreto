@@ -7,10 +7,15 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface UserQueryRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long id);
     Optional<User> findByEmail(String email);
+
+    Optional<User> findByEmailAndAndNickname(String email, String nickName);
+
+    Optional<User> findByEmailAndPassword(String email, String password);
 }

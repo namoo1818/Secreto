@@ -10,6 +10,6 @@ import lombok.Data;
 public class EMailRequestDto {
     private String subject;
     private String to;
-    private String from;
+    private String from = "pjg.secreto@gmail.com";
     private String contents;
 }

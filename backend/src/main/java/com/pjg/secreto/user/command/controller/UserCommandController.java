@@ -3,15 +3,13 @@ package com.pjg.secreto.user.command.controller;
 import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.user.command.dto.*;
 import com.pjg.secreto.user.command.service.UserCommandService;
+import com.pjg.secreto.user.common.dto.EmailValidationResponseDto;
 import com.pjg.secreto.user.common.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,54 +26,51 @@ public class UserCommandController {
     }
 
     @PutMapping("/users/delete/")
-    public ResponseEntity<?> withdraw(@RequestBody WithdrawRequestDto dto){
-
+    public ResponseEntity<?> withdraw(@RequestBody WithdrawRequestDto dto, Authentication authentication){
+        userCommandService.withdraw(dto, authentication);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "지금까지 이용해주셔서 감사합니다.");
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/users/modify/")
-    public ResponseEntity<?> modify(@RequestBody ModifyRequestDto dto){
-
+    public ResponseEntity<?> modify(@RequestBody ModifyRequestDto dto, Authentication authentication){
+        userCommandService.modify(dto, authentication);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 수정되었습니다.");
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/users/password/request")
     public ResponseEntity<?> requestChangePassword(@RequestBody ChangePasswordRequestDto dto){
-
+        userCommandService.sendPasswordChangeEmail(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호 변경을 위한 페이지 링크를 이메일로 발송하였습니다.");
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/users/password/change/{userId}")
-    public ResponseEntity<?> resetPassword(@PathVariable Long userId){
-
+    @PutMapping("/users/password/reset/")
+    public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequestDto dto){
+        userCommandService.resetPassword(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호 변경에 성공하였습니다.");
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/cert/{userId}")
     public ResponseEntity<?> createCertCode(@PathVariable String userId){
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "이메일에 검증코드가 발송되었습니다. 확인 해주세요");
+        EmailValidationResponseDto result = userCommandService.sendEmailValidationMail(userId);
+        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "이메일에 검증코드가 발송되었습니다. 확인 해주세요", result);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/users/password")
     public ResponseEntity<?> changePassword(@RequestBody ChangeLegacyPasswordRequestDto dto){
-
+        userCommandService.changePassword(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호 변경에 성공하였습니다.");
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users/refreshAccess")
     public ResponseEntity<?> refreshAccessToken(@RequestHeader String RefreshToken){
-//        Map<String, Object> result =new HashMap<>();
-//        result.put("AccessToken", "123w1231232afasf");
-//        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "AcessToken이 재발급 되었습니다.", result);
-
-        RefreshTokensResponseDto response = userCommandService.refreshToken(RefreshToken);
-
+        RefreshTokensResponseDto refreshToken = userCommandService.refreshToken(RefreshToken);
+        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 토큰을 갱신 하였습니다.", refreshToken);
         return ResponseEntity.ok(response);
     }
 
