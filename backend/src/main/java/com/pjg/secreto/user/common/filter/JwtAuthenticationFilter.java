@@ -1,9 +1,11 @@
 package com.pjg.secreto.user.common.filter;
 
+import com.pjg.secreto.user.common.dto.PrincipalUser;
 import com.pjg.secreto.user.common.exception.UserException;
 import com.pjg.secreto.user.common.service.CustomUserDetailService;
 import com.pjg.secreto.user.common.service.JwtService;
 import com.pjg.secreto.user.query.service.UserQueryService;
+import io.micrometer.common.util.StringUtils;
 import io.netty.util.internal.StringUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,11 +24,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
@@ -39,47 +43,45 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailService customUserDetailService;
+    private final AccessDeniedHandler accessDeniedHandler;
 
     @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String authorization= request.getHeader("AccessToken");
+//        if(isWhiteList(request)){
+//            filterChain.doFilter(request, response);
+//        }
 
-        String authorization = request.getHeader("AccessToken");
+        log.info("1. requestURI={}",request.getRequestURI());
 
-        if (isWhiteList(request)) {
+        //Authorization 헤더 검증
+        if (StringUtils.isBlank(authorization) || !authorization.startsWith("bearer ")) {
             filterChain.doFilter(request, response);
+            return;
         }
+        log.info("2. requestURI={}",request.getRequestURI());
+
+        String token = authorization.split(" ")[1];
+        log.info("3. token={}", token);
 
 
-        if (authorization == null || !authorization.startsWith("berear ")) {
-
-            log.info("token null");
+        //토큰 소멸 시간 검증
+        if (!jwtService.validateToken(token)) {
+//            filterChain.doFilter(request, response);
+            accessDeniedHandler.handle(request, response, new AccessDeniedException(null));
             return;
         }
 
-        String accessTokenType = null;
-        String accessToken = null;
 
-        accessTokenType = request.getHeader("AccessToken").split(" ")[0];
-        accessToken = request.getHeader("AccessToken").split(" ")[1];
+        String email = jwtService.extractEmail(token);
+        log.info("4. extracted email={}", email);
+        UserDetails userDetails = customUserDetailService.loadUserByUsername(email);
+        Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        if (!jwtService.isTokenValid(accessToken)){
-            return;
-        }
-
-        String email = jwtService.extractEmail(accessToken);
-
-        if (email != null) {
-            UserDetails userDetails = customUserDetailService.loadUserByUsername(email);
-            Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            log.info(authentication.toString());
-        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        PrincipalUser p = (PrincipalUser) authentication.getPrincipal();
+        log.info("5. principalUser={}", p);
         filterChain.doFilter(request, response);
     }
 
@@ -104,11 +106,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return false;
     }
 
-    private static boolean isBearerType(String accessTokenType) {
-        return accessTokenType != null || !accessTokenType.equals("bearer");
-    }
-
-    private boolean isNotAuthenticated() {
-        return SecurityContextHolder.getContext().getAuthentication() == null;
-    }
 }

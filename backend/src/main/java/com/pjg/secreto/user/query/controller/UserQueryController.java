@@ -7,6 +7,8 @@ import com.pjg.secreto.user.common.dto.ProviderUser;
 import com.pjg.secreto.user.common.dto.UserInfo;
 import com.pjg.secreto.user.query.dto.*;
 import com.pjg.secreto.user.query.service.UserQueryService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -36,21 +39,29 @@ public class UserQueryController {
     @PostMapping("/users/log-out")
     public ResponseEntity<?> logout(@RequestBody LogOutRequestDto dto){
         queryService.logOut(dto);
+
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "로그아웃 하셨습니다.");
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        System.out.println(authentication);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<?> detail(@PathVariable String userId,  Authentication authentication){
-        Map<String, Object> result = new HashMap<>();
-        result.put("userInfo", new UserInfo(
-                "",
-                "hm_son7@naver.com",
-                "손흥민",
-                "https://i.namu.wiki/i/_BVQ0GmKg_SW5_wWhgZPO1v_A6w7kGGPBww_5HaSQJcxl-QMHqzgqd1143pU8jsvEvD-G03lBPf24ZekZ875NPFyLaeQx6RxPGb-S0GFwkhHS1psHxaK_BkThCl40V-MEY-g2dZp8rHaTCrzA_CD5w.webp"
-        ));
+//    @PostMapping("/users/log-out")
+//    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication ) {
+//
+//        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+//        logoutHandler.logout(request, response, authentication);
+//
+//        return ResponseEntity.ok(new SuccessResponse(HttpStatus.OK, "로그아웃 하셨습니다."));
+//
+//    }
 
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 반환하였습니다.", "");
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<?> detail(Authentication authentication){
+        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
+        ProviderUser providerUser = principal.providerUser();
+
+        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 반환하였습니다.", providerUser);
         return ResponseEntity.ok(response);
     }
 
