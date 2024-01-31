@@ -34,6 +34,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
+import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -44,6 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailService customUserDetailService;
     private final AccessDeniedHandler accessDeniedHandler;
+    private final String[] whiteList = {"/users/sign-up", "/users/log-in" ,"/users/refreshAccess",
+            "/cert/**", "/users/password/**","/oauth2/**"};
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -52,11 +55,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //            filterChain.doFilter(request, response);
 //        }
 
+        String requestURI = request.getRequestURI();
         log.info("1. requestURI={}",request.getRequestURI());
+        log.info("1-1. authorization={}",authorization);
+
+        if (isWhiteList(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         //Authorization 헤더 검증
         if (StringUtils.isBlank(authorization) || !authorization.startsWith("bearer ")) {
-            filterChain.doFilter(request, response);
+            accessDeniedHandler.handle(request, response, new AccessDeniedException(null));
             return;
         }
         log.info("2. requestURI={}",request.getRequestURI());
@@ -85,25 +95,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private static boolean isWhiteList(HttpServletRequest request) {
-        List<AntPathRequestMatcher> whiteList = List.of(
-                new AntPathRequestMatcher("/users/sign-up"),
-                new AntPathRequestMatcher("/users/log-in"),
-                new AntPathRequestMatcher("/users/refreshAccess"),
-                new AntPathRequestMatcher("/cert/**"),
-                new AntPathRequestMatcher("/users/password/**"),
-                new AntPathRequestMatcher("/oauth2/**")
-        );
-
-        String servletPath = request.getServletPath();
-
-        for (AntPathRequestMatcher matcher : whiteList) {
-            if (matcher.matches(request)) {
-                return true;
-            }
-        }
-
-        return false;
+    private boolean isWhiteList(String requestURI) {
+        return PatternMatchUtils.simpleMatch(whiteList, requestURI);
     }
+
+//    private static boolean isWhiteList(HttpServletRequest request) {
+//        List<AntPathRequestMatcher> whiteList = List.of(
+//                new AntPathRequestMatcher("/users/sign-up"),
+//                new AntPathRequestMatcher("/users/log-in"),
+//                new AntPathRequestMatcher("/users/refreshAccess"),
+//                new AntPathRequestMatcher("/cert/**"),
+//                new AntPathRequestMatcher("/users/password/**"),
+//                new AntPathRequestMatcher("/oauth2/**")
+//        );
+//
+//        String servletPath = request.getServletPath();
+//
+//        for (AntPathRequestMatcher matcher : whiteList) {
+//            if (matcher.matches(request)) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 
 }
