@@ -1,6 +1,9 @@
 package com.pjg.secreto.user.query.controller;
 
+import com.pjg.secreto.common.Util.AuthUtils;
 import com.pjg.secreto.common.response.SuccessResponse;
+import com.pjg.secreto.user.common.dto.PrincipalUser;
+import com.pjg.secreto.user.common.dto.ProviderUser;
 import com.pjg.secreto.user.common.dto.UserInfo;
 import com.pjg.secreto.user.query.dto.*;
 import com.pjg.secreto.user.query.service.UserQueryService;
@@ -9,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +30,9 @@ public class UserQueryController {
         LoginResponseDto result = queryService.login(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "로그인에 성공하였습니다.", result);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info(authentication.toString());
+        String id = AuthUtils.getAuthenticatedUserId();
+        log.info(id);
+//        log.info(id);
         return ResponseEntity.ok(response);
     }
 
@@ -38,7 +43,7 @@ public class UserQueryController {
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> detail(@PathVariable String userId){
+    public ResponseEntity<?> detail(@PathVariable String userId, @AuthenticationPrincipal Authentication authentication){
 
         Map<String, Object> result = new HashMap<>();
         result.put("userInfo", new UserInfo(
@@ -47,6 +52,9 @@ public class UserQueryController {
                 "손흥민",
                 "https://i.namu.wiki/i/_BVQ0GmKg_SW5_wWhgZPO1v_A6w7kGGPBww_5HaSQJcxl-QMHqzgqd1143pU8jsvEvD-G03lBPf24ZekZ875NPFyLaeQx6RxPGb-S0GFwkhHS1psHxaK_BkThCl40V-MEY-g2dZp8rHaTCrzA_CD5w.webp"
         ));
+
+        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
+        ProviderUser providerUser = principal.providerUser();
 
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 반환하였습니다.", result);
         return ResponseEntity.ok(response);

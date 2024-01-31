@@ -1,5 +1,6 @@
 package com.pjg.secreto.user.common.dto;
 
+import com.pjg.secreto.user.common.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -16,6 +17,5 @@ public interface ProviderUser {
     List<? extends GrantedAuthority> getAuthorities();
     Map<String, Object> getAttributes();
     OAuth2User getOAuth2User();
-
     String getSub();
 }

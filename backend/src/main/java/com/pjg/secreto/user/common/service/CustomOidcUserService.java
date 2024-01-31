@@ -3,9 +3,12 @@ package com.pjg.secreto.user.common.service;
 import com.pjg.secreto.user.command.service.UserCommandService;
 import com.pjg.secreto.user.common.converters.ProviderUserConverter;
 import com.pjg.secreto.user.common.converters.ProviderUserRequest;
+import com.pjg.secreto.user.common.dto.AbstractOAuth2Provider;
 import com.pjg.secreto.user.common.dto.PrincipalUser;
 import com.pjg.secreto.user.common.dto.ProviderUser;
+import com.pjg.secreto.user.common.entity.User;
 import com.pjg.secreto.user.query.repository.UserQueryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class CustomOidcUserService extends AbstractOAuth2UserService
         implements OAuth2UserService<OidcUserRequest, OidcUser> {
 
+    @Autowired
     public CustomOidcUserService(UserQueryRepository userQueryRepository, UserCommandService userCommandService, ProviderUserConverter<ProviderUserRequest, ProviderUser> providerUserConverter) {
         super(userQueryRepository, userCommandService, providerUserConverter);
     }
@@ -38,10 +42,10 @@ public class CustomOidcUserService extends AbstractOAuth2UserService
         OidcUser oidcUser = oidcUserService.loadUser(oidcUserRequest);
 
         ProviderUserRequest providerUserRequest = new ProviderUserRequest(clientRegistration,oidcUser);
-        ProviderUser providerUser = providerUser(providerUserRequest);
+        AbstractOAuth2Provider providerUser = (AbstractOAuth2Provider) providerUser(providerUserRequest);
 
-
-        super.register(providerUser, oidcUserRequest);
+        User register = super.register(providerUser, oidcUserRequest);
+        providerUser.setId(register.getId().toString());
 
         return new PrincipalUser(providerUser);
     }

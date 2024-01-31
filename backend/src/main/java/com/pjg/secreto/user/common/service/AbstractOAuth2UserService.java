@@ -20,13 +20,15 @@ public abstract class AbstractOAuth2UserService {
 
     private final ProviderUserConverter<ProviderUserRequest, ProviderUser> providerUserConverter;
 
-    public void register(ProviderUser providerUser, OAuth2UserRequest userRequest){
+    public User register(ProviderUser providerUser, OAuth2UserRequest userRequest){
         Optional<User> user = userQueryRepository.findByEmail(providerUser.getEmail());
 
         if(user.isEmpty()){
-            userCommandService.register(providerUser);
+            return userCommandService.register(providerUser);
         }
+        return user.orElseThrow();
     }
+
     public ProviderUser providerUser(ProviderUserRequest providerUserRequest){
         return providerUserConverter.convert(providerUserRequest);
     }

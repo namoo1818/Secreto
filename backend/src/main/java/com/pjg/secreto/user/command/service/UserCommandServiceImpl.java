@@ -2,9 +2,9 @@ package com.pjg.secreto.user.command.service;
 
 
 import com.pjg.secreto.user.command.dto.JoinRequestDto;
+import com.pjg.secreto.user.command.dto.RefreshTokensResponseDto;
 import com.pjg.secreto.user.command.repository.RefreshTokenCommandRepository;
 import com.pjg.secreto.user.command.repository.UserCommandRepository;
-import com.pjg.secreto.user.common.dto.PrincipalUser;
 import com.pjg.secreto.user.common.dto.ProviderUser;
 import com.pjg.secreto.user.common.entity.RefreshToken;
 import com.pjg.secreto.user.common.entity.User;
@@ -13,11 +13,7 @@ import com.pjg.secreto.user.common.service.JwtService;
 import com.pjg.secreto.user.query.repository.RefreshTokenQueryRepository;
 import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.http.SecurityHeaders;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -29,8 +25,8 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserQueryRepository userQueryRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final RefreshTokenCommandRepository refreshTokenCommandRepository;
     private final RefreshTokenQueryRepository refreshTokenQueryRepository;
+    private final RefreshTokenCommandRepository refreshTokenCommandRepository;
 
     @Override
     public User register(ProviderUser target) {
@@ -48,7 +44,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     @Override
-    public String refreshToken(String refreshToken) {
+    public RefreshTokensResponseDto refreshToken(String refreshToken) {
         // 우선 입력 받은 토큰이 유효한지 검증
         boolean tokenValid = jwtService.isTokenValid(refreshToken);
         if(!tokenValid) throw new UserException("리프레시 토큰이 만료되었습니다.");
@@ -57,22 +53,18 @@ public class UserCommandServiceImpl implements UserCommandService {
         String email = jwtService.extractEmail(refreshToken);
         if(email == null) throw new UserException("리프레스 토큰이 만료되었거나 유효하지 않습니다.");
 
+        RefreshToken searchedRefreshToken = refreshTokenQueryRepository.findByEmail(email)
+                .orElseThrow(() -> new UserException("리프레시 토큰이 존재하지 않습니다."));
 
-        // 서버에 저장된 리프레시 토큰과 사용자가 가져온 리프레시 토큰이 동일한지 체크
-        RefreshToken savedRefreshToken = refreshTokenQueryRepository.findByEmail(email)
-                .orElseThrow(() -> new UserException("리프레스 토큰이 만료되었습니다"));
+        User user = userQueryRepository.findByEmail(email)
+                .orElseThrow(() -> new UserException("해당 유저를 찾을 수 없습니다."));
 
-        boolean isEqual = savedRefreshToken.getRefreshToken().equals(refreshToken);
+        String newAccessToken = jwtService.generateAccessToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
 
-        if(!isEqual) throw new UserException("리프레스 토큰이 만료되었습니다");
+        refreshTokenCommandRepository.save(new RefreshToken(email, refreshToken));
 
-        // 만약 정상적으로 검증되었으면 액세스토큰 갱신
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
-
-        String accessToken = jwtService.generateAccessToken(principal.providerUser());
-        return accessToken;
+        return new RefreshTokensResponseDto(user, newAccessToken, newRefreshToken);
     }
 
     private void validateDuplicatedEmail(String email) {

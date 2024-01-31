@@ -99,4 +99,8 @@ public class RoomUser {
         this.standbyYn = false;
     }
 
+    public void bookmark() {
+        this.bookmarkYn = true;
+    }
+
 }
