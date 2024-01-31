@@ -41,8 +41,7 @@ public class UserQueryController {
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> detail(@PathVariable String userId, @AuthenticationPrincipal Authentication authentication){
-
+    public ResponseEntity<?> detail(@PathVariable String userId,  Authentication authentication){
         Map<String, Object> result = new HashMap<>();
         result.put("userInfo", new UserInfo(
                 "",
@@ -51,9 +50,7 @@ public class UserQueryController {
                 "https://i.namu.wiki/i/_BVQ0GmKg_SW5_wWhgZPO1v_A6w7kGGPBww_5HaSQJcxl-QMHqzgqd1143pU8jsvEvD-G03lBPf24ZekZ875NPFyLaeQx6RxPGb-S0GFwkhHS1psHxaK_BkThCl40V-MEY-g2dZp8rHaTCrzA_CD5w.webp"
         ));
 
-        System.out.println(authentication);;
-
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 반환하였습니다.", result);
+        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 반환하였습니다.", "");
         return ResponseEntity.ok(response);
     }
 
