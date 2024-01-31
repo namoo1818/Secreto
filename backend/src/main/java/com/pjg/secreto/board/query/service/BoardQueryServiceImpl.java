@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 @RequiredArgsConstructor
@@ -69,6 +70,7 @@ public class BoardQueryServiceImpl implements BoardQueryService{
     @Override
     public SearchPostResponseDto getPost(Long boardNo) {
         Board board = boardQueryRepository.findById(boardNo).orElseThrow();
+        System.out.println(LocalDateTime.now());
         return SearchPostResponseDto.toDto(board);
     }
 

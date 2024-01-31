@@ -14,23 +14,25 @@ public class WriteBoardRequestDto {
     private RoomUser roomUser;
     private String title;
     private String content;
+    private String imgUrl;
     private String boardCategory;
     private String missionCategory;
     private Boolean publicYn;
-    private String writer;
 
     public Board toEntity(){
         return Board.builder()
                 .roomUser(roomUser)
                 .title(title)
                 .content(content)
+                .imgUrl(imgUrl)
                 .registerAt(LocalDateTime.now())
                 .hit(0L)
-                .boardCategory(BoardCategory.valueOf(boardCategory))
+                .boardCategory(BoardCategory.from(boardCategory))
                 .publicYn(publicYn)
                 .missionCategory(missionCategory)
                 .likedCount(0L)
-                .writer(writer)
+                //추후수정
+                .writer("writer")
                 .build();
     }
 

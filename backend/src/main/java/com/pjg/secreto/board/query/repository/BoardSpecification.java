@@ -1,7 +1,6 @@
 package com.pjg.secreto.board.query.repository;
 
 import com.pjg.secreto.board.common.entity.Board;
-import com.pjg.secreto.board.common.entity.BoardCategory;
 import org.springframework.data.jpa.domain.Specification;
 
 public class BoardSpecification {
@@ -14,7 +13,7 @@ public class BoardSpecification {
             root.fetch("boardEntryLogs");
 
             return criteriaBuilder.and(
-                    criteriaBuilder.equal(root.get("boardCategory"), BoardCategory.valueOf(boardCategory)),
+                    criteriaBuilder.equal(root.get("boardCategory"), boardCategory),
                     criteriaBuilder.like(root.get("title"), "%" + title + "%"),
                     criteriaBuilder.equal(root.get("roomUser").get("id"), roomUserNo)
             );
@@ -29,7 +28,7 @@ public class BoardSpecification {
             root.fetch("boardEntryLogs");
 
             return criteriaBuilder.and(
-                    criteriaBuilder.equal(root.get("boardCategory"), BoardCategory.valueOf(boardCategory)),
+                    criteriaBuilder.equal(root.get("boardCategory"), boardCategory),
                     criteriaBuilder.like(root.get("content"), "%" + content + "%"),
                     criteriaBuilder.equal(root.get("roomUser").get("id"), roomUserNo)
             );
@@ -44,7 +43,7 @@ public class BoardSpecification {
             root.fetch("boardEntryLogs");
 
             return criteriaBuilder.and(
-                    criteriaBuilder.equal(root.get("boardCategory"), BoardCategory.valueOf(boardCategory)),
+                    criteriaBuilder.equal(root.get("boardCategory"), boardCategory),
                     criteriaBuilder.like(root.get("writer"), "%" + writer + "%"),
                     criteriaBuilder.equal(root.get("roomUser").get("id"), roomUserNo)
             );

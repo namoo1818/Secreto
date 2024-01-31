@@ -7,5 +7,6 @@ public class SearchBoardRequestDto {
     String boardCategory;
     String title;
     String content;
+    String imgUrl;
     String writer;
 }
