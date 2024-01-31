@@ -1,12 +1,15 @@
 package com.pjg.secreto.user.common.handler;
 
 import com.pjg.secreto.common.Util.AuthUtils;
-import com.pjg.secreto.user.command.repository.RefreshTokenCommandRepository;
+import com.pjg.secreto.user.command.repository.UserCommandRepository;
+import com.pjg.secreto.user.common.Repository.RefreshTokenRepository;
 import com.pjg.secreto.user.common.config.SecurityUtilConfig;
 import com.pjg.secreto.user.common.dto.PrincipalUser;
 import com.pjg.secreto.user.common.dto.ProviderUser;
 import com.pjg.secreto.user.common.entity.RefreshToken;
+import com.pjg.secreto.user.common.entity.User;
 import com.pjg.secreto.user.common.service.JwtService;
+import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +22,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +31,9 @@ import java.nio.charset.StandardCharsets;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final String redirectUrl = SecurityUtilConfig.RESPONSE_REDIRECT_URL;
     private final JwtService jwtService;
-    private final RefreshTokenCommandRepository refreshTokenCommandRepository;
+    private final UserQueryRepository userQueryRepository;
+    private final UserCommandRepository userCommandRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
 
     @Override
@@ -47,7 +54,26 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = jwtService.generateAccessToken(providerUser);
         String refreshToken = jwtService.generateRefreshToken(providerUser);
 
-        refreshTokenCommandRepository.save(new RefreshToken(userEmail, refreshToken));
+        User user = userQueryRepository.findByEmail(userEmail).orElseThrow();
+        Optional<RefreshToken> userRefreshToken = refreshTokenRepository.findByUser(user);
+
+        if (userRefreshToken.isPresent()){
+            RefreshToken tokens = userRefreshToken.get();
+            tokens.setRefreshToken(refreshToken);
+            refreshTokenRepository.save(tokens);
+        }
+
+        else {
+            RefreshToken tokens = RefreshToken.builder()
+                    .refreshToken(refreshToken)
+                    .registeredAt(LocalDateTime.now())
+                    .user(user)
+                    .build();
+
+            RefreshToken savedRefreshToken = refreshTokenRepository.save(tokens);
+            user.setRefreshToken(savedRefreshToken);
+        }
+
 
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl)
                 .queryParam("accessToken", accessToken)

@@ -1,28 +1,31 @@
 package com.pjg.secreto.user.common.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.TimeToLive;
-import org.springframework.data.redis.core.index.Indexed;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RedisHash(value = "refreshToken" )
+import java.time.LocalDateTime;
+
+@Entity
+@Data
+@NoArgsConstructor(access = AccessLevel.PROTECTED )
+@Table(name = "tbl_refresh_token")
 public class RefreshToken {
-
-    @TimeToLive
-    @Value("${jwt.refresh-token.expiration}")
-    private Long timeToLive;
-
     @Id
-    private String email;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn
+    private User user;
 
     private String refreshToken;
 
-    public RefreshToken(String email, String refreshToken) {
-        this.email = email;
+    private LocalDateTime registeredAt;
+
+    @Builder
+    public RefreshToken(User user, String refreshToken, LocalDateTime registeredAt) {
+        this.user = user;
         this.refreshToken = refreshToken;
+        this.registeredAt = registeredAt;
     }
 }
