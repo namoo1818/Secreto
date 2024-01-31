@@ -24,8 +24,8 @@ public class BoardCommandController {
     @PutMapping(value="/post")
     public ResponseEntity<?> updatePost(@RequestBody UpdateBoardRequestDto updateBoardRequestDto){
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         Long result = boardCommandService.updatePost(updateBoardRequestDto);
 

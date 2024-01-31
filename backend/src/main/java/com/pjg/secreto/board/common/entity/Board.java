@@ -49,7 +49,8 @@ public class Board {
 
     private Long hit;
 
-    @Convert(converter = BoardCategoryConverter.class)
+//    @Convert(converter = BoardCategoryConverter.class)
+    @Enumerated(value = EnumType.STRING)
     private BoardCategory boardCategory;
 
     private Boolean publicYn;
@@ -82,5 +83,8 @@ public class Board {
         this.imgUrl = imgUrl;
         this.boardCategory = boardCategory;
         this.publicYn = publicYn;
+    }
+    public void updateBoard(Long likedCount){
+        this.likedCount = likedCount;
     }
 }

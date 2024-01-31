@@ -2,30 +2,17 @@ package com.pjg.secreto.user.common.filter;
 
 import com.pjg.secreto.user.common.service.CustomUserDetailService;
 import com.pjg.secreto.user.common.service.JwtService;
-import com.pjg.secreto.user.query.service.UserQueryService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.beans.Transient;
-import java.io.IOException;
-import java.security.Principal;
-import java.security.Security;
-
-import jakarta.transaction.TransactionScoped;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
@@ -55,37 +42,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        String accessToken = authorization.split(" ")[1];
 
 
-        final String accessTokenType = request.getHeader("AccessToken").split(" ")[0];
-        final String accessToken = request.getHeader("AccessToken").split(" ")[1];
-
-        final String refreshTokenType = request.getHeader("RefreshToken").split(" ")[0];
-        final String refreshToken = request.getHeader("RefreshToken").split(" ")[1];
+//        final String accessTokenType = request.getHeader("AccessToken").split(" ")[0];
+//        final String accessToken = request.getHeader("AccessToken").split(" ")[1];
+//
+//        final String refreshTokenType = request.getHeader("RefreshToken").split(" ")[0];
+//        final String refreshToken = request.getHeader("RefreshToken").split(" ")[1];
 
         final String email;
 
         // 만약 타입이 Baarer 토큰타입 체크
-        if (!(isBearerType(accessTokenType) && isBearerType(refreshTokenType))) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        if (!(isBearerType(accessTokenType) && isBearerType(refreshTokenType))) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         // 액세스토큰이 만료되었는지 여부 체크
-        if (!(jwtService.validateToken(accessToken)) && jwtService.validateToken(refreshToken)){
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        if (!(jwtService.validateToken(accessToken)) && jwtService.validateToken(refreshToken)){
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
-        email = jwtService.extractEmail(accessToken);
+//        email = jwtService.extractEmail(accessToken);
 
-        if (email != null && isNotAuthenticated()) {
-
-            UserDetails userDetails = customUserDetailService.loadUserByUsername(email);
-
-            Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-
-            System.out.println(authToken);
-        }
+//        if (email != null && isNotAuthenticated()) {
+//
+//            UserDetails userDetails = customUserDetailService.loadUserByUsername(email);
+//
+//            Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//            SecurityContextHolder.getContext().setAuthentication(authToken);
+//
+//            System.out.println(authToken);
+//        }
         filterChain.doFilter(request, response);
     }
 
