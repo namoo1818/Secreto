@@ -19,10 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Service
@@ -69,16 +72,30 @@ public class UserQueryServiceImpl implements UserQueryService {
                                     providerUser.getProfileUrl());
 
         User user = userQueryRepository.findByEmail(dto.getEmail()).orElseThrow();
+        Optional<RefreshToken> byUser = refreshTokenRepository.findByUser(user);
+        RefreshToken tokens = null;
 
-        RefreshToken tokens = RefreshToken.builder()
-                .refreshToken(refreshToken)
-                .registeredAt(LocalDateTime.now())
-                .user(user)
-                .build();
+        if(byUser.isPresent()){
+            tokens = byUser.get();
+            tokens.setRefreshToken(refreshToken);
+        }
 
-        RefreshToken savedRefreshToken = refreshTokenRepository.save(tokens);
+        else{
+            tokens = RefreshToken.builder()
+                    .refreshToken(refreshToken)
+                    .registeredAt(LocalDateTime.now())
+                    .user(user)
+                    .build();
+        }
+
+        assert tokens != null;
+        refreshTokenRepository.save(tokens);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContext context = SecurityContextHolder.getContext();
+        log.info("로그인 {}",context.getAuthentication());
+        PrincipalUser up = (PrincipalUser) context.getAuthentication().getPrincipal();
+        log.info("로그인 등록 {}", up);
 
         LoginResponseDto result = LoginResponseDto.builder()
                 .accessToken(accessToken)
@@ -92,10 +109,16 @@ public class UserQueryServiceImpl implements UserQueryService {
     @Override
     public void logOut(LogOutRequestDto dto) {
         User user = userQueryRepository.findByEmail(dto.getEmail()).orElseThrow();
-        System.out.println(user.getId());;
-        refreshTokenRepository.deleteByUser(user);
 
+        SecurityContext context = SecurityContextHolder.getContext();
+        PrincipalUser up = (PrincipalUser) context.getAuthentication().getPrincipal();
+        log.info("로그아웃 {}", up);
+
+        log.info("로그아웃 서비스 {}", dto.getEmail());
+        System.out.println(user.getId());
+        refreshTokenRepository.deleteByUser(user);
         SecurityContextHolder.clearContext();
+        log.info("로그아웃 서비스 종료", dto.getEmail());
     }
 
 }

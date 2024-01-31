@@ -78,14 +78,18 @@ public class JwtService {
             return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
+            return false;
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
+            return false;
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token", e);
+            return false;
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty.", e);
+            return false;
         }
-        return false;
+
     }
 
     private String buildToken(

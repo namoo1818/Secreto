@@ -28,35 +28,28 @@ public class UserCommandController {
     }
 
     @PutMapping("/users/delete/")
-    public ResponseEntity<?> withdraw(@RequestHeader String Type,
-                                      @RequestHeader String AccessToken,
-                                      @RequestBody WithdrawRequestDto dto){
+    public ResponseEntity<?> withdraw(@RequestBody WithdrawRequestDto dto){
 
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "지금까지 이용해주셔서 감사합니다.");
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/users/modify/")
-    public ResponseEntity<?> modify(@RequestHeader String Type,
-                                    @RequestHeader String AccessToken,
-                                    @RequestBody ModifyRequestDto dto){
+    public ResponseEntity<?> modify(@RequestBody ModifyRequestDto dto){
 
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 수정되었습니다.");
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/users/password/request")
-    public ResponseEntity<?> requestChangePassword(@RequestHeader String Type,
-                                                   @RequestHeader String AccessToken,
-                                                   @RequestBody ChangePasswordRequestDto dto){
+    public ResponseEntity<?> requestChangePassword(@RequestBody ChangePasswordRequestDto dto){
 
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호 변경을 위한 페이지 링크를 이메일로 발송하였습니다.");
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/users/password/change/{userId}")
-    public ResponseEntity<?> resetPassword(@PathVariable String userId,
-                                           @RequestBody ResetPasswordRequestDto dto){
+    public ResponseEntity<?> resetPassword(@PathVariable Long userId){
 
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호 변경에 성공하였습니다.");
         return ResponseEntity.ok(response);
@@ -69,9 +62,7 @@ public class UserCommandController {
     }
 
     @PutMapping("/users/password")
-    public ResponseEntity<?> changePassword(@RequestHeader String Type,
-                                            @RequestHeader String AccessToken,
-                                            @RequestBody ChangeLegacyPasswordRequestDto dto){
+    public ResponseEntity<?> changePassword(@RequestBody ChangeLegacyPasswordRequestDto dto){
 
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호 변경에 성공하였습니다.");
         return ResponseEntity.ok(response);

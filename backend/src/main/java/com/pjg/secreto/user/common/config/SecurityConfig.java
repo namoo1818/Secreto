@@ -11,6 +11,7 @@ import com.pjg.secreto.user.common.service.CustomOidcUserService;
 import com.pjg.secreto.user.common.service.CustomUserDetailService;
 import com.pjg.secreto.user.common.service.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
