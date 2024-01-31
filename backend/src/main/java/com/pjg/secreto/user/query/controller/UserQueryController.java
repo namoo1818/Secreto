@@ -30,14 +30,12 @@ public class UserQueryController {
         LoginResponseDto result = queryService.login(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "로그인에 성공하였습니다.", result);
 
-        String id = AuthUtils.getAuthenticatedUserId();
-        log.info(id);
-//        log.info(id);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/users/log-out")
     public ResponseEntity<?> logout(@RequestBody LogOutRequestDto dto){
+        queryService.logOut(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "로그아웃 하셨습니다.");
         return ResponseEntity.ok(response);
     }
@@ -53,8 +51,7 @@ public class UserQueryController {
                 "https://i.namu.wiki/i/_BVQ0GmKg_SW5_wWhgZPO1v_A6w7kGGPBww_5HaSQJcxl-QMHqzgqd1143pU8jsvEvD-G03lBPf24ZekZ875NPFyLaeQx6RxPGb-S0GFwkhHS1psHxaK_BkThCl40V-MEY-g2dZp8rHaTCrzA_CD5w.webp"
         ));
 
-        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
-        ProviderUser providerUser = principal.providerUser();
+        System.out.println(authentication);;
 
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 반환하였습니다.", result);
         return ResponseEntity.ok(response);
