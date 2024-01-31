@@ -363,7 +363,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
     }
 
-
     /**
      * 방 입장 코드 생성 메서드
      */
