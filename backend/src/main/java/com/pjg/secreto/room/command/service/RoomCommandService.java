@@ -11,8 +11,6 @@ public interface RoomCommandService {
 
     Long enterRoom(EnterRoomRequestDto enterRoomRequestDto);
 
-//    void setNickname(SetNicknameRequestDto setNicknameRequestDto);
-
     void acceptUser(AcceptUserRequestDto acceptUserRequestDto);
 
     void deligateAdmin(DeligateAdminRequestDto deligateAdminRequestDto);
