@@ -116,4 +116,12 @@ public class RoomUser {
         this.usersManiti = usersManiti;
     }
 
+    public void setManito(Long manitoNo) {
+        this.usersManito = manitoNo;
+    }
+
+    public void setManiti(Long manitiNo) {
+        this.usersManiti = manitiNo;
+    }
+
 }
