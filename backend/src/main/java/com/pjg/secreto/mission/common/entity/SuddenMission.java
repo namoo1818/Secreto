@@ -3,8 +3,12 @@ package com.pjg.secreto.mission.common.entity;
 import com.pjg.secreto.room.common.entity.Room;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,10 +25,16 @@ public class SuddenMission {
     @JoinColumn(name = "room_no")
     private Room room;
 
-    private String missionSubmitAt;
+    private LocalDateTime missionSubmitAt;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Builder
+    public SuddenMission(Room room, LocalDateTime missionSubmitAt, String content) {
+        this.room = room;
+        this.missionSubmitAt = missionSubmitAt;
+        this.content = content;
+    }
 
 }

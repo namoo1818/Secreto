@@ -30,5 +30,8 @@ public class UserMission {
     @Column(nullable = false)
     private MissionType missionType;
 
+    private int missionRerollCount;
+
+    private Boolean missionCertifyYn;
 
 }

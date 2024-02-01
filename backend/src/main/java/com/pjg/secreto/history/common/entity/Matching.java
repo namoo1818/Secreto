@@ -42,4 +42,9 @@ public class Matching {
         this.deprecatedAt = deprecatedAt;
     }
 
+    public void changeMatchingInfo(Long manitoNo, Long manitiNo) {
+        this.manitoNo = manitoNo;
+        this.manitiNo = manitiNo;
+    }
+
 }

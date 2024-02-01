@@ -43,8 +43,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
         ProviderUser providerUser = principal.providerUser();
 
-        String id = AuthUtils.getAuthenticatedUserId(authentication);
-        log.info(id);
+        Long id = AuthUtils.getAuthenticatedUserId(authentication);
+        log.info("id = " + id);
 
         String userEmail = providerUser.getEmail();
 
