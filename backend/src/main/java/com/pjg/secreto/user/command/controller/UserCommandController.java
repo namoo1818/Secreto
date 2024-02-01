@@ -5,7 +5,6 @@ import com.pjg.secreto.user.command.dto.*;
 import com.pjg.secreto.user.command.service.UserCommandService;
 import com.pjg.secreto.user.common.dto.EmailValidationResponseDto;
 import com.pjg.secreto.user.common.service.JwtService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Example", description = "Example API")
 @RestController
 @RequiredArgsConstructor
 public class UserCommandController {
