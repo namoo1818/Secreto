@@ -1,6 +1,5 @@
 package com.pjg.secreto.board.common.entity;
 
-import com.pjg.secreto.common.converter.LocalDateTimeConverter;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +10,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -44,12 +42,10 @@ public class Board {
 
     private String imgUrl;
 
-    @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime registerAt;
 
     private Long hit;
 
-//    @Convert(converter = BoardCategoryConverter.class)
     @Enumerated(value = EnumType.STRING)
     private BoardCategory boardCategory;
 
@@ -60,7 +56,6 @@ public class Board {
     private Long likedCount;
 
     private String writer;
-
     @Builder
     public Board(RoomUser roomUser, String title, String content, String imgUrl, LocalDateTime registerAt, Long hit, BoardCategory boardCategory, Boolean publicYn, String missionCategory, Long likedCount, String writer) {
         this.roomUser = roomUser;
@@ -84,7 +79,11 @@ public class Board {
         this.boardCategory = boardCategory;
         this.publicYn = publicYn;
     }
-    public void updateBoard(Long likedCount){
+    public void updateLikedCount(Long likedCount){
         this.likedCount = likedCount;
+    }
+
+    public void updateHit(Long hit){
+        this.hit = hit;
     }
 }

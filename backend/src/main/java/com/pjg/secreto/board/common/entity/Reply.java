@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +32,7 @@ public class Reply {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-//    @Convert(converter = BoardCategoryConverter.class)
+    @CreatedDate
     private LocalDateTime registerAt;
 
     private Long parentReplyNo;

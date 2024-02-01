@@ -1,6 +1,7 @@
 package com.pjg.secreto.common.config;
 
 import com.pjg.secreto.board.command.dto.WriteBoardRequestDto;
+import com.pjg.secreto.board.command.dto.WriteReplyRequestDto;
 import com.pjg.secreto.board.command.service.BoardCommandService;
 import com.pjg.secreto.board.common.entity.BoardCategory;
 import com.pjg.secreto.room.command.repository.RoomCommandRepository;
@@ -38,6 +39,7 @@ public class InitDb {
         private final RoomUserCommandRepository roomUserCommandRepository;
         private final BoardCommandService boardCommandService;
 
+
         public void dbInit() {
             System.out.println("=================================================== test");
             User user = userCommandRepository.save(
@@ -52,9 +54,17 @@ public class InitDb {
                     new RoomUser(user, room, LocalDateTime.now(), LocalDateTime.now(), true, "게임방닉네임", true)
             );
 
-            boardCommandService.writePost(
-                    new WriteBoardRequestDto(
-                            user.getId(), "t", "c", null, BoardCategory.BOAST, "aaa", true
+            for(int i = 0; i<100;i++) {
+                boardCommandService.writePost(
+                        new WriteBoardRequestDto(
+                                roomUSer.getId(), "t", "c", null, BoardCategory.BOAST, "aaa", true
+                        )
+                );
+            }
+
+            boardCommandService.writeReply(
+                    new WriteReplyRequestDto(
+                            roomUSer.getId(), 1L, "댓글입니다.", null, null, true
                     )
             );
 

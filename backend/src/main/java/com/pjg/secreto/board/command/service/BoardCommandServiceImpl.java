@@ -10,6 +10,7 @@ import com.pjg.secreto.board.common.entity.Board;
 import com.pjg.secreto.board.common.entity.BoardCategory;
 import com.pjg.secreto.board.common.entity.Liked;
 import com.pjg.secreto.board.common.entity.Reply;
+import com.pjg.secreto.board.common.exception.BoardException;
 import com.pjg.secreto.board.query.repository.BoardQueryRepository;
 import com.pjg.secreto.board.query.repository.LikedQueryRepository;
 import com.pjg.secreto.board.query.repository.ReplyQueryRepository;
@@ -66,7 +67,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
     @Override
     public void deletePost(Long boardNo) {
         Board board = boardQueryRepository.findById(boardNo)
-                .orElseThrow(()->new IllegalArgumentException("해당 게시글이 없습니다. id="+boardNo));
+                .orElseThrow(()->new BoardException("해당 게시글이 없습니다. id="+boardNo));
         boardCommandRepository.delete(board);
     }
 
@@ -74,9 +75,12 @@ public class BoardCommandServiceImpl implements BoardCommandService {
     public void writePost(WriteBoardRequestDto writeBoardRequestDto) {
         Long roomUserNo = writeBoardRequestDto.getRoomUserNo();
         RoomUser roomUser = roomUserQueryRepository.findById(roomUserNo).orElseThrow(
-                () -> new UserException()
+                () -> new BoardException()
         );
+
+
         Board board = Board.builder()
+                .roomUser(roomUser)
                 .title(writeBoardRequestDto.getTitle())
                 .content(writeBoardRequestDto.getContent())
                 .imgUrl(writeBoardRequestDto.getImgUrl())
@@ -85,7 +89,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                 .publicYn(writeBoardRequestDto.getPublicYn())
                 .missionCategory(writeBoardRequestDto.getMissionCategory())
                 .writer("writer")   // 추후 수정
-                .roomUser(roomUser)
+                .hit(0L)
                 .likedCount(0L)
                 .build();
         boardCommandRepository.save(board);
@@ -93,47 +97,60 @@ public class BoardCommandServiceImpl implements BoardCommandService {
 
     @Override
     public void updateLike(Long boardNo, Long roomUserNo) {
-        Board board = boardQueryRepository.findById(boardNo)
-                .orElseThrow(()->new IllegalArgumentException("해당 게시글이 없습니다. id="+boardNo));
+        try {
+            Board board = boardQueryRepository.findById(boardNo)
+                    .orElseThrow(() -> new BoardException("해당 게시글이 없습니다. id=" + boardNo));
 
-        RoomUser roomUser = roomUserQueryRepository.findById(roomUserNo)
-                .orElseThrow(()->new IllegalArgumentException("유저가 없습니다. id="+roomUserNo));
+            RoomUser roomUser = roomUserQueryRepository.findById(roomUserNo)
+                    .orElseThrow(() -> new BoardException("유저가 없습니다. id=" + roomUserNo));
 
-        Optional liked = likedQueryRepository.findLikedByBoardAndRoomUser(board, roomUser);
+            likedQueryRepository.findLikedByBoardAndRoomUser(board, roomUser)
+                    .ifPresent(a -> {
+                        throw new BoardException("이미 좋아요를 눌렀습니다.");
+                    });
 
-        liked.ifPresent(likedValue-> {
-                    new IllegalArgumentException("이미 좋아요를 누르셨습니다.");
-                });
-        likedCommandRepository.save(new Liked(board, roomUser));
-        board.updateBoard(board.getLikedCount()+1);
+            likedCommandRepository.save(new Liked(board, roomUser));
+            board.updateLikedCount(board.getLikedCount() + 1);
+        } catch (Exception e) {
+            throw new BoardException(e.getMessage());
+        }
 
     }
 
     @Override
     public void deleteLike(Long boardNo, Long roomUserNo) {
         Board board = boardQueryRepository.findById(boardNo)
-                .orElseThrow(()->new IllegalArgumentException("해당 게시글이 없습니다. id="+boardNo));
+                .orElseThrow(()->new BoardException("해당 게시글이 없습니다. id="+boardNo));
 
         RoomUser roomUser = roomUserQueryRepository.findById(roomUserNo)
-                .orElseThrow(()->new IllegalArgumentException("유저가 없습니다. id="+roomUserNo));
+                .orElseThrow(()->new BoardException("유저가 없습니다. id="+roomUserNo));
 
         Liked liked = likedQueryRepository.findLikedByBoardAndRoomUser(board, roomUser)
-                .orElseThrow(()->new IllegalArgumentException("이미 처리된 요청입니다."));
+                .orElseThrow(()->new BoardException("이미 처리된 요청입니다."));
 
         likedCommandRepository.delete(liked);
 
-        board.updateBoard(board.getLikedCount()-1);
+        board.updateLikedCount(board.getLikedCount()-1);
     }
 
     @Override
     public void writeReply(WriteReplyRequestDto writeReplyRequestDto) {
         Long roomUserNo = writeReplyRequestDto.getRoomUserNo();
         RoomUser roomUser = roomUserQueryRepository.findById(roomUserNo)
-                .orElseThrow(()->new IllegalArgumentException("해당 유저가 없습니다. id="+roomUserNo));
+                .orElseThrow(()->new UserException("해당 유저가 없습니다. id="+roomUserNo));
 
         Long boardNo = writeReplyRequestDto.getBoardNo();
         Board board = boardQueryRepository.findById(boardNo)
-                .orElseThrow(()->new IllegalArgumentException("해당 게시글이 없습니다. id="+boardNo));
+                .orElseThrow(()->new BoardException("해당 게시글이 없습니다. id="+boardNo));
+
+        Boolean annonymityYn = writeReplyRequestDto.getAnnonymityYn();
+        String writer = "";
+
+        if(annonymityYn){
+            writer = "익명";
+        } else {
+            writer = roomUser.getNickname();
+        }
 
         Reply reply = Reply.builder()
                 .roomUser(roomUser)
@@ -142,7 +159,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                 .registerAt(LocalDateTime.now())
                 .parentReplyNo(writeReplyRequestDto.getParentReplyNo())
                 .tagUserNo(writeReplyRequestDto.getTagUserNo())
-                .writer("writer") //추후 수정
+                .writer(writer)
                 .annonymityYn(writeReplyRequestDto.getAnnonymityYn())
                 .build();
 
@@ -151,8 +168,9 @@ public class BoardCommandServiceImpl implements BoardCommandService {
 
     @Override
     public void deleteReply(Long replyNo) {
+
         Reply reply = replyQueryRepository.findById(replyNo)
-                .orElseThrow(()->new IllegalArgumentException("해당 댓글이 없습니다. id="+replyNo));
+                .orElseThrow(()->new BoardException("해당 댓글이 없습니다. id="+replyNo));
         replyCommandRepository.delete(reply);
                 
     }
