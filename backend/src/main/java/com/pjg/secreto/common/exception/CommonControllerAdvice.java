@@ -20,9 +20,9 @@ public class CommonControllerAdvice {
 
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<?> ExpiredJwtExceptionHandler(Exception e) {
-        log.error("유저 예외 발생", e);
+        log.error("토큰 예외 발생", e);
 
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, "전송한 토큰이 만료되었습니다.");
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
