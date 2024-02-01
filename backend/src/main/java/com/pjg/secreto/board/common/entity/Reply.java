@@ -1,10 +1,12 @@
 package com.pjg.secreto.board.common.entity;
 
+import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -20,12 +22,17 @@ public class Reply {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_user_no")
+    private RoomUser roomUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_no")
     private Board board;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @CreatedDate
     private LocalDateTime registerAt;
 
     private Long parentReplyNo;
@@ -37,7 +44,8 @@ public class Reply {
     private Boolean annonymityYn;
 
     @Builder
-    public Reply(Board board, String content, LocalDateTime registerAt, Long parentReplyNo, Long tagUserNo, String writer, Boolean annonymityYn) {
+    public Reply(RoomUser roomUser, Board board, String content, LocalDateTime registerAt, Long parentReplyNo, Long tagUserNo, String writer, Boolean annonymityYn) {
+        this.roomUser = roomUser;
         this.board = board;
         this.content = content;
         this.registerAt = registerAt;
