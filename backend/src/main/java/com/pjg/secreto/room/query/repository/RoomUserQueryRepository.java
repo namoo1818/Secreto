@@ -15,7 +15,7 @@ public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, 
 
     List<RoomUser> findRoomUserByRoom(Room findRoom);
 
-    @Query("select ru from RoomUser ru where ru.room.id = :roomNo")
+    @Query("select ru from RoomUser ru join fetch ru.user where ru.room.id = :roomNo")
     List<RoomUser> findAllByRoomId(Long roomNo);
 
     @Query("select ru from RoomUser ru join fetch ru.room where ru.user.id = :userNo")

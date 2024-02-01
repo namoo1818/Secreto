@@ -2,6 +2,7 @@ package com.pjg.secreto.common.exception;
 
 import com.pjg.secreto.common.response.ErrorResponse;
 import com.pjg.secreto.common.response.SuccessResponse;
+import com.pjg.secreto.mission.common.exception.MissionException;
 import com.pjg.secreto.room.common.exception.RoomException;
 import com.pjg.secreto.user.common.exception.UserException;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,13 @@ public class CommonControllerAdvice {
     @ExceptionHandler(RoomException.class)
     public ResponseEntity<ErrorResponse> RoomExceptionHandler(Exception e) {
         log.error("방 예외발생", e);
+
+        return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
+    }
+
+    @ExceptionHandler(MissionException.class)
+    public ResponseEntity<ErrorResponse> MissionExceptionHandler(Exception e) {
+        log.error("미션 예외발생", e);
 
         return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
