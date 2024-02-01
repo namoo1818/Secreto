@@ -1,8 +1,8 @@
 package com.pjg.secreto.user.command.service;
 
 
-import com.pjg.secreto.history.command.dto.EMailRequestDto;
+import com.pjg.secreto.user.common.dto.EmailSendRequestDto;
 
 public interface EmailSenderService {
-    void sendMail(EMailRequestDto dto);
+    void sendMail(EmailSendRequestDto dto);
 }
