@@ -9,6 +9,8 @@ import com.pjg.secreto.user.query.dto.*;
 import com.pjg.secreto.user.query.service.UserQueryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,7 +32,7 @@ public class UserQueryController {
     private final UserQueryService queryService;
 
     @PostMapping("/users/log-in")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto dto){
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto dto){
         LoginResponseDto result = queryService.login(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "로그인에 성공하였습니다.", result);
 
@@ -40,40 +42,29 @@ public class UserQueryController {
     @PostMapping("/users/log-out")
     public ResponseEntity<?> logout(@RequestBody LogOutRequestDto dto){
         queryService.logOut(dto);
-
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "로그아웃 하셨습니다.");
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        System.out.println(authentication);
         return ResponseEntity.ok(response);
     }
 
-//    @PostMapping("/users/log-out")
-//    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication ) {
-//
-//        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-//        logoutHandler.logout(request, response, authentication);
-//
-//        return ResponseEntity.ok(new SuccessResponse(HttpStatus.OK, "로그아웃 하셨습니다."));
-//
-//    }
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<?> detail(Authentication authentication){
-        PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
-        ProviderUser providerUser = principal.providerUser();
+        UserInfo detail = queryService.detail(authentication);
 
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 반환하였습니다.", providerUser);
+        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 반환하였습니다.", detail);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users/password/{certCode}")
-    public ResponseEntity<?> allowChangePassword(@PathVariable String certCode){
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호를 변경하는 페이지로 이동합니다.");
+    public ResponseEntity<?> allowChangePassword(@PathVariable @NotBlank String certCode){
+        String requestedEmail = queryService.allowChangePassword(certCode);
+        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호를 변경할 수 있습니다.", requestedEmail);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/cert")
-    public ResponseEntity<?> validateCertCode(@RequestBody ValidateCertRequestDto dto){
+    public ResponseEntity<?> validateCertCode(@RequestBody @Valid ValidateCertRequestDto dto){
+        queryService.validateDuplicatedEmail(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "이메일이 정상적으로 검증되었습니다.");
         return ResponseEntity.ok(response);
     }

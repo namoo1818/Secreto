@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class SecurityUtilConfig {
-    public static final String RESPONSE_REDIRECT_URL = "http://localhost:"+ "5173" +"/oauth/redirect";
+    public static final String RESPONSE_REDIRECT_URL = "http://localhost:"+ "80" +"/oauth/redirect";
 
     @Bean
     public PasswordEncoder passwordEncoder() {
