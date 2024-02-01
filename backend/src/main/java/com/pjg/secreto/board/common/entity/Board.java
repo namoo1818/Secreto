@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Getter
@@ -41,11 +40,13 @@ public class Board {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    private String imgUrl;
+
     private LocalDateTime registerAt;
 
     private Long hit;
 
-    @Convert(converter = BoardCategoryConverter.class)
+    @Enumerated(value = EnumType.STRING)
     private BoardCategory boardCategory;
 
     private Boolean publicYn;
@@ -55,12 +56,12 @@ public class Board {
     private Long likedCount;
 
     private String writer;
-
     @Builder
-    public Board(RoomUser roomUser, String title, String content, LocalDateTime registerAt, Long hit, BoardCategory boardCategory, Boolean publicYn, String missionCategory, Long likedCount, String writer) {
+    public Board(RoomUser roomUser, String title, String content, String imgUrl, LocalDateTime registerAt, Long hit, BoardCategory boardCategory, Boolean publicYn, String missionCategory, Long likedCount, String writer) {
         this.roomUser = roomUser;
         this.title = title;
         this.content = content;
+        this.imgUrl = imgUrl;
         this.registerAt = registerAt;
         this.hit = hit;
         this.boardCategory = boardCategory;
@@ -70,11 +71,19 @@ public class Board {
         this.writer = writer;
     }
 
-    public void updateBoard(Long id, String title, String content, String boardCategory, Boolean publicYn){
+    public void updateBoard(Long id, String title, String content, String imgUrl, BoardCategory boardCategory, Boolean publicYn){
         this.id = id;
         this.title = title;
         this.content = content;
-        this.boardCategory = BoardCategory.valueOf(boardCategory);
+        this.imgUrl = imgUrl;
+        this.boardCategory = boardCategory;
         this.publicYn = publicYn;
+    }
+    public void updateLikedCount(Long likedCount){
+        this.likedCount = likedCount;
+    }
+
+    public void updateHit(Long hit){
+        this.hit = hit;
     }
 }

@@ -1,4 +1,11 @@
 package com.pjg.secreto.board.common.exception;
 
-public class BoardException {
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+public class BoardException extends RuntimeException {
+    public BoardException(String msg) {
+
+        super(msg);
+    }
 }
