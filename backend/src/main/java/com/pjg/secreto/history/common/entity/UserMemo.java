@@ -3,6 +3,7 @@ package com.pjg.secreto.history.common.entity;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,5 +30,13 @@ public class UserMemo {
     private ManitoPredictType manitoPredictType;
 
     private Long memoTo;
+
+    @Builder
+    public UserMemo(RoomUser roomUser, String memo, ManitoPredictType manitoPredictType, Long memoTo) {
+        this.roomUser = roomUser;
+        this.memo = memo;
+        this.manitoPredictType = manitoPredictType;
+        this.memoTo = memoTo;
+    }
 
 }

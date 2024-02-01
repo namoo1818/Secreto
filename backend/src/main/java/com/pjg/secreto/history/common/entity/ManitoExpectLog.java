@@ -3,8 +3,11 @@ package com.pjg.secreto.history.common.entity;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,8 +24,15 @@ public class ManitoExpectLog {
     @JoinColumn(name = "room_user_no")
     private RoomUser roomUser;
 
-    private String expectedAt;
+    private LocalDateTime expectedAt;
 
     private Long expectedUser;
+
+    @Builder
+    public ManitoExpectLog(RoomUser roomUser, LocalDateTime expectedAt, Long expectedUser) {
+        this.roomUser = roomUser;
+        this.expectedAt = expectedAt;
+        this.expectedUser = expectedUser;
+    }
 
 }

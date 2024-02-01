@@ -11,6 +11,7 @@ import com.pjg.secreto.user.common.service.CustomOidcUserService;
 import com.pjg.secreto.user.common.service.CustomUserDetailService;
 import com.pjg.secreto.user.common.service.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,10 +42,13 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final OAuth2SuccessHandler successHandler;
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/static/js/**", "/static/images/**", "/static/css/**", "/static/scss/**");
-    }
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return (web) -> web.ignoring()
+//                .requestMatchers("/static/js/**", "/static/images/**", "/static/css/**", "/static/scss/**")
+//                .requestMatchers("/users/sign-up", "/users/log-in" ,"/users/refreshAccess",
+//                        "/cert/**", "/users/password/**","/oauth2/**");
+//    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -73,9 +77,6 @@ public class SecurityConfig {
                     userInfoEndpointConfig -> {
                         userInfoEndpointConfig.oidcUserService(customOidcUserService);
                     });
-            oauth2.authorizationEndpoint(authorizationEndpointConfig -> {
-
-            });
             oauth2.successHandler(successHandler);
             oauth2.failureHandler(new OAuth2FailHandler());
         });
@@ -83,3 +84,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
+

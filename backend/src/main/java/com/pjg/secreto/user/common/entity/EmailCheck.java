@@ -12,10 +12,10 @@ import org.springframework.data.redis.core.index.Indexed;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RedisHash(value = "emailCheck" )
 public class EmailCheck {
-
-    @Id
+    @Indexed
     private String email;
 
+    @Id
     private String validationCode;
 
     @Value("${email.expiration}")

@@ -1,6 +1,6 @@
 package com.pjg.secreto.user.command.service;
 
-import com.pjg.secreto.history.command.dto.EMailRequestDto;
+import com.pjg.secreto.user.common.dto.EmailSendRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
@@ -16,7 +16,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     private final JavaMailSender javaMailSender;
 
     @Override
-    public void sendMail(EMailRequestDto dto) {
+    public void sendMail(EmailSendRequestDto dto) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(properties.getUsername());
         message.setTo(dto.getTo());

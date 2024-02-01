@@ -5,5 +5,6 @@ import lombok.Data;
 @Data
 public class ExitRoomRequestDto {
 
+    private Long userNo;
     private Long roomNo;
 }

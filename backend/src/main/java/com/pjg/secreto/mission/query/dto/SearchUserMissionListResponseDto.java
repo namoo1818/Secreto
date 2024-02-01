@@ -1,9 +1,12 @@
 package com.pjg.secreto.mission.query.dto;
 
+import com.pjg.secreto.mission.common.entity.MissionType;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Builder
+@AllArgsConstructor
 @Data
 public class SearchUserMissionListResponseDto {
 
@@ -11,7 +14,7 @@ public class SearchUserMissionListResponseDto {
 
     private String missionReceivedAt;
 
-    private String missionType;
+    private MissionType missionType;
 
     private int missionRerollCount;
 
