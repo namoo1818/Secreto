@@ -14,5 +14,5 @@ import java.util.Optional;
 public interface BoardQueryRepository extends JpaRepository<Board, Long>, JpaSpecificationExecutor<Board> {
     Page<Board> findAll(Specification<Board> spec, Pageable pageable);
 
-    Optional<Board> findById(Long id);
+    Optional<Board> findById(Long boardNo);
 }

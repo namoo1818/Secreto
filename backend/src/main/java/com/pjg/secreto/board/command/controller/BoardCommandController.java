@@ -45,11 +45,11 @@ public class BoardCommandController {
 
     // 게시글 작성
     @PostMapping(value="/post")
-    public ResponseEntity<?> createPost(@RequestBody WriteBoardRequestDto writerBoardRequestDto){
+    public ResponseEntity<?> createPost(@RequestBody WriteBoardRequestDto writeBoardRequestDto){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-        boardCommandService.writePost(writerBoardRequestDto);
+        boardCommandService.writePost(writeBoardRequestDto);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "게시글 작성 성공"));
     }

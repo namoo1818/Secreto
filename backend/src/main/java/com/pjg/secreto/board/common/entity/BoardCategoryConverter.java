@@ -12,6 +12,21 @@ public class BoardCategoryConverter implements AttributeConverter<BoardCategory,
 
     @Override
     public BoardCategory convertToEntityAttribute(String s) {
-        return BoardCategory.valueOf(s);
+        try {
+            int intValue = Integer.parseInt(s);
+
+            switch (intValue) {
+                case 0:
+                    return BoardCategory.BOAST;
+                case 1:
+                    return BoardCategory.CERTIFICATE;
+                case 2:
+                    return BoardCategory.NOTICE;
+                default:
+                    throw new IllegalArgumentException(String.format("게시판 카테고리에 %s가 존재하지 않습니다.", s));
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("숫자로 변환할 수 없는 값입니다.", e);
+        }
     }
 }

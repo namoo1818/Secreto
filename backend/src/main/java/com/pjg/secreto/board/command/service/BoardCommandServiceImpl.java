@@ -47,14 +47,15 @@ public class BoardCommandServiceImpl implements BoardCommandService {
     @Override
     public Long updatePost(UpdateBoardRequestDto updateBoardRequestDto) {
         Long boardNo = updateBoardRequestDto.getBoardNo();
-        BoardCategory newCategory = BoardCategory.valueOf(updateBoardRequestDto.getBoardCategory());
+        BoardCategory newCategory = updateBoardRequestDto.getBoardCategory();
         String newTitle = updateBoardRequestDto.getTitle();
         String newContent = updateBoardRequestDto.getContent();
+        String newImgUrl = updateBoardRequestDto.getImgUrl();
         Boolean newPublicYn = updateBoardRequestDto.getPublicYn();
 
-        Optional<Board> post = Optional.ofNullable(boardQueryRepository.getById(boardNo));
+        Optional<Board> post = boardQueryRepository.findById(boardNo);
         post.ifPresent(selectBoard->{
-            selectBoard.updateBoard(boardNo, newTitle, newContent, String.valueOf(newCategory), newPublicYn);
+            selectBoard.updateBoard(boardNo, newTitle, newContent, newImgUrl, newCategory, newPublicYn);
         });
 
         return boardNo;

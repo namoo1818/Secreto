@@ -26,6 +26,7 @@ public class Reply {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Convert(converter = BoardCategoryConverter.class)
     private LocalDateTime registerAt;
 
     private Long parentReplyNo;

@@ -27,6 +27,7 @@ public class BoardEntryLog {
     @JoinColumn(name = "room_user_no")
     private RoomUser roomUser;
 
+    @Convert(converter = BoardCategoryConverter.class)
     private LocalDateTime entryAt;
 
 }
