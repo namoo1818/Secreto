@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
 
-        if (authorization == null || !authorization.startsWith("berear ")) {
+        if (authorization == null || !authorization.startsWith("bearer ")) {
 
             log.info("token null");
             return;
