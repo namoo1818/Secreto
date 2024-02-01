@@ -11,7 +11,7 @@ public interface MissionQueryService {
 
     List<SearchMissionListResponseDto> searchMissionList(Long roomNo);
 
-    List<SearchUserMissionListResponseDto> searchUserMissionList(Long roomNo);
+    List<SearchUserMissionListResponseDto> searchUserMissionList(SearchUserMissionListRequestDto searchUserMissionListRequestDto);
 
-    SearchMemoResponseDto searchMemo(Long userMemoNo);
+    SearchMemoResponseDto searchMemo(SearchMemoRequestDto searchMemoRequestDto);
 }

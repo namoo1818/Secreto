@@ -1,5 +1,6 @@
 package com.pjg.secreto.mission.query.dto;
 
+import com.pjg.secreto.history.common.entity.ManitoPredictType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,7 +12,7 @@ public class SearchMemoResponseDto {
 
     private String memo;
 
-    private String manitoPredictType;
+    private ManitoPredictType manitoPredictType;
 
     private Long memoTo;
 }

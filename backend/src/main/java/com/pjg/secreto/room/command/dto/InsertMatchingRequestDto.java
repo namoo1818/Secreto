@@ -5,7 +5,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AcceptUserRequestDto {
+public class InsertMatchingRequestDto {
+
+    private Long roomNo;
 
     private List<Long> roomUserNos;
 }

@@ -67,13 +67,11 @@ public class RoomQueryServiceImpl implements RoomQueryService{
     }
 
     @Override
-    public List<SearchRoomListResponseDto> searchRoomList() {
+    public List<SearchRoomListResponseDto> searchRoomList(Long userNo) {
 
         try {
 
-            Long userNo = 1L;
-
-            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllWithRoom(userNo);
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllWithRoomByUserNo(userNo);
 
             List<SearchRoomListResponseDto> result = findRoomUsers.stream()
                     .map(r -> new SearchRoomListResponseDto(
@@ -91,6 +89,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
             return result;
         } catch (Exception e) {
+
             throw new RoomException(e.getMessage());
         }
 
