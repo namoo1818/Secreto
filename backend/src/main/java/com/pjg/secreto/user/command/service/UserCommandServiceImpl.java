@@ -91,7 +91,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         String newRefreshToken = jwtService.generateRefreshToken(user);
 
 
-        RefreshToken findRefreshToken = refreshTokenRepository.findByUser(user)
+        RefreshToken findRefreshToken = refreshTokenRepository.findById(user.getEmail())
                 .orElseThrow(() -> new UserException("리프레시 토큰이 존재하지 않거나 만료되었습니다."));
 
         findRefreshToken.setRefreshToken(newRefreshToken);
@@ -120,7 +120,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     public User modify(ModifyRequestDto dto, Authentication authentication) {
-        String userEmail = AuthUtils.getAuthenticatedUserId(authentication);
+        String userEmail = AuthUtils.getAuthenticatedUserEmail(authentication);
 
         User user = userQueryRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UserException("해당 유저를 조회할 수 없습니다."));

@@ -55,7 +55,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String refreshToken = jwtService.generateRefreshToken(providerUser);
 
         User user = userQueryRepository.findByEmail(userEmail).orElseThrow();
-        Optional<RefreshToken> userRefreshToken = refreshTokenRepository.findByUser(user);
+        Optional<RefreshToken> userRefreshToken = refreshTokenRepository.findById(user.getEmail());
 
         if (userRefreshToken.isPresent()){
             RefreshToken tokens = userRefreshToken.get();

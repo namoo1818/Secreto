@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import javax.annotation.Nullable;
+
 @Data
 public class JoinRequestDto {
     @NotBlank
@@ -19,6 +21,9 @@ public class JoinRequestDto {
 
     @NotBlank
     private String nickname;
+
+    @Nullable
+    private String profileUrl;
 
     public User convertUser(){
         return new User(this.email, this.password, this.nickname);

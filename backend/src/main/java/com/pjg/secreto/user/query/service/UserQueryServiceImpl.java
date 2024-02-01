@@ -74,7 +74,7 @@ public class UserQueryServiceImpl implements UserQueryService {
         String refreshToken = jwtService.generateRefreshToken(providerUser);
         UserInfo info = new UserInfo(providerUser);
 
-        Optional<RefreshToken> byUser = refreshTokenRepository.findByUser(user);
+        Optional<RefreshToken> byUser = refreshTokenRepository.findById(user.getEmail());
         RefreshToken tokens = null;
 
         if(byUser.isPresent()){
@@ -118,7 +118,7 @@ public class UserQueryServiceImpl implements UserQueryService {
 
         log.info("로그아웃 서비스 {}", dto.getEmail());
         System.out.println(user.getId());
-        refreshTokenRepository.deleteByUser(user);
+//        refreshTokenRepository.deleteById(dto.getEmail());
         SecurityContextHolder.clearContext();
         log.info("로그아웃 서비스 종료", dto.getEmail());
     }
