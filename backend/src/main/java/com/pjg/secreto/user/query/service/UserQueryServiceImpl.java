@@ -124,7 +124,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     }
 
     @Override
-    public UserInfo detail(Authentication authentication) {
+    public UserInfo detail(Authentication authentication, Long userId) {
         PrincipalUser principal = (PrincipalUser) authentication.getPrincipal();
         ProviderUser providerUser = principal.providerUser();
         UserInfo info = new UserInfo(providerUser);
