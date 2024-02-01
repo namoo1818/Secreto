@@ -101,4 +101,8 @@ public class Room {
         this.roomStartYn = roomStartYn;
     }
 
+    public void terminateRoom() {
+        this.roomEndAt = LocalDateTime.now();
+    }
+
 }

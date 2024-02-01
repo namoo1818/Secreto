@@ -12,11 +12,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import static com.pjg.secreto.common.Util.AuthUtils.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/room")
@@ -56,7 +60,9 @@ public class RoomQueryController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-        List<SearchRoomListResponseDto> result = roomQueryService.searchRoomList();
+        Long userNo = getAuthenticatedUserId();
+
+        List<SearchRoomListResponseDto> result = roomQueryService.searchRoomList(userNo);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "방 리스트를 조회하였습니다.", result));
     }

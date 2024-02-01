@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class DeligateAdminRequestDto {
 
-    private Long existingHost;
+    private Long roomNo;
 
     private Long newHost;
 }

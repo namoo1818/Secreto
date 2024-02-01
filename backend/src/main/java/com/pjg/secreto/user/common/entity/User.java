@@ -3,10 +3,7 @@ package com.pjg.secreto.user.common.entity;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.user.common.dto.ProviderUser;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,6 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Setter
 @Table(name = "tbl_user")
 public class User {
 
@@ -35,8 +33,6 @@ public class User {
     private String withdrawalAt;
 
     private String joinAt;
-
-    private String refreshToken;
 
     private String profileUrl;
 

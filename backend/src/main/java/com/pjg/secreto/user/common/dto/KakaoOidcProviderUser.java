@@ -30,7 +30,7 @@ public class KakaoOidcProviderUser extends AbstractOAuth2Provider {
 
     @Override
     public String getId() {
-        return (String)getAttributes().get("id");
+        return super.getId();
     }
 
     @Override

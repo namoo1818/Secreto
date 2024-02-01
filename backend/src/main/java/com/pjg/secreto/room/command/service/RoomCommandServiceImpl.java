@@ -1,5 +1,7 @@
 package com.pjg.secreto.room.command.service;
 
+import com.pjg.secreto.history.command.repository.MatchingCommandRepository;
+import com.pjg.secreto.history.common.entity.Matching;
 import com.pjg.secreto.mission.command.repository.MissionScheduleCommandRepository;
 import com.pjg.secreto.mission.command.repository.RoomMissionCommandRepository;
 import com.pjg.secreto.mission.common.entity.MissionSchedule;
@@ -24,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Period;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -43,6 +47,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     private final UserQueryRepository userQueryRepository;
     private final RoomMissionCommandRepository roomMissionCommandRepository;
     private final RoomUserQueryRepository roomUserQueryRepository;
+    private final MatchingCommandRepository matchingCommandRepository;
 
 
     // 방 생성 api (user 개발 완료 시 개발 예정)
@@ -52,7 +57,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         try {
 
             // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
-            Long userNo = 1L;
+            Long userNo = createRoomRequestDto.getUserNo();
 
             List<Room> rooms = roomQueryRepository.findAll();
 
@@ -118,6 +123,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             Room room = roomQueryRepository.findById(changeRoomNameRequestDto.getRoomNo()).orElseThrow(() -> new UserException("해당 유저가 없습니다."));
 
             room.changeName(changeRoomNameRequestDto.getRoomName());
+
         } catch (Exception e) {
             throw new RoomException(e.getMessage());
         }
@@ -137,14 +143,27 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             log.info("현재 날짜 : " + today);
 
             // 미션 일정 생성 (미션 시작일과 방 끝나는 날짜를 기준으로 주기마다 날짜 생성해야 함)
+//            LocalDateTime startDT = LocalDateTime.of(2024, 1, 10, 18, 40, 25);
+//            LocalDateTime endDT = LocalDateTime.of(2024, 2, 1, 14, 30, 55);
+//            int period = 3;
+//            LocalDate missionStartDate = startDT.toLocalDate();
+//            LocalDate roomEndDate = endDT.toLocalDate();
+
             int period = setRoomRequestDto.getPeriod();
             LocalDate missionStartDate = setRoomRequestDto.getMissionStartAt();
-            LocalDateTime roomEndDate = setRoomRequestDto.getRoomEndAt();
+            LocalDate roomEndDate = setRoomRequestDto.getRoomEndAt().toLocalDate();
 
+            Period diff = Period.between(missionStartDate, roomEndDate);
+            int totalDays = diff.getDays();
+            log.info("시작일과 종료일의 날짜 차이 : " + totalDays);
 
+            for(int i=0; i<totalDays; i+=period) {
 
-//            MissionSchedule missionSchedule = MissionSchedule.builder().room(room).missionSubmitAt("dd").build();
-//            missionScheduleCommandRepository.save()
+                LocalDate date = missionStartDate.plusDays(i);
+                MissionSchedule missionSchedule = MissionSchedule.builder().room(room).missionSubmitAt(date).build();
+                missionScheduleCommandRepository.save(missionSchedule);
+            }
+
 
             // 방 미션에 미션 추가
             List<MissionDto> missionList = setRoomRequestDto.getMissionList();
@@ -154,8 +173,51 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 roomMissionCommandRepository.save(roomMission);
             }
 
-            // 매칭 정보 추가
+            /**
+             * 매칭 정보 추가를 위한 로직
+              */
+            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(setRoomRequestDto.getRoomNo());
 
+            // key 랜덤으로 섞기
+            Long keys[] = new Long[roomUsers.size()];
+            Random r = new Random();
+            for(int i=0; i<roomUsers.size(); i++) {
+                keys[i] = r.nextLong(roomUsers.size()) + 1;
+
+                for(int j=0; j<i; j++) {
+                    if(keys[i] == keys[j]) {
+                        i--;
+                    }
+                }
+            }
+
+            log.info("keys = " + Arrays.toString(keys));
+
+            // 매칭 정보 저장
+            for(int i=0; i<keys.length; i++) {
+
+                RoomUser findRoomUser = roomUserQueryRepository.findById(keys[i])
+                        .orElseThrow(() -> new RoomException("해당 유저가 존재하지 않습니다."));
+
+                Matching matching = Matching.builder()
+                        .roomUser(findRoomUser).matchingAt(LocalDateTime.now()).deprecatedAt(null)
+                        .manitoNo(null).manitiNo(null).build();
+                if(i == 0) {
+                    matching.changeMatchingInfo(keys[keys.length-1], keys[i+1]);
+                    findRoomUser.setMatchingInfo(keys[keys.length-1], keys[i+1]);
+                }
+                else if(i == keys.length-1) {
+                    matching.changeMatchingInfo(keys[i-1], keys[0]);
+                    findRoomUser.setMatchingInfo(keys[i-1], keys[0]);
+                }
+                else {
+                    matching.changeMatchingInfo(keys[i-1], keys[i+1]);
+                    findRoomUser.setMatchingInfo(keys[i-1], keys[i+1]);
+                }
+
+                matchingCommandRepository.save(matching);
+
+            }
 
             // 방 정보 수정
             room.startRoom(LocalDateTime.now(), setRoomRequestDto.getRoomEndAt(),
@@ -179,7 +241,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         try {
 
             // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
-            Long userNo = 2L;
+            Long userNo = enterRoomRequestDto.getUserNo();
 
             // 사용할 닉네임 입력
             Room findRoom = roomQueryRepository.findByEntryCode(enterRoomRequestDto.getEntryCode());
@@ -210,7 +272,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         try {
 
             // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
-            Long userNo = 1L;
+            Long userNo = exitRoomRequestDto.getUserNo();
 
             // 방 유저 조회
             Room findRoom = roomQueryRepository.findById(exitRoomRequestDto.getRoomNo())
@@ -228,21 +290,18 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         }
     }
 
-//    @Override
-//    public void setNickname(SetNicknameRequestDto setNicknameRequestDto) {
-//
-//    }
-
     @Override
     public void acceptUser(AcceptUserRequestDto acceptUserRequestDto) {
 
         try {
 
-            RoomUser findRoomUser = roomUserQueryRepository.findById(acceptUserRequestDto.getRoomUserNo())
-                    .orElseThrow(() -> new RoomException("해당 룸 유저가 존재하지 않습니다."));
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findByRoomUserNos(acceptUserRequestDto.getRoomUserNos());
 
             // 방 유저 정보 변경
-            findRoomUser.accepted();
+            for(RoomUser ru : findRoomUsers) {
+                ru.accepted();
+            }
+
         } catch (Exception e) {
 
             throw new RoomException(e.getMessage());
@@ -263,16 +322,140 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     @Override
     public void deligateAdmin(DeligateAdminRequestDto deligateAdminRequestDto) {
 
+        try {
+
+            Room findRoom = roomQueryRepository.findById(deligateAdminRequestDto.getRoomNo())
+                    .orElseThrow(() -> new RoomException("해당 방이 존재하지 않습니다."));
+
+            findRoom.changeHost(deligateAdminRequestDto.getNewHost());
+
+        } catch (Exception e) {
+            throw new RoomException(e.getMessage());
+        }
 
     }
 
     @Override
     public void bookmarkRoom(BookmarkRoomRequestDto bookmarkRoomRequestDto) {
 
+        try {
+
+            Long userNo = bookmarkRoomRequestDto.getUserNo();
+
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, bookmarkRoomRequestDto.getRoomNo());
+
+            findRoomUser.bookmark();
+
+        } catch (Exception e) {
+            throw new RoomException(e.getMessage());
+        }
     }
 
     @Override
     public void terminateRoom(TerminateRoomRequestDto terminateRoomRequestDto) {
+
+        try {
+
+            Room findRoom = roomQueryRepository.findById(terminateRoomRequestDto.getRoomNo())
+                    .orElseThrow(() -> new RoomException("방이 존재하지 않습니다."));
+
+            findRoom.terminateRoom();
+
+        } catch (Exception e) {
+
+            throw new RoomException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void initMatching(InitMatchingRequestDto initMatchingRequestDto) {
+
+        try {
+
+            /**
+             * 매칭 정보 추가를 위한 로직
+             */
+            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(initMatchingRequestDto.getRoomNo());
+
+            // key 랜덤으로 섞기
+            Long keys[] = new Long[roomUsers.size()];
+            Random r = new Random();
+            for(int i=0; i<roomUsers.size(); i++) {
+                keys[i] = r.nextLong(roomUsers.size()) + 1;
+
+                for(int j=0; j<i; j++) {
+                    if(keys[i] == keys[j]) {
+                        i--;
+                    }
+                }
+            }
+
+            log.info("keys = " + Arrays.toString(keys));
+
+            // 매칭 정보 저장
+            for(int i=0; i<keys.length; i++) {
+
+                RoomUser findRoomUser = roomUserQueryRepository.findById(keys[i])
+                        .orElseThrow(() -> new RoomException("해당 유저가 존재하지 않습니다."));
+
+                Matching matching = Matching.builder()
+                        .roomUser(findRoomUser).matchingAt(LocalDateTime.now()).deprecatedAt(null)
+                        .manitoNo(null).manitiNo(null).build();
+                if(i == 0) {
+                    matching.changeMatchingInfo(keys[keys.length-1], keys[i+1]);
+                    findRoomUser.setMatchingInfo(keys[keys.length-1], keys[i+1]);
+                }
+                else if(i == keys.length-1) {
+                    matching.changeMatchingInfo(keys[i-1], keys[0]);
+                    findRoomUser.setMatchingInfo(keys[i-1], keys[0]);
+                }
+                else {
+                    matching.changeMatchingInfo(keys[i-1], keys[i+1]);
+                    findRoomUser.setMatchingInfo(keys[i-1], keys[i+1]);
+                }
+
+                matchingCommandRepository.save(matching);
+
+            }
+
+        } catch (Exception e) {
+
+            throw new RoomException(e.getMessage());
+        }
+
+    }
+
+    @Override
+    public void insertMatching(InsertMatchingRequestDto insertMatchingRequestDto) {
+
+//        try {
+//
+//            List<RoomUser> roomUsers = roomUserQueryRepository
+//                    .findAllByRoomUserNosAndRoomNo(insertMatchingRequestDto.getRoomUserNos(), insertMatchingRequestDto.getRoomNo());
+//
+//
+//            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(initMatchingRequestDto.getRoomNo());
+//
+//            // key 랜덤으로 섞기
+//            Long keys[] = new Long[roomUsers.size()];
+//            Random r = new Random();
+//            for(int i=0; i<roomUsers.size(); i++) {
+//                keys[i] = r.nextLong(roomUsers.size()) + 1;
+//
+//                for(int j=0; j<i; j++) {
+//                    if(keys[i] == keys[j]) {
+//                        i--;
+//                    }
+//                }
+//            }
+//
+//        } catch (Exception e) {
+//
+//            throw new RoomException(e.getMessage());
+//        }
+
+
+
 
     }
 

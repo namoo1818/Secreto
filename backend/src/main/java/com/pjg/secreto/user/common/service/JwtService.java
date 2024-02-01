@@ -1,6 +1,7 @@
 package com.pjg.secreto.user.common.service;
 
 import com.pjg.secreto.user.common.dto.ProviderUser;
+import com.pjg.secreto.user.common.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -29,6 +30,14 @@ public class JwtService {
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
+    }
+
+    public String generateAccessToken(User user) {
+        return buildToken(new HashMap<>(), user, accessTokenExpiration);
+    }
+
+    public String generateRefreshToken(User user) {
+        return buildToken(new HashMap<>(), user, refreshTokenExpiration);
     }
 
     public String generateAccessToken(ProviderUser providerUser) {
@@ -69,14 +78,31 @@ public class JwtService {
             return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
+            return false;
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
+            return false;
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token", e);
+            return false;
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty.", e);
+            return false;
         }
-        return false;
+
+    }
+
+    private String buildToken(
+            Map<String, Object> extraClaims,
+            User user,
+            long expiration){
+        addClaims(extraClaims, user);
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     private String buildToken(
@@ -95,6 +121,13 @@ public class JwtService {
     private static void addClaims(Map<String, Object> extraClaims, ProviderUser providerUser) {
         extraClaims.put("id", providerUser.getId());
         extraClaims.put("nickname", providerUser.getUsername());
+        extraClaims.put("email", providerUser.getEmail());
+        extraClaims.put("provider", providerUser.getProvider());
+    }
+
+    private static void addClaims(Map<String, Object> extraClaims, User providerUser) {
+        extraClaims.put("id", providerUser.getId());
+        extraClaims.put("nickname", providerUser.getNickname());
         extraClaims.put("email", providerUser.getEmail());
         extraClaims.put("provider", providerUser.getProvider());
     }

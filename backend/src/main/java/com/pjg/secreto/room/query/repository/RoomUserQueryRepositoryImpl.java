@@ -23,18 +23,5 @@ public class RoomUserQueryRepositoryImpl implements RoomUserQueryRepositoryCusto
         this.queryFactory = new JPAQueryFactory(em);
     }
 
-    @Override
-    public List<SearchRoomUserListResponseDto> findAllWithMatching() {
-        return queryFactory
-                .select(Projections.fields(SearchRoomUserListResponseDto.class,
-                roomUser.id,
-                roomUser.user,
-                roomUser.room,
-                roomUser.userEntryAt,
-                roomUser.userLeaveAt,
-                roomUser.standbyYn,
-                roomUser.nickname))
-                .from(roomUser)
-                .fetch();
-    }
+
 }

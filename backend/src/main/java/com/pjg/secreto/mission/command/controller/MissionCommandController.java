@@ -1,5 +1,6 @@
 package com.pjg.secreto.mission.command.controller;
 
+import com.pjg.secreto.common.Util.AuthUtils;
 import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.mission.command.dto.*;
 import com.pjg.secreto.mission.command.service.MissionCommandService;
@@ -49,6 +50,8 @@ public class MissionCommandController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
+        Long userNo = AuthUtils.getAuthenticatedUserId();
+        predictManitoRequestDto.setUserNo(userNo);
         missionCommandService.predictManito(predictManitoRequestDto);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "마니또 추리가 완료되었습니다.", null));
@@ -60,6 +63,8 @@ public class MissionCommandController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
+        Long userNo = AuthUtils.getAuthenticatedUserId();
+        memoUserRequestDto.setUserNo(userNo);
         MemoUserResponseDto result = missionCommandService.memoUser(memoUserRequestDto);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "메모가 작성되었습니다.", result));
@@ -71,6 +76,8 @@ public class MissionCommandController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
+        Long userNo = AuthUtils.getAuthenticatedUserId();
+        updateMemoRequestDto.setUserNo(userNo);
         UpdateMemoResponseDto result = missionCommandService.updateMemo(updateMemoRequestDto);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "메모가 수정되었습니다.", result));

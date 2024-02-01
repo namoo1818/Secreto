@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class BookmarkRoomRequestDto {
 
+    private Long userNo;
     private Long roomNo;
 
 }

@@ -1,99 +1,150 @@
 package com.pjg.secreto.mission.query.service;
 
+import com.pjg.secreto.history.common.entity.UserMemo;
+import com.pjg.secreto.history.query.repository.UserMemoQueryRepository;
+import com.pjg.secreto.mission.common.entity.RoomMission;
+import com.pjg.secreto.mission.common.entity.SuddenMission;
+import com.pjg.secreto.mission.common.entity.SystemMission;
+import com.pjg.secreto.mission.common.entity.UserMission;
+import com.pjg.secreto.mission.common.exception.MissionException;
 import com.pjg.secreto.mission.query.dto.*;
+import com.pjg.secreto.mission.query.repository.RoomMissionQueryRepository;
+import com.pjg.secreto.mission.query.repository.SuddenMissionQueryRepository;
+import com.pjg.secreto.mission.query.repository.SystemMissionQueryRepository;
+import com.pjg.secreto.mission.query.repository.UserMissionQueryRepository;
+import com.pjg.secreto.room.common.entity.RoomUser;
+import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class MissionQueryServiceImpl implements MissionQueryService {
 
+    private final SystemMissionQueryRepository systemMissionQueryRepository;
+    private final SuddenMissionQueryRepository suddenMissionQueryRepository;
+    private final RoomMissionQueryRepository roomMissionQueryRepository;
+    private final UserMissionQueryRepository userMissionQueryRepository;
+    private final RoomUserQueryRepository roomUserQueryRepository;
+    private final UserMemoQueryRepository userMemoQueryRepository;
+
     @Override
     public List<SearchSystemMissionResponseDto> searchSystemMission() {
 
-        List<SearchSystemMissionResponseDto> resultList = new ArrayList<>();
+        try {
 
-        SearchSystemMissionResponseDto result1 = SearchSystemMissionResponseDto.builder().content("미션 1").build();
-        SearchSystemMissionResponseDto result2 = SearchSystemMissionResponseDto.builder().content("미션 2").build();
-        SearchSystemMissionResponseDto result3 = SearchSystemMissionResponseDto.builder().content("미션 3").build();
-        SearchSystemMissionResponseDto result4 = SearchSystemMissionResponseDto.builder().content("미션 4").build();
-        SearchSystemMissionResponseDto result5 = SearchSystemMissionResponseDto.builder().content("미션 5").build();
+            List<SystemMission> systemMissions = systemMissionQueryRepository.findAll();
 
-        resultList.add(result1);
-        resultList.add(result2);
-        resultList.add(result3);
-        resultList.add(result4);
-        resultList.add(result5);
+            List<SearchSystemMissionResponseDto> result = systemMissions.stream()
+                    .map(sm -> new SearchSystemMissionResponseDto(
+                            sm.getContent())).toList();
 
-        return resultList;
+            return result;
+
+        } catch (Exception e) {
+
+            throw new MissionException(e.getMessage());
+        }
     }
 
     @Override
     public List<SearchSuddenMissionResponseDto> searchSuddenMission(Long roomNo) {
 
-        List<SearchSuddenMissionResponseDto> resultList = new ArrayList<>();
+        try {
 
-        SearchSuddenMissionResponseDto result1 = SearchSuddenMissionResponseDto.builder().missionSubmitAt("2024/01/15").content("돌발 미션1").build();
-        SearchSuddenMissionResponseDto result2 = SearchSuddenMissionResponseDto.builder().missionSubmitAt("2024/01/17").content("돌발 미션2").build();
-        SearchSuddenMissionResponseDto result3 = SearchSuddenMissionResponseDto.builder().missionSubmitAt("2024/01/19").content("돌발 미션3").build();
+            List<SuddenMission> suddenMissions = suddenMissionQueryRepository.findAllByRoomNoAfterNow(roomNo);
 
-        resultList.add(result1);
-        resultList.add(result2);
-        resultList.add(result3);
+            List<SearchSuddenMissionResponseDto> result = suddenMissions.stream()
+                    .map(sm -> new SearchSuddenMissionResponseDto(
+                            sm.getMissionSubmitAt(),
+                            sm.getContent()
+                    )).toList();
 
-        return resultList;
+            return result;
+        } catch (Exception e) {
+
+            throw new MissionException(e.getMessage());
+        }
     }
 
     @Override
     public List<SearchMissionListResponseDto> searchMissionList(Long roomNo) {
 
-        List<SearchMissionListResponseDto> resultList = new ArrayList<>();
+        try {
 
-        SearchMissionListResponseDto result1 = SearchMissionListResponseDto.builder().content("미션1").build();
-        SearchMissionListResponseDto result2 = SearchMissionListResponseDto.builder().content("미션2").build();
-        SearchMissionListResponseDto result3 = SearchMissionListResponseDto.builder().content("미션3").build();
-        SearchMissionListResponseDto result4 = SearchMissionListResponseDto.builder().content("미션4").build();
-        SearchMissionListResponseDto result5 = SearchMissionListResponseDto.builder().content("미션5").build();
+            List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNO(roomNo);
 
-        resultList.add(result1);
-        resultList.add(result2);
-        resultList.add(result3);
-        resultList.add(result4);
-        resultList.add(result5);
+            List<SearchMissionListResponseDto> result = roomMissions.stream()
+                    .map(rm -> new SearchMissionListResponseDto(
+                            rm.getContent()
+                    )).toList();
 
-        return resultList;
+            return result;
+
+        } catch (Exception e) {
+
+            throw new MissionException(e.getMessage());
+        }
     }
 
     @Override
-    public List<SearchUserMissionListResponseDto> searchUserMissionList(Long roomNo) {
+    public List<SearchUserMissionListResponseDto> searchUserMissionList(SearchUserMissionListRequestDto searchUserMissionListRequestDto) {
 
-        List<SearchUserMissionListResponseDto> resultList = new ArrayList<>();
+        try {
 
-        SearchUserMissionListResponseDto result1 = SearchUserMissionListResponseDto.builder().content("미션1")
-                .missionReceivedAt("2024/01/19").missionType("individual").missionRerollCount(2).missionCertifyYn(false).build();
+            Long userNo = searchUserMissionListRequestDto.getUserNo();
+            Long roomNo = searchUserMissionListRequestDto.getRoomNo();
 
-        SearchUserMissionListResponseDto result2 = SearchUserMissionListResponseDto.builder().content("미션2")
-                .missionReceivedAt("2024/01/17").missionType("common").missionRerollCount(0).missionCertifyYn(true).build();
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo);
 
-        SearchUserMissionListResponseDto result3 = SearchUserMissionListResponseDto.builder().content("미션3")
-                .missionReceivedAt("2024/01/15").missionType("individual").missionRerollCount(2).missionCertifyYn(true).build();
+            List<UserMission> userMissions = userMissionQueryRepository.findByRoomUserNo(findRoomUser.getId());
 
-        resultList.add(result1);
-        resultList.add(result2);
-        resultList.add(result3);
+            List<SearchUserMissionListResponseDto> result = userMissions.stream()
+                    .map(um -> SearchUserMissionListResponseDto.builder()
+                            .missionReceivedAt(um.getMissionReceivedAt())
+                            .content(um.getContent())
+                            .missionType(um.getMissionType())
+                            .missionCertifyYn(um.getMissionCertifyYn())
+                            .missionRerollCount(um.getMissionRerollCount()).build()).toList();
 
-        return resultList;
+            return result;
+
+        } catch (Exception e) {
+
+            throw new MissionException(e.getMessage());
+        }
+
     }
 
     @Override
-    public SearchMemoResponseDto searchMemo(Long userMemoNo) {
+    public SearchMemoResponseDto searchMemo(SearchMemoRequestDto searchMemoRequestDto) {
 
-        SearchMemoResponseDto result = SearchMemoResponseDto.builder().userMemoNo(1L)
-                .memo("얘는 확실히 아닌듯").manitoPredictType("NO").memoTo(3L).build();
+        try {
 
-        return result;
+            Long userNo = searchMemoRequestDto.getUserNo();
+
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, searchMemoRequestDto.getRoomNo());
+            UserMemo findUserMemo = userMemoQueryRepository.findByRoomUserNo(findRoomUser.getId());
+
+            SearchMemoResponseDto result = SearchMemoResponseDto.builder()
+                    .memo(findUserMemo.getMemo())
+                    .userMemoNo(findUserMemo.getId())
+                    .manitoPredictType(findUserMemo.getManitoPredictType())
+                    .memoTo(findUserMemo.getMemoTo()).build();
+
+            return result;
+
+        } catch (Exception e) {
+
+            throw new MissionException(e.getMessage());
+        }
+
     }
 }

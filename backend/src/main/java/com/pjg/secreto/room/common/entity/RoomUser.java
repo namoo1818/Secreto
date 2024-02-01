@@ -76,8 +76,14 @@ public class RoomUser {
 
     private Boolean bookmarkYn;
 
+    private Long usersManito;
+
+    private Long usersManiti;
+
+
     @Builder
-    public RoomUser(User user, Room room, LocalDateTime userEntryAt, LocalDateTime userLeaveAt, Boolean standByYn, String nickname, Boolean bookmarkYn) {
+    public RoomUser(User user, Room room, LocalDateTime userEntryAt, LocalDateTime userLeaveAt,
+                    Boolean standByYn, String nickname, Boolean bookmarkYn, Long usersManito, Long usersManiti) {
         this.user = user;
         this.room = room;
         this.userEntryAt = userEntryAt;
@@ -85,6 +91,8 @@ public class RoomUser {
         this.standbyYn = standByYn;
         this.nickname = nickname;
         this.bookmarkYn = bookmarkYn;
+        this.usersManito = usersManito;
+        this.usersManiti = usersManiti;
     }
 
     // 유저가 방을 나갈 때
@@ -97,6 +105,15 @@ public class RoomUser {
     public void accepted() {
         this.userEntryAt = LocalDateTime.now();
         this.standbyYn = false;
+    }
+
+    public void bookmark() {
+        this.bookmarkYn = true;
+    }
+
+    public void setMatchingInfo(Long usersManito, Long usersManiti) {
+        this.usersManito = usersManito;
+        this.usersManiti = usersManiti;
     }
 
 }
