@@ -29,7 +29,6 @@ public class RoomQueryController {
 
     private final RoomQueryService roomQueryService;
 
-    // 완성
     @GetMapping("/enter")
     public ResponseEntity<?> enterRoom(@RequestBody CheckCodeDto checkCodeDto) {
 

@@ -11,11 +11,11 @@ import org.springframework.http.HttpStatus;
 public class SuccessResponse {
 
     HttpStatus status;
-    String msg;
+    String message;
     Object result;
 
-    public SuccessResponse(HttpStatus status, String msg){
+    public SuccessResponse(HttpStatus status, String message){
         this.status = status;
-        this.msg = msg;
+        this.message = message;
     }
 }
