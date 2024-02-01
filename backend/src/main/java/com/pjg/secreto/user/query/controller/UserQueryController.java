@@ -48,8 +48,8 @@ public class UserQueryController {
 
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> detail(Authentication authentication){
-        UserInfo detail = queryService.detail(authentication);
+    public ResponseEntity<?> detail(@PathVariable Long userId,Authentication authentication){
+        UserInfo detail = queryService.detail(authentication, userId);
 
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 반환하였습니다.", detail);
         return ResponseEntity.ok(response);

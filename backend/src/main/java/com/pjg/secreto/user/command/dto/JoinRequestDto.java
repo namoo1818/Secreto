@@ -12,14 +12,14 @@ import javax.annotation.Nullable;
 
 @Data
 public class JoinRequestDto {
-    @NotBlank
-    @Email
+    @NotBlank(message = "이메일의 양식에 맞지 않습니다.")
+    @Email(message = "이메일이 빈값으로 전달되었습니다.")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "비밀번호가 공백으로 전달되었습니다.")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "닉네임이 공백으로 전달되었습니다.")
     private String nickname;
 
     @Nullable

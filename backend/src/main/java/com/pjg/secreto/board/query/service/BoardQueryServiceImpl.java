@@ -1,77 +1,166 @@
 package com.pjg.secreto.board.query.service;
 
+import com.pjg.secreto.board.command.repository.BoardCommandRepository;
+import com.pjg.secreto.board.command.repository.BoardEntryLogCommandRepository;
 import com.pjg.secreto.board.common.entity.Board;
+import com.pjg.secreto.board.common.entity.BoardCategory;
+import com.pjg.secreto.board.common.entity.BoardEntryLog;
 import com.pjg.secreto.board.common.entity.Reply;
+import com.pjg.secreto.board.common.exception.BoardException;
 import com.pjg.secreto.board.query.dto.SearchBoardRequestDto;
 import com.pjg.secreto.board.query.dto.SearchBoardResponseDto;
 import com.pjg.secreto.board.query.dto.SearchPostResponseDto;
 import com.pjg.secreto.board.query.dto.SearchReplyResponseDto;
+import com.pjg.secreto.board.query.repository.BoardEntryLogQueryRepository;
 import com.pjg.secreto.board.query.repository.BoardQueryRepository;
-import com.pjg.secreto.board.query.repository.BoardSpecification;
 import com.pjg.secreto.board.query.repository.ReplyQueryRepository;
+import com.pjg.secreto.room.common.entity.RoomUser;
+import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
+import com.pjg.secreto.user.common.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 @Service
 public class BoardQueryServiceImpl implements BoardQueryService{
+    private BoardEntryLogCommandRepository boardEntryLogCommandRepository;
+    private BoardEntryLogQueryRepository boardEntryLogQueryRepository;
+    private BoardCommandRepository boardCommandRepository;
     private BoardQueryRepository boardQueryRepository;
     private ReplyQueryRepository replyQueryRepository;
+    private RoomUserQueryRepository roomUserQueryRepository;
 
     @Autowired
-    public BoardQueryServiceImpl(BoardQueryRepository boardQueryRepository, ReplyQueryRepository replyQueryRepository){
+    public BoardQueryServiceImpl(BoardEntryLogCommandRepository boardEntryLogCommandRepository, BoardEntryLogQueryRepository boardEntryLogQueryRepository, BoardCommandRepository boardCommandRepository, BoardQueryRepository boardQueryRepository, ReplyQueryRepository replyQueryRepository, RoomUserQueryRepository roomUserQueryRepository){
+        this.boardEntryLogCommandRepository = boardEntryLogCommandRepository;
+        this.boardEntryLogQueryRepository = boardEntryLogQueryRepository;
+        this.boardCommandRepository = boardCommandRepository;
         this.boardQueryRepository = boardQueryRepository;
         this.replyQueryRepository = replyQueryRepository;
+        this.roomUserQueryRepository = roomUserQueryRepository;
     }
 
     @Override
     public Page<SearchBoardResponseDto> getBoardBySpecification(SearchBoardRequestDto serachRequest, Pageable pageable) {
-        Specification<Board> spec = (root, query, criteriaBuilder) -> null;
+        Long roomNo = serachRequest.getRoomNo();
+        BoardCategory boardCategory = serachRequest.getBoardCategory();
+        String title = serachRequest.getTitle();
+        String content = serachRequest.getContent();
+        String writer = serachRequest.getWriter();
 
-        Long roomUserNo = serachRequest.getRoomUserNo();
-        String boardCategory = serachRequest.getBoardCategory();
+        List<Board> boardList;
 
-        if(serachRequest.getTitle()!=null){
-            spec = spec.and(BoardSpecification.boardRoomUserAndCategoryAndTitle(
-                    roomUserNo,
-                    boardCategory,
-                    serachRequest.getTitle()
-            ));
+        if(boardCategory==null) {
+            throw new BoardException("게시판 카테고리를 선택해주세요");
         }
-        if(serachRequest.getContent()!=null){
-            spec = spec.and(BoardSpecification.boardRoomUserAndCategoryAndContent(
-                    roomUserNo,
-                    boardCategory,
-                    serachRequest.getContent()
-            ));
+        if(title!=null) {
+            boardList = boardQueryRepository.findBoardByBoardCategoryAndTitleContaining(boardCategory, title);
         }
-        if(serachRequest.getWriter()!=null){
-            spec = spec.and(BoardSpecification.boardRoomUserAndCategoryAndWriter(
-                    roomUserNo,
-                    boardCategory,
-                    serachRequest.getWriter()
-            ));
+        else if(content!=null){
+            boardList = boardQueryRepository.findBoardByBoardCategoryAndContentContaining(boardCategory, content);
+        }
+        else if(writer!=null){
+            boardList = boardQueryRepository.findBoardByBoardCategoryAndWriterContaining(boardCategory, writer);
+        } else {
+            boardList = boardQueryRepository.findBoardByBoardCategory(boardCategory);
         }
 
-        Page<SearchBoardResponseDto> searchBoardResponseDto = boardQueryRepository.findAll(spec, pageable).map(SearchBoardResponseDto::toDto);
+        List<SearchBoardResponseDto> boardResponseDtoList = new ArrayList<>();
+
+        for(Board board:boardList){
+            if(board.getRoomUser().getRoom().getId()==roomNo) {
+                User user = board.getRoomUser().getUser();
+
+                String writerEmail = user.getEmail();
+                String writerProfileUrl = user.getProfileUrl();
+
+                Boolean publicYn = board.getPublicYn();
+
+                if (!publicYn) {
+                    writerEmail = null;
+                    writerProfileUrl = null;
+                }
+
+                SearchBoardResponseDto searchBoardResponseDto = SearchBoardResponseDto.builder()
+                        .boardNo(board.getId())
+                        .title(board.getTitle())
+                        .registerAt(board.getRegisterAt())
+                        .hit(board.getHit())
+                        .boardCategory(board.getBoardCategory())
+                        .publicYn(board.getPublicYn())
+                        .missionCategory(board.getMissionCategory())
+                        .likedCount(board.getLikedCount())
+                        .writer(board.getWriter())
+                        .writerEmail(writerEmail)
+                        .writerProfileUrl(writerProfileUrl)
+                        .replyCount(board.getReplies().size())
+                        .imgUrl(board.getImgUrl())
+                        .build();
+                boardResponseDtoList.add(searchBoardResponseDto);
+            }
+        }
+
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        int start = (int)pageable.getOffset();
+        int end = Math.min((start+size),boardResponseDtoList.size());
+
+        Page<SearchBoardResponseDto> searchBoardResponseDto = new PageImpl<>(boardResponseDtoList.subList(start, end), pageable, boardResponseDtoList.size());
 
         return searchBoardResponseDto;
     }
 
     @Override
-    public SearchPostResponseDto getPost(Long boardNo) {
+    public SearchPostResponseDto getPost(Long boardNo, Long roomUserNo) {
         Board board = boardQueryRepository.findById(boardNo).orElseThrow();
-        System.out.println(LocalDateTime.now());
-        return SearchPostResponseDto.toDto(board);
+        RoomUser roomUser = roomUserQueryRepository.findById(roomUserNo).orElseThrow();
+
+        Optional boardEntryLog = boardEntryLogQueryRepository.findByBoardAndAndRoomUserAndAndEntryAt(board, roomUser, LocalDate.now());
+
+        if(boardEntryLog.isEmpty()){
+            boardEntryLogCommandRepository.save(new BoardEntryLog(board, roomUser, LocalDate.now()));
+            board.updateHit(board.getHit()+1);
+        }
+
+        User user = board.getRoomUser().getUser();
+
+        String writerEmail = user.getEmail();
+        String writerProfileUrl = user.getProfileUrl();
+
+        Boolean publicYn = board.getPublicYn();
+
+        if(!publicYn){
+            writerEmail = null;
+            writerProfileUrl = null;
+        }
+
+        SearchPostResponseDto searchPostResponseDto = SearchPostResponseDto.builder()
+                .boardNo(board.getId())
+                .roomUserNo(board.getRoomUser().getId())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .registerAt(board.getRegisterAt())
+                .hit(board.getHit())
+                .boardCategory(board.getBoardCategory())
+                .publicYn(board.getPublicYn())
+                .missionCategory(board.getMissionCategory())
+                .likedCount(board.getLikedCount())
+                .writer(board.getWriter())
+                .writerEmail(writerEmail)
+                .writerProfileUrl(writerProfileUrl)
+                .build();
+        return searchPostResponseDto;
     }
 
 
@@ -84,7 +173,30 @@ public class BoardQueryServiceImpl implements BoardQueryService{
         List<SearchReplyResponseDto> searchReplyResponseDtoList = new ArrayList<>();
 
         for(Reply reply:replyList){
-            searchReplyResponseDtoList.add(SearchReplyResponseDto.toDto(reply));
+            RoomUser roomUser = roomUserQueryRepository.findById(reply.getRoomUser().getId()).orElseThrow();
+            User user = roomUser.getUser();
+
+            String writerEmail = user.getEmail();
+            String writerProfileUrl = user.getProfileUrl();
+
+            Boolean annonymityYn = reply.getAnnonymityYn();
+            if(annonymityYn){
+                writerEmail = null;
+                writerProfileUrl = null;
+            }
+
+            SearchReplyResponseDto responseDto =  SearchReplyResponseDto.builder()
+                    .replyNo(reply.getId())
+                    .roomUserNo(reply.getRoomUser().getId())
+                    .content(reply.getContent())
+                    .registerAt(reply.getRegisterAt())
+                    .parentReplyNo(reply.getParentReplyNo())
+                    .tagUserNo(reply.getTagUserNo())
+                    .writer(reply.getWriter())
+                    .writerEmail(writerEmail)
+                    .writerProfileUrl(writerProfileUrl)
+                    .build();
+            searchReplyResponseDtoList.add(responseDto);
         }
 
         return searchReplyResponseDtoList;

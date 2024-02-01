@@ -1,6 +1,5 @@
 package com.pjg.secreto.board.query.dto;
 
-import com.pjg.secreto.board.common.entity.Reply;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,22 +9,13 @@ import java.time.LocalDateTime;
 @Data
 public class SearchReplyResponseDto {
     Long replyNo;
+    Long roomUserNo;
     String content;
     LocalDateTime registerAt;
     Long parentReplyNo;
     Long tagUserNo;
     String writer;
+    String writerEmail;
+    String writerProfileUrl;
     Boolean annonymityYn;
-
-    public static SearchReplyResponseDto toDto(final Reply reply){
-        return SearchReplyResponseDto.builder()
-                .replyNo(reply.getId())
-                .content(reply.getContent())
-                .registerAt(reply.getRegisterAt())
-                .parentReplyNo(reply.getParentReplyNo())
-                .tagUserNo(reply.getTagUserNo())
-                .writer(reply.getWriter())
-                .annonymityYn(reply.getAnnonymityYn())
-                .build();
-    }
 }
