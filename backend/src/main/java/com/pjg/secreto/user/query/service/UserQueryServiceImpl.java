@@ -84,9 +84,9 @@ public class UserQueryServiceImpl implements UserQueryService {
 
         else{
             tokens = RefreshToken.builder()
+                    .email(user.getEmail())
                     .refreshToken(refreshToken)
                     .registeredAt(LocalDateTime.now())
-                    .user(user)
                     .build();
         }
 

@@ -9,6 +9,8 @@ import com.pjg.secreto.user.query.dto.*;
 import com.pjg.secreto.user.query.service.UserQueryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,7 +31,7 @@ public class UserQueryController {
     private final UserQueryService queryService;
 
     @PostMapping("/users/log-in")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto dto){
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto dto){
         LoginResponseDto result = queryService.login(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "로그인에 성공하였습니다.", result);
 
@@ -53,14 +55,14 @@ public class UserQueryController {
     }
 
     @GetMapping("/users/password/{certCode}")
-    public ResponseEntity<?> allowChangePassword(@PathVariable String certCode){
+    public ResponseEntity<?> allowChangePassword(@PathVariable @NotBlank String certCode){
         String requestedEmail = queryService.allowChangePassword(certCode);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호를 변경할 수 있습니다.", requestedEmail);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/cert")
-    public ResponseEntity<?> validateCertCode(@RequestBody ValidateCertRequestDto dto){
+    public ResponseEntity<?> validateCertCode(@RequestBody @Valid ValidateCertRequestDto dto){
         queryService.validateDuplicatedEmail(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "이메일이 정상적으로 검증되었습니다.");
         return ResponseEntity.ok(response);

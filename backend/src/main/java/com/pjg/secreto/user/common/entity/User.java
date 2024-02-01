@@ -42,9 +42,6 @@ public class User {
 
     private String sub;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private RefreshToken refreshToken;
-
     public User(ProviderUser providerUser) {
         this.nickname = providerUser.getUsername();
         this.password = providerUser.getPassword();

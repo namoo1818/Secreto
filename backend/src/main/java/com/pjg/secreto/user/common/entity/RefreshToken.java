@@ -2,29 +2,23 @@ package com.pjg.secreto.user.common.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED )
-@Table(name = "tbl_refresh_token")
+@RedisHash(value = "refreshToken")
 public class RefreshToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    private User user;
-
+    private String email;
     private String refreshToken;
-
     private LocalDateTime registeredAt;
 
     @Builder
-    public RefreshToken(User user, String refreshToken, LocalDateTime registeredAt) {
-        this.user = user;
+    public RefreshToken(String email, String refreshToken, LocalDateTime registeredAt) {
+        this.email = email;
         this.refreshToken = refreshToken;
         this.registeredAt = registeredAt;
     }

@@ -66,12 +66,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         else {
             RefreshToken tokens = RefreshToken.builder()
                     .refreshToken(refreshToken)
+                    .email(user.getEmail())
                     .registeredAt(LocalDateTime.now())
-                    .user(user)
                     .build();
 
             RefreshToken savedRefreshToken = refreshTokenRepository.save(tokens);
-            user.setRefreshToken(savedRefreshToken);
         }
 
 

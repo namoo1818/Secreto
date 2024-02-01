@@ -8,14 +8,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserInfo {
-    private String prodiver;
+    private String provider;
     private String email;
     private String nickname;
     private String profileUrl;
     private String id;
 
     public UserInfo(ProviderUser providerUser) {
-        this.prodiver = providerUser.getProvider();
+        this.provider = providerUser.getProvider();
         this.email = providerUser.getEmail();
         this.nickname = providerUser.getUsername();
         this.profileUrl = providerUser.getProfileUrl();
