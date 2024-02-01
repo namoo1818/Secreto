@@ -5,6 +5,7 @@ import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.mission.common.exception.MissionException;
 import com.pjg.secreto.room.common.exception.RoomException;
 import com.pjg.secreto.user.common.exception.UserException;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Slf4j
 @RestControllerAdvice
 public class CommonControllerAdvice {
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<?> ExpiredJwtExceptionHandler(Exception e) {
+        log.error("유저 예외 발생", e);
+
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, e.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> commonExceptionHandler(Exception e) {
@@ -45,7 +54,6 @@ public class CommonControllerAdvice {
         return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
 
-//    @ExceptionHandler(value = {UsernameNotFoundException.class,})
 
 
 }
