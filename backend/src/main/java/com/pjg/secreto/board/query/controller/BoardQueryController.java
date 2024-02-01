@@ -46,11 +46,12 @@ public class BoardQueryController {
     // 게시글 상세 조회
     @GetMapping(value="/post/{boardNo}")
     public ResponseEntity<?> readPost(@PathVariable Long boardNo){
+        Long roomUserNo = 1L;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-        SearchPostResponseDto result = boardQueryService.getPost(boardNo);
+        SearchPostResponseDto result = boardQueryService.getPost(boardNo, roomUserNo);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "게시글 상세 조회 성공", result));
     }

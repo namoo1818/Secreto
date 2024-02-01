@@ -12,7 +12,7 @@ import java.util.List;
 public interface BoardQueryService {
     public Page<SearchBoardResponseDto> getBoardBySpecification(SearchBoardRequestDto serachRequest, Pageable pageable);
 
-    public SearchPostResponseDto getPost(Long boardNo);
+    public SearchPostResponseDto getPost(Long boardNo, Long roomUserNo);
 
     public List<SearchReplyResponseDto> getRely(Long boardNo);
 

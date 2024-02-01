@@ -3,10 +3,12 @@ package com.pjg.secreto.board.common.entity;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,9 +29,15 @@ public class BoardEntryLog {
     @JoinColumn(name = "room_user_no")
     private RoomUser roomUser;
 
-    @Convert(converter = BoardCategoryConverter.class)
-    private LocalDateTime entryAt;
+    @CreatedDate
+    private LocalDate entryAt;
 
+    @Builder
+    public BoardEntryLog(Board board, RoomUser roomUser, LocalDate entryAt) {
+        this.board = board;
+        this.roomUser = roomUser;
+        this.entryAt = entryAt;
+    }
 }
 
 
