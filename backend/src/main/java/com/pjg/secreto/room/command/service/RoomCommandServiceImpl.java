@@ -178,15 +178,9 @@ public class RoomCommandServiceImpl implements RoomCommandService {
               */
             List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(setRoomRequestDto.getRoomNo());
 
-            List<Long> roomUserNos = new ArrayList<>(roomUsers.size());
-            for(RoomUser ru : roomUsers) {
-                roomUserNos.add(ru.getId());
-            }
-
             // key 랜덤으로 섞기
-            Random r = new Random();
-
             Long keys[] = new Long[roomUsers.size()];
+            Random r = new Random();
             for(int i=0; i<roomUsers.size(); i++) {
                 keys[i] = r.nextLong(roomUsers.size()) + 1;
 
@@ -383,15 +377,9 @@ public class RoomCommandServiceImpl implements RoomCommandService {
              */
             List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(initMatchingRequestDto.getRoomNo());
 
-            List<Long> roomUserNos = new ArrayList<>(roomUsers.size());
-            for(RoomUser ru : roomUsers) {
-                roomUserNos.add(ru.getId());
-            }
-
             // key 랜덤으로 섞기
-            Random r = new Random();
-
             Long keys[] = new Long[roomUsers.size()];
+            Random r = new Random();
             for(int i=0; i<roomUsers.size(); i++) {
                 keys[i] = r.nextLong(roomUsers.size()) + 1;
 
@@ -440,21 +428,17 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     @Override
     public void insertMatching(InsertMatchingRequestDto insertMatchingRequestDto) {
 
-        try {
-
-            List<RoomUser> newUsers = roomUserQueryRepository
-                    .findAllByRoomUserNosAndRoomNo(insertMatchingRequestDto.getRoomUserNos(), insertMatchingRequestDto.getRoomNo());
-
-
-//            List<Long> roomUserNos = new ArrayList<>(roomUsers.size());
-//            for(RoomUser ru : roomUsers) {
-//                roomUserNos.add(ru.getId());
-//            }
+//        try {
+//
+//            List<RoomUser> roomUsers = roomUserQueryRepository
+//                    .findAllByRoomUserNosAndRoomNo(insertMatchingRequestDto.getRoomUserNos(), insertMatchingRequestDto.getRoomNo());
+//
+//
+//            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(initMatchingRequestDto.getRoomNo());
 //
 //            // key 랜덤으로 섞기
-//            Random r = new Random();
-//
 //            Long keys[] = new Long[roomUsers.size()];
+//            Random r = new Random();
 //            for(int i=0; i<roomUsers.size(); i++) {
 //                keys[i] = r.nextLong(roomUsers.size()) + 1;
 //
@@ -464,15 +448,11 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 //                    }
 //                }
 //            }
-
-//            log.info("keys = " + Arrays.toString(keys));
-
-
-
-        } catch (Exception e) {
-
-            throw new RoomException(e.getMessage());
-        }
+//
+//        } catch (Exception e) {
+//
+//            throw new RoomException(e.getMessage());
+//        }
 
 
 
