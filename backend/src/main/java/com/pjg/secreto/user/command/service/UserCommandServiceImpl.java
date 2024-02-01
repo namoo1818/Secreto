@@ -66,7 +66,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         String tokens;
         String type;
 
-        if (StringUtil.isNullOrEmpty(refreshToken) || refreshToken.startsWith("bearer ")) {
+        if (StringUtil.isNullOrEmpty(refreshToken) || !refreshToken.startsWith("bearer ")) {
             throw new UserException("잘못된 형태의 리프레시 토큰이 전달되었습니다.");
         }
 

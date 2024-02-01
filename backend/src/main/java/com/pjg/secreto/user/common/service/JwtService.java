@@ -82,6 +82,7 @@ public class JwtService {
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
             return false;
+//            throw new ExpiredJwtException(null, null, null);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token", e);
             return false;
