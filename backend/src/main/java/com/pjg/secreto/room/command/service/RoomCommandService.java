@@ -22,4 +22,8 @@ public interface RoomCommandService {
     void denyUser(DenyUserRequestDto denyUserRequestDto);
 
     void exitRoom(ExitRoomRequestDto exitRoomRequestDto);
+
+    void initMatching(InitMatchingRequestDto initMatchingRequestDto);
+
+    void insertMatching(InsertMatchingRequestDto insertMatchingRequestDto);
 }

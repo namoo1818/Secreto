@@ -75,7 +75,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
         try {
 
-            Long userNo = 1L;
+            Long userNo = predictManitoRequestDto.getUserNo();
 
             RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, predictManitoRequestDto.getRoomNo());
 
@@ -96,7 +96,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
         try {
 
-            Long userNo = 1L;
+            Long userNo = memoUserRequestDto.getUserNo();
 
             RoomUser roomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, memoUserRequestDto.getRoomNo());
 
@@ -122,7 +122,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
         try {
 
-            Long userNo = 1L;
+            Long userNo = updateMemoRequestDto.getUserNo();
 
             RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, updateMemoRequestDto.getRoomNo());
 

@@ -11,7 +11,7 @@ import java.util.List;
 public interface RoomQueryService {
     List<SearchRoomUserListResponseDto> searchRoomUserList(Long roomNo);
 
-    List<SearchRoomListResponseDto> searchRoomList();
+    List<SearchRoomListResponseDto> searchRoomList(Long userNo);
 
     SearchRoomResponseDto searchRoom(Long roomNo);
 

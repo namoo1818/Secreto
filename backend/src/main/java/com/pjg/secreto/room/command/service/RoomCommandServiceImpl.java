@@ -57,7 +57,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         try {
 
             // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
-            Long userNo = 1L;
+            Long userNo = createRoomRequestDto.getUserNo();
 
             List<Room> rooms = roomQueryRepository.findAll();
 
@@ -204,12 +204,15 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .manitoNo(null).manitiNo(null).build();
                 if(i == 0) {
                     matching.changeMatchingInfo(keys[keys.length-1], keys[i+1]);
+                    findRoomUser.setMatchingInfo(keys[keys.length-1], keys[i+1]);
                 }
                 else if(i == keys.length-1) {
                     matching.changeMatchingInfo(keys[i-1], keys[0]);
+                    findRoomUser.setMatchingInfo(keys[i-1], keys[0]);
                 }
                 else {
                     matching.changeMatchingInfo(keys[i-1], keys[i+1]);
+                    findRoomUser.setMatchingInfo(keys[i-1], keys[i+1]);
                 }
 
                 matchingCommandRepository.save(matching);
@@ -238,7 +241,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         try {
 
             // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
-            Long userNo = 2L;
+            Long userNo = enterRoomRequestDto.getUserNo();
 
             // 사용할 닉네임 입력
             Room findRoom = roomQueryRepository.findByEntryCode(enterRoomRequestDto.getEntryCode());
@@ -269,7 +272,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         try {
 
             // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
-            Long userNo = 1L;
+            Long userNo = exitRoomRequestDto.getUserNo();
 
             // 방 유저 조회
             Room findRoom = roomQueryRepository.findById(exitRoomRequestDto.getRoomNo())
@@ -292,11 +295,13 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         try {
 
-            RoomUser findRoomUser = roomUserQueryRepository.findById(acceptUserRequestDto.getRoomUserNo())
-                    .orElseThrow(() -> new RoomException("해당 룸 유저가 존재하지 않습니다."));
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findByRoomUserNos(acceptUserRequestDto.getRoomUserNos());
 
             // 방 유저 정보 변경
-            findRoomUser.accepted();
+            for(RoomUser ru : findRoomUsers) {
+                ru.accepted();
+            }
+
         } catch (Exception e) {
 
             throw new RoomException(e.getMessage());
@@ -335,7 +340,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         try {
 
-            Long userNo = 1L;
+            Long userNo = bookmarkRoomRequestDto.getUserNo();
 
             RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, bookmarkRoomRequestDto.getRoomNo());
 
@@ -360,8 +365,100 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             throw new RoomException(e.getMessage());
         }
+    }
+
+    @Override
+    public void initMatching(InitMatchingRequestDto initMatchingRequestDto) {
+
+        try {
+
+            /**
+             * 매칭 정보 추가를 위한 로직
+             */
+            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(initMatchingRequestDto.getRoomNo());
+
+            // key 랜덤으로 섞기
+            Long keys[] = new Long[roomUsers.size()];
+            Random r = new Random();
+            for(int i=0; i<roomUsers.size(); i++) {
+                keys[i] = r.nextLong(roomUsers.size()) + 1;
+
+                for(int j=0; j<i; j++) {
+                    if(keys[i] == keys[j]) {
+                        i--;
+                    }
+                }
+            }
+
+            log.info("keys = " + Arrays.toString(keys));
+
+            // 매칭 정보 저장
+            for(int i=0; i<keys.length; i++) {
+
+                RoomUser findRoomUser = roomUserQueryRepository.findById(keys[i])
+                        .orElseThrow(() -> new RoomException("해당 유저가 존재하지 않습니다."));
+
+                Matching matching = Matching.builder()
+                        .roomUser(findRoomUser).matchingAt(LocalDateTime.now()).deprecatedAt(null)
+                        .manitoNo(null).manitiNo(null).build();
+                if(i == 0) {
+                    matching.changeMatchingInfo(keys[keys.length-1], keys[i+1]);
+                    findRoomUser.setMatchingInfo(keys[keys.length-1], keys[i+1]);
+                }
+                else if(i == keys.length-1) {
+                    matching.changeMatchingInfo(keys[i-1], keys[0]);
+                    findRoomUser.setMatchingInfo(keys[i-1], keys[0]);
+                }
+                else {
+                    matching.changeMatchingInfo(keys[i-1], keys[i+1]);
+                    findRoomUser.setMatchingInfo(keys[i-1], keys[i+1]);
+                }
+
+                matchingCommandRepository.save(matching);
+
+            }
+
+        } catch (Exception e) {
+
+            throw new RoomException(e.getMessage());
+        }
 
     }
+
+    @Override
+    public void insertMatching(InsertMatchingRequestDto insertMatchingRequestDto) {
+
+//        try {
+//
+//            List<RoomUser> roomUsers = roomUserQueryRepository
+//                    .findAllByRoomUserNosAndRoomNo(insertMatchingRequestDto.getRoomUserNos(), insertMatchingRequestDto.getRoomNo());
+//
+//
+//            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(initMatchingRequestDto.getRoomNo());
+//
+//            // key 랜덤으로 섞기
+//            Long keys[] = new Long[roomUsers.size()];
+//            Random r = new Random();
+//            for(int i=0; i<roomUsers.size(); i++) {
+//                keys[i] = r.nextLong(roomUsers.size()) + 1;
+//
+//                for(int j=0; j<i; j++) {
+//                    if(keys[i] == keys[j]) {
+//                        i--;
+//                    }
+//                }
+//            }
+//
+//        } catch (Exception e) {
+//
+//            throw new RoomException(e.getMessage());
+//        }
+
+
+
+
+    }
+
 
     /**
      * 방 입장 코드 생성 메서드

@@ -23,6 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class UserQueryController {
+
     private final UserQueryService queryService;
 
     @PostMapping("/users/log-in")

@@ -1,5 +1,6 @@
 package com.pjg.secreto.mission.query.controller;
 
+import com.pjg.secreto.common.Util.AuthUtils;
 import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.mission.command.dto.AddSuddenMissionRequestDto;
 import com.pjg.secreto.mission.query.dto.*;
@@ -55,12 +56,15 @@ public class MissionQueryController {
     }
 
     @GetMapping("/user/{roomNo}")
-    public ResponseEntity<?> searchUserMissionList(@PathVariable Long roomNo) {
+    public ResponseEntity<?> searchUserMissionList(@PathVariable Long roomNo, SearchUserMissionListRequestDto searchUserMissionListRequestDto) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-        List<SearchUserMissionListResponseDto> result = missionQueryService.searchUserMissionList(roomNo);
+        Long userNo = AuthUtils.getAuthenticatedUserId();
+        searchUserMissionListRequestDto.setUserNo(userNo);
+        searchUserMissionListRequestDto.setRoomNo(roomNo);
+        List<SearchUserMissionListResponseDto> result = missionQueryService.searchUserMissionList(searchUserMissionListRequestDto);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "유저 별 미션 리스트를 조회하였습니다.", result));
     }
@@ -71,6 +75,8 @@ public class MissionQueryController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
+        Long userNo = AuthUtils.getAuthenticatedUserId();
+        searchMemoRequestDto.setUserNo(userNo);
         searchMemoRequestDto.setUserMemoNo(userMemoNo);
         SearchMemoResponseDto result = missionQueryService.searchMemo(searchMemoRequestDto);
 

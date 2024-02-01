@@ -95,11 +95,12 @@ public class MissionQueryServiceImpl implements MissionQueryService {
     }
 
     @Override
-    public List<SearchUserMissionListResponseDto> searchUserMissionList(Long roomNo) {
+    public List<SearchUserMissionListResponseDto> searchUserMissionList(SearchUserMissionListRequestDto searchUserMissionListRequestDto) {
 
         try {
 
-            Long userNo = 1L;
+            Long userNo = searchUserMissionListRequestDto.getUserNo();
+            Long roomNo = searchUserMissionListRequestDto.getRoomNo();
 
             RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo);
 
@@ -127,7 +128,7 @@ public class MissionQueryServiceImpl implements MissionQueryService {
 
         try {
 
-            Long userNo = 1L;
+            Long userNo = searchMemoRequestDto.getUserNo();
 
             RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, searchMemoRequestDto.getRoomNo());
             UserMemo findUserMemo = userMemoQueryRepository.findByRoomUserNo(findRoomUser.getId());
