@@ -3,7 +3,7 @@ package com.pjg.secreto.user.command.service;
 
 import com.pjg.secreto.common.Util.AuthUtils;
 import com.pjg.secreto.common.Util.RandomUtils;
-import com.pjg.secreto.history.command.dto.EMailRequestDto;
+import com.pjg.secreto.user.common.dto.EmailSendRequestDto;
 import com.pjg.secreto.user.command.dto.*;
 import com.pjg.secreto.user.command.repository.EmailCheckCommandRepository;
 import com.pjg.secreto.user.command.repository.UserCommandRepository;
@@ -147,7 +147,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         String url = randomCode;
 
-        EMailRequestDto emailSendDto = EMailRequestDto.builder()
+        EmailSendRequestDto emailSendDto = EmailSendRequestDto.builder()
                 .to(dto.getEmail())
                 .subject("비밀번호 변경 페이지로 안내합니다.")
                 .contents("<a href=http://localhost/ " + url + ">").build();
@@ -184,7 +184,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         String url = randomCode;
 
-        EMailRequestDto emailSendDto = EMailRequestDto.builder()
+        EmailSendRequestDto emailSendDto = EmailSendRequestDto.builder()
                 .to(userId)
                 .subject("비밀번호 변경 페이지로 안내합니다.")
                 .contents("<a href=http://localhost/ " + url + ">").build();
