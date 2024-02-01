@@ -6,6 +6,6 @@ import lombok.Data;
 
 @Data
 public class WithdrawRequestDto {
-    @NotBlank
+    @NotBlank(message = "비밀번호가 공백으로 전달되었습니다.")
     private String password;
 }

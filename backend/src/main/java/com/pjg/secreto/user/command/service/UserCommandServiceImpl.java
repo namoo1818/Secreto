@@ -22,6 +22,7 @@ import io.netty.util.internal.StringUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,8 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final EmailSenderService emailSenderService;
     private final PasswordCheckRepository passwordCheckRepository;
     private final EmailCheckCommandRepository emailCheckCommandRepository;
+
+    private String FRONT_END_URL = "https://i10a805.p.ssafy.io";
 
     @Override
     public User register(ProviderUser target) {
@@ -142,15 +145,15 @@ public class UserCommandServiceImpl implements UserCommandService {
         Optional<PasswordCheck> byId = passwordCheckRepository.findByEmail(dto.getEmail());
         if(byId.isPresent()) throw new UserException("비밀번호 변경 페이지가 이메일로 발송되었습니다. 발송되지 않았을 경우, 스팸 메일을 체크해주세요");
 
-        String randomCode = RandomUtils.generateRandomCode(8);
+        String randomCode = RandomUtils.generateRandomCode(20);
         passwordCheckRepository.save(new PasswordCheck(dto.getEmail(), randomCode));
 
-        String url = randomCode;
+        String url = "find_password?code=" + randomCode;
 
         EmailSendRequestDto emailSendDto = EmailSendRequestDto.builder()
                 .to(dto.getEmail())
                 .subject("비밀번호 변경 페이지로 안내합니다.")
-                .contents("<a href=http://localhost/ " + url + ">").build();
+                .contents("<a href=http://"+ FRONT_END_URL + "/ " + url + ">").build();
 
         emailSenderService.sendMail(emailSendDto);
     }
@@ -179,15 +182,14 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         if(byEmail.isPresent()) throw new UserException("이미 이메일이 발송되었습니다. 메일을 확인해주세요!");
 
-        String randomCode = RandomUtils.generateRandomCode(8);
+        String randomCode = RandomUtils.generateRandomCode(6);
         passwordCheckRepository.save(new PasswordCheck(userId, randomCode));
 
-        String url = randomCode;
 
         EmailSendRequestDto emailSendDto = EmailSendRequestDto.builder()
                 .to(userId)
-                .subject("비밀번호 변경 페이지로 안내합니다.")
-                .contents("<a href=http://localhost/ " + url + ">").build();
+                .subject("[Secreto] 이메일 인증 코드 입니다.")
+                .contents(randomCode+ "입니다.").build();
 
         emailSenderService.sendMail(emailSendDto);
 

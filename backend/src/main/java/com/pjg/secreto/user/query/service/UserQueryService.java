@@ -18,7 +18,7 @@ public interface UserQueryService {
 
     void logOut(LogOutRequestDto dto);
 
-    UserInfo detail(Authentication authentication);
+    UserInfo detail(Authentication authentication, Long userId);
 
     String allowChangePassword(String certCode);
 
