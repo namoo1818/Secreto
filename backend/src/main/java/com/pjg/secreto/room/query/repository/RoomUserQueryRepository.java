@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, RoomUserQueryRepositoryCustom{
 
@@ -22,7 +23,7 @@ public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, 
     List<RoomUser> findAllWithRoomByUserNo(Long userNo);
 
     @Query("select ru from RoomUser ru where ru.user.id = :userNo and ru.room.id = :roomNo")
-    RoomUser findByUserNoAndRoomNo(Long userNo, Long roomNo);
+    Optional<RoomUser> findByUserNoAndRoomNo(Long userNo, Long roomNo);
 
     @Query("select ru from RoomUser ru where ru.id in :roomUserNos")
     List<RoomUser> findByRoomUserNos(List<Long> roomUserNos);

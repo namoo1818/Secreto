@@ -102,7 +102,7 @@ public class MissionQueryServiceImpl implements MissionQueryService {
             Long userNo = searchUserMissionListRequestDto.getUserNo();
             Long roomNo = searchUserMissionListRequestDto.getRoomNo();
 
-            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo);
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
 
             List<UserMission> userMissions = userMissionQueryRepository.findByRoomUserNo(findRoomUser.getId());
 
@@ -130,7 +130,7 @@ public class MissionQueryServiceImpl implements MissionQueryService {
 
             Long userNo = searchMemoRequestDto.getUserNo();
 
-            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, searchMemoRequestDto.getRoomNo());
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, searchMemoRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
             UserMemo findUserMemo = userMemoQueryRepository.findByRoomUserNo(findRoomUser.getId());
 
             SearchMemoResponseDto result = SearchMemoResponseDto.builder()

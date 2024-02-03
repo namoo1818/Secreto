@@ -13,7 +13,7 @@ public interface RoomQueryService {
 
     List<SearchRoomListResponseDto> searchRoomList(Long userNo);
 
-    SearchRoomResponseDto searchRoom(Long roomNo);
+    SearchRoomResponseDto searchRoom(Long userNo, Long roomNo);
 
     boolean enterRoom(CheckCodeDto checkCodeDto);
 }

@@ -96,9 +96,11 @@ public class RoomQueryServiceImpl implements RoomQueryService{
     }
 
     @Override
-    public SearchRoomResponseDto searchRoom(Long roomNo) {
+    public SearchRoomResponseDto searchRoom(Long userNo, Long roomNo) {
 
         try {
+
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new RoomException("해당 방 유저가 없습니다."));
 
             Room find = roomQueryRepository.findById(roomNo).orElseThrow(() -> new RoomException("해당 방이 없습니다."));
 
@@ -107,15 +109,14 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                     .roomStartAt(find.getRoomStartAt()).roomEndAt(find.getRoomEndAt())
                     .hostParticipantYn(find.getHostParticipantYn()).commonYn(find.getCommonYn())
                     .missionSubmitTime(find.getMissionSubmitTime()).missionStartAt(find.getMissionStartAt())
-                    .roomStartYn(find.getRoomStartYn()).build();
+                    .roomStartYn(find.getRoomStartYn()).roomUserNo(findRoomUser.getId()).build();
 
             return result;
 
         } catch (Exception e) {
-            e.getStackTrace();
+            throw new RoomException(e.getMessage());
         }
 
-        return null;
     }
 
 }
