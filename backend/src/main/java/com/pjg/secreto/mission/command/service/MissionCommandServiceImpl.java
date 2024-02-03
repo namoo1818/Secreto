@@ -77,7 +77,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
             Long userNo = predictManitoRequestDto.getUserNo();
 
-            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, predictManitoRequestDto.getRoomNo());
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, predictManitoRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
 
             ManitoExpectLog manitoExpectLog = ManitoExpectLog.builder()
                     .roomUser(findRoomUser).expectedUser(predictManitoRequestDto.getExpectedManito())
@@ -98,7 +98,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
             Long userNo = memoUserRequestDto.getUserNo();
 
-            RoomUser roomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, memoUserRequestDto.getRoomNo());
+            RoomUser roomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, memoUserRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
 
             UserMemo userMemo = UserMemo.builder()
                     .roomUser(roomUser).memo(memoUserRequestDto.getMemo())
@@ -124,7 +124,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
             Long userNo = updateMemoRequestDto.getUserNo();
 
-            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, updateMemoRequestDto.getRoomNo());
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, updateMemoRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
 
             UserMemo findUserMemo = userMemoQueryRepository.findByRoomUserNo(findRoomUser.getId());
 
