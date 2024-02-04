@@ -13,10 +13,6 @@ public class ModifyRequestDto {
     @Email(message = "이메일이 빈값으로 전달되었습니다.")
     private String email;
 
-
-    @NotBlank(message = "비밀번호가 빈 값으로 전달되었습니다.")
-    private String password;
-
     @Nullable
     private String profileUrl;
 }
