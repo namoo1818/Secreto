@@ -71,21 +71,29 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
         try {
 
-            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllWithRoomByUserNo(userNo);
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllWithUserAndRoomByUserNo(userNo);
 
-            List<SearchRoomListResponseDto> result = findRoomUsers.stream()
-                    .map(r -> new SearchRoomListResponseDto(
-                            r.getRoom().getId(),
-                            r.getRoom().getRoomName(),
-                            r.getRoom().getEntryCode(),
-                            r.getRoom().getRoomStartAt(),
-                            r.getRoom().getRoomEndAt(),
-                            r.getRoom().getHostParticipantYn(),
-                            r.getRoom().getCommonYn(),
-                            r.getRoom().getMissionSubmitTime(),
-                            r.getRoom().getMissionStartAt(),
-                            r.getRoom().getRoomStartYn(),
-                            r.getStandbyYn())).toList();
+            List<SearchRoomListResponseDto> result = new ArrayList<>();
+            for(RoomUser ru : findRoomUsers) {
+
+                int findRoomUserCnt = roomUserQueryRepository.findParticipantCntById(ru.getId());
+
+                result.add(SearchRoomListResponseDto.builder()
+                        .roomNo(ru.getRoom().getId())
+                        .roomName(ru.getRoom().getRoomName())
+                        .entryCode(ru.getRoom().getEntryCode())
+                        .roomStartAt(ru.getRoom().getRoomStartAt())
+                        .roomEndAt(ru.getRoom().getRoomEndAt())
+                        .hostParticipantYn(ru.getRoom().getHostParticipantYn())
+                        .commonYn(ru.getRoom().getCommonYn())
+                        .missionSubmitTime(ru.getRoom().getMissionSubmitTime())
+                        .missionStartAt(ru.getRoom().getMissionStartAt())
+                        .standbyYn(ru.getStandbyYn())
+                        .nickname(ru.getNickname())
+                        .participantCnt(findRoomUserCnt)
+                        .bookmarkYn(ru.getBookmarkYn()).build());
+
+            }
 
             return result;
         } catch (Exception e) {
@@ -100,16 +108,20 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
         try {
 
-            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new RoomException("해당 방 유저가 없습니다."));
-
-            Room find = roomQueryRepository.findById(roomNo).orElseThrow(() -> new RoomException("해당 방이 없습니다."));
+            RoomUser findRoomUser = roomUserQueryRepository.findWithUserAndRoomByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new RoomException("해당 방 유저가 없습니다."));
 
             SearchRoomResponseDto result = SearchRoomResponseDto.builder()
-                    .roomNo(find.getId()).roomName(find.getRoomName()).entryCode(find.getEntryCode())
-                    .roomStartAt(find.getRoomStartAt()).roomEndAt(find.getRoomEndAt())
-                    .hostParticipantYn(find.getHostParticipantYn()).commonYn(find.getCommonYn())
-                    .missionSubmitTime(find.getMissionSubmitTime()).missionStartAt(find.getMissionStartAt())
-                    .roomStartYn(find.getRoomStartYn()).roomUserNo(findRoomUser.getId()).build();
+                    .roomNo(findRoomUser.getRoom().getId())
+                    .roomName(findRoomUser.getRoom().getRoomName())
+                    .entryCode(findRoomUser.getRoom().getEntryCode())
+                    .roomStartAt(findRoomUser.getRoom().getRoomStartAt())
+                    .roomEndAt(findRoomUser.getRoom().getRoomEndAt())
+                    .hostParticipantYn(findRoomUser.getRoom().getHostParticipantYn())
+                    .commonYn(findRoomUser.getRoom().getCommonYn())
+                    .missionSubmitTime(findRoomUser.getRoom().getMissionSubmitTime())
+                    .missionStartAt(findRoomUser.getRoom().getMissionStartAt())
+                    .roomStartYn(findRoomUser.getRoom().getRoomStartYn())
+                    .userInfo(new UserInfoDto(findRoomUser.getId(), findRoomUser.getNickname(), findRoomUser.getUser().getProfileUrl())).build();
 
             return result;
 
