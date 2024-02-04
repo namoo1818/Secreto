@@ -2,21 +2,26 @@ package com.pjg.secreto.history.query.controller;
 
 import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.history.query.dto.*;
+import com.pjg.secreto.history.query.service.HistoryQueryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequestMapping("history")
+@RequiredArgsConstructor
 public class HistoryQueryController {
+    private final HistoryQueryService historyQueryService;
 
     @GetMapping("/{roomId}/predict")
     public ResponseEntity<?> predictManittoResult(@PathVariable Long roomId) {
@@ -66,7 +71,7 @@ public class HistoryQueryController {
                         "망고노예",
                         100000L,
                         "<img src='http://www.naver.com'> 제가 혼나고 삽니다.",
-                        "2023-01-19 17:49:00",
+                        LocalDateTime.now(),
                         "https://www.nis.go.kr/main.do"
                 )
         ));
@@ -78,7 +83,7 @@ public class HistoryQueryController {
                         "망고노예",
                         100000L,
                         "<img src='http://www.naver.com'> 제가 혼나고 삽니다.",
-                        "2023-01-19 17:49:00",
+                        LocalDateTime.now(),
                         "https://www.nis.go.kr/main.do"
                 )
         ));
@@ -90,7 +95,7 @@ public class HistoryQueryController {
                         "이싸피",
                         null,
                         null,
-                        "2023-01-19 17:49:00",
+                        LocalDateTime.now(),
                         "https://www.nis.go.kr/main.do"
                 )
         ));
@@ -102,7 +107,7 @@ public class HistoryQueryController {
                         "이싸피",
                         10000L,
                         null,
-                        "2023-01-19 17:49:00",
+                        LocalDateTime.now(),
                         "https://www.nis.go.kr/main.do"
                 )
         ));
@@ -114,7 +119,7 @@ public class HistoryQueryController {
                         "김싸피",
                         null,
                         null,
-                        "2023-01-19 17:49:00",
+                        LocalDateTime.now(),
                         "https://www.nis.go.kr/main.do"
                 )
         ));
@@ -126,18 +131,8 @@ public class HistoryQueryController {
 
     @GetMapping("/{roomId}/wordCloud")
     public ResponseEntity<?> searchManitoWorldCloud(@PathVariable Long roomId) {
-        Map<String, Object> result = new HashMap<>();
-        ArrayList<Object> words = new ArrayList<>();
-        words.add(new CloudDto("Vue", 1000L));
-        words.add(new CloudDto("js", 200L));
-        words.add(new CloudDto("is", 800L));
-        words.add(new CloudDto("text", 1000000L));
-        words.add(new CloudDto("lunch", 100L));
-
-        result.put("words", words);
-
+        List<List<?>> result = historyQueryService.getWorldCloudContents(roomId);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 데이터를 로드하였습니다.", result);
-
         return ResponseEntity.ok(response);
     }
 
