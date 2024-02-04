@@ -13,8 +13,6 @@ public class SearchRoomResponseDto {
 
     private Long roomNo;
 
-    private Long roomUserNo;
-
     private String roomName;
 
     private String entryCode;
@@ -32,5 +30,7 @@ public class SearchRoomResponseDto {
     private LocalDate missionStartAt;
 
     private Boolean roomStartYn;
+
+    private UserInfoDto userInfo;
 
 }

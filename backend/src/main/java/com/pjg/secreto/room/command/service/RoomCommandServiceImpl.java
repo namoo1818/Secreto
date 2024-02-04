@@ -55,7 +55,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         try {
 
-            // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
             Long userNo = createRoomRequestDto.getUserNo();
 
             List<Room> rooms = roomQueryRepository.findAll();
@@ -266,7 +265,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         try {
 
-            // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
             Long userNo = enterRoomRequestDto.getUserNo();
 
             // 사용할 닉네임 입력

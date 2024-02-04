@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@AllArgsConstructor
+@Builder
 @Data
 public class SearchRoomListResponseDto {
 
@@ -33,6 +33,12 @@ public class SearchRoomListResponseDto {
     private Boolean roomStartYn;
 
     private Boolean standbyYn;
+
+    private String nickname;
+
+    private int participantCnt;
+
+    private Boolean bookmarkYn;
 
 
 }

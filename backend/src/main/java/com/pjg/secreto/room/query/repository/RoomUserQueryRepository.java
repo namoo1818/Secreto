@@ -19,8 +19,8 @@ public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, 
     @Query("select ru from RoomUser ru join fetch ru.user where ru.room.id = :roomNo")
     List<RoomUser> findAllByRoomId(Long roomNo);
 
-    @Query("select ru from RoomUser ru join fetch ru.room where ru.user.id = :userNo")
-    List<RoomUser> findAllWithRoomByUserNo(Long userNo);
+//    @Query("select ru from RoomUser ru join fetch ru.room where ru.user.id = :userNo")
+//    List<RoomUser> findAllWithRoomByUserNo(Long userNo);
 
     @Query("select ru from RoomUser ru where ru.user.id = :userNo and ru.room.id = :roomNo")
     Optional<RoomUser> findByUserNoAndRoomNo(Long userNo, Long roomNo);
@@ -30,4 +30,16 @@ public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, 
 
     @Query("select ru from RoomUser ru where ru.id in :roomUserNos and ru.room.id = :roomNo")
     List<RoomUser> findAllByRoomUserNosAndRoomNo(List<Long> roomUserNos, Long roomNo);
+
+//    @Query("select ru from RoomUser ru join fetch ru.user u where ru.user.id = :userNo and ru.room.id = :roomNo")
+//    Optional<RoomUser> findWithUserByUserNoAndRoomNo(Long userNo, Long roomNo);
+
+    @Query("select ru from RoomUser ru join fetch ru.user u join fetch ru.room r where ru.user.id = :userNo and ru.room.id = :roomNo")
+    Optional<RoomUser> findWithUserAndRoomByUserNoAndRoomNo(Long userNo, Long roomNo);
+
+    @Query("select ru from RoomUser ru join fetch ru.user u join fetch ru.room r where ru.user.id = :userNo")
+    List<RoomUser> findAllWithUserAndRoomByUserNo(Long userNo);
+
+    @Query("select count(ru) from RoomUser ru where ru.standbyYn = false")
+    int findParticipantCntById(Long id);
 }
