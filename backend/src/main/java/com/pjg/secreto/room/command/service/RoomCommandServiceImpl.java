@@ -6,6 +6,7 @@ import com.pjg.secreto.mission.command.repository.MissionScheduleCommandReposito
 import com.pjg.secreto.mission.command.repository.RoomMissionCommandRepository;
 import com.pjg.secreto.mission.common.entity.MissionSchedule;
 import com.pjg.secreto.mission.common.entity.RoomMission;
+import com.pjg.secreto.mission.common.exception.MissionException;
 import com.pjg.secreto.room.command.dto.*;
 import com.pjg.secreto.room.command.repository.RoomCommandRepository;
 import com.pjg.secreto.room.command.repository.RoomUserCommandRepository;
@@ -367,7 +368,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             Long userNo = bookmarkRoomRequestDto.getUserNo();
 
-            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, bookmarkRoomRequestDto.getRoomNo());
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, bookmarkRoomRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
 
             findRoomUser.bookmark();
 

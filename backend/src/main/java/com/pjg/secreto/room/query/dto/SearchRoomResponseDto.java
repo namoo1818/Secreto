@@ -13,6 +13,8 @@ public class SearchRoomResponseDto {
 
     private Long roomNo;
 
+    private Long roomUserNo;
+
     private String roomName;
 
     private String entryCode;
