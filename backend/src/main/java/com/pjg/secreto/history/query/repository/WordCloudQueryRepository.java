@@ -16,7 +16,7 @@ public class WordCloudQueryRepository {
     public List<List<?>>getCloudWordsData(Long roomId){
         QWordCloud wordCloud = QWordCloud.wordCloud;
 
-        return query.select(Projections.list(wordCloud.content, wordCloud.weight))
+        return query.select(Projections.list(wordCloud.content, wordCloud.value))
                 .from(wordCloud)
                 .where(wordCloud.user.room.id.eq(roomId))
                 .fetch();

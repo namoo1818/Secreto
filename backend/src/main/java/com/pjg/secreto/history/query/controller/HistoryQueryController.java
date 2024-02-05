@@ -26,36 +26,9 @@ public class HistoryQueryController {
     @GetMapping("/{roomId}/predict")
     public ResponseEntity<?> predictManittoResult(@PathVariable Long roomId) {
         Map<String, Object> result = new HashMap<>();
-        List<Object> predictHistory = new ArrayList<>();
-
-        predictHistory.add(new PredictBoardDto(
-                new PlayerDto("망고망고", "https://naver.com", "admin@naver.com"),
-                new PlayerDto("이싸피", "https://naver.com", "user1@naver.com"),
-                true
-        ));
-
-        predictHistory.add(new PredictBoardDto(
-                new PlayerDto("이싸피", "https://naver.com", "user1@naver.com"),
-                new PlayerDto("김싸피", "https://naver.com", "user2@naver.com"),
-                false
-        ));
-
-        predictHistory.add(new PredictBoardDto(
-                new PlayerDto("김싸피", "https://naver.com", "user2@naver.com"),
-                new PlayerDto("김도현", "https://naver.com", "user3@naver.com"),
-                true
-        ));
-
-        predictHistory.add(new PredictBoardDto(
-                new PlayerDto("김싸피", "https://naver.com", "user3@naver.com"),
-                new PlayerDto("김도현", "https://naver.com", "admin1@naver.com"),
-                true
-        ));
-
-        result.put("predict_history", predictHistory);
-
-
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "", result);
+        List<PredictBoardDto> manitoResultList = historyQueryService.getManitoResultList(roomId);
+        result.put("predict_history", manitoResultList);
+        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 데이터를 로드하였습니다.", result);
         return ResponseEntity.ok(response);
     }
 
@@ -63,9 +36,8 @@ public class HistoryQueryController {
     public ResponseEntity<?> summaryManitoResult(@PathVariable Long roomId) {
         Map<String, Object> result = new HashMap<>();
         List<SummaryDto> manitoStaticResult = historyQueryService.getManitoStaticResult(roomId);
-
         result.put("summary_result", manitoStaticResult);
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "", result);
+        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 데이터를 로드하였습니다.", result);
         return ResponseEntity.ok(response);
     }
 

@@ -15,9 +15,10 @@ public class WordCloud {
     private Long id;
 
     @OneToOne
+    @JoinColumn(name = "room_user_no")
     private RoomUser user;
 
     private String content;
 
-    private Long weight;
+    private Long value;
 }
