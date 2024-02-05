@@ -58,7 +58,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         EmailConfirm emailConfirm = emailConfirmRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new UserException("해당 유저의 이메일 인증 기록을 확인 할 수 없습니다."));
 
-        if(!emailConfirm.isChecked()) throw new UserException("해당 유저의 이메일이 인증되지 않았습니다.");
+        if (!emailConfirm.isChecked()) throw new UserException("해당 유저의 이메일이 인증되지 않았습니다.");
 
         emailConfirmRepository.deleteById(emailConfirm.getValidationCode());
         emailCheckRepository.deleteById(emailConfirm.getValidationCode());
@@ -118,9 +118,12 @@ public class UserCommandServiceImpl implements UserCommandService {
         User user = userQueryRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UserException("해당 유저를 조회할 수 없습니다."));
 
+        boolean isYourPassword = passwordEncoder.matches(dto.getPassword(), user.getPassword());
+
+        if (!isYourPassword) throw new UserException("비밀번호를 잘못 입력하였습니다.");
+
         user.setWithdrawalAt(LocalDateTime.now().toString());
         user.setWithdrawalYn(true);
-
 
         userCommandRepository.save(user);
 
@@ -149,11 +152,17 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .orElseThrow(() -> new UserException("해당 유저를 조회할 수 없습니다."));
 
 
-        Optional<PasswordCheck> byId = passwordCheckRepository.findByEmail(dto.getEmail());
-        if (byId.isPresent()) throw new UserException("비밀번호 변경 페이지가 이메일로 발송되었습니다. 발송되지 않았을 경우, 스팸 메일을 체크해주세요");
+        Optional<PasswordCheck> passwordCheck = passwordCheckRepository.findByEmail(dto.getEmail());
 
         String randomCode = RandomUtils.generateRandomCode(20);
-        passwordCheckRepository.save(new PasswordCheck(dto.getEmail(), randomCode));
+
+        if (passwordCheck.isEmpty())
+            passwordCheckRepository.save(new PasswordCheck(dto.getEmail(), randomCode));
+        else {
+            PasswordCheck changePasswordCheck = passwordCheck.orElseThrow();
+            changePasswordCheck.setValidationCode(randomCode);
+            passwordCheckRepository.save(changePasswordCheck);
+        }
 
         String url = UriComponentsBuilder.newInstance()
                 .scheme("https")
@@ -163,11 +172,10 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .build()
                 .toString();
 
-
         EmailSendRequestDto emailSendDto = EmailSendRequestDto.builder()
                 .to(dto.getEmail())
                 .subject("비밀번호 변경 페이지로 안내합니다.")
-                .contents("<a href="+ url +"> 비밀번호 변경하기 </a>").build();
+                .contents("<a href=" + url + "> 비밀번호 변경하기 </a>").build();
 
         emailSenderService.sendMail(emailSendDto);
     }
@@ -193,11 +201,11 @@ public class UserCommandServiceImpl implements UserCommandService {
         User user = userQueryRepository.findByEmail(authenticatedUserEmail)
                 .orElseThrow(() -> new UserException("해당 유저를 찾을 수 없습니다."));
 
-        boolean matches = passwordEncoder.matches(dto.getOldPassword(), user.getPassword());
+        boolean isYourPassword = passwordEncoder.matches(dto.getOldPassword(), user.getPassword());
+        boolean isSameCurrentPassword = passwordEncoder.matches(dto.getNewPassword(), user.getPassword());
 
-
-
-        if(!matches) throw new UserException("이전에 사용하던 비밀번호와 일치하지 않습니다.");
+        if (!isYourPassword) throw new UserException("이전에 사용하던 비밀번호와 일치하지 않습니다.");
+        if (isSameCurrentPassword) throw new UserException("이전에 사용하던 비밀번호와 변경하고자 하는 비밀번호는 서로 달라야합니다.");
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userCommandRepository.save(user);
@@ -205,18 +213,36 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     public EmailValidationResponseDto sendEmailValidationMail(String userId) {
+        User user = userQueryRepository.findByEmail(userId).orElse(null);
+
+        if (user != null) throw new UserException("이미 해당 이메일을 사용하고 있는 유저가 있습니다.");
+
         Optional<EmailCheck> byEmail = emailCheckRepository.findByEmail(userId);
 
-        if (byEmail.isPresent()) throw new UserException("이미 이메일이 발송되었습니다. 메일을 확인해주세요!");
-
         String randomCode = RandomUtils.generateRandomCode(6);
-        emailCheckRepository.save(new EmailCheck(userId, randomCode));
-        emailConfirmRepository.save(new EmailConfirm(userId, randomCode,false));
+
+        if(byEmail.isEmpty()){
+            emailCheckRepository.save(new EmailCheck(userId, randomCode));
+            emailConfirmRepository.save(new EmailConfirm(userId, randomCode, false));
+        }
+
+        else {
+            EmailCheck changeEmailCheck = byEmail.orElseThrow();
+            EmailConfirm changeEmailConfirm = emailConfirmRepository.findById(changeEmailCheck.getValidationCode()).orElseThrow();
+
+            String validationCode = changeEmailConfirm.getValidationCode();
+
+            emailCheckRepository.deleteById(validationCode);
+            emailConfirmRepository.deleteById(validationCode);
+
+            emailCheckRepository.save(new EmailCheck(userId, randomCode));
+            emailConfirmRepository.save(new EmailConfirm(userId, randomCode, false));
+        }
 
         EmailSendRequestDto emailSendDto = EmailSendRequestDto.builder()
                 .to(userId)
                 .subject("[Secreto] 이메일 인증 코드 입니다.")
-                .contents(randomCode + "입니다.").build();
+                .contents("회원님의 이메일 인증 코드는 <b>" + randomCode + "</b> 입니다.").build();
 
         emailSenderService.sendMail(emailSendDto);
 

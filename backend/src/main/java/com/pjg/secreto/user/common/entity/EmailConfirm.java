@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,6 +21,10 @@ public class EmailConfirm {
     private String validationCode;
 
     private boolean isChecked;
+
+    @Value("${email.expiration}")
+    @TimeToLive
+    private Long timeToLive;
 
     public EmailConfirm(String email, String validationCode, boolean isChecked) {
         this.email = email;
