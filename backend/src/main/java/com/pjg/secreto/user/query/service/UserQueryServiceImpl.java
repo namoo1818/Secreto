@@ -1,14 +1,14 @@
 package com.pjg.secreto.user.query.service;
 
 import com.pjg.secreto.user.command.repository.UserCommandRepository;
+import com.pjg.secreto.user.common.Repository.EmailCheckRepository;
+import com.pjg.secreto.user.common.Repository.EmailConfirmRepository;
 import com.pjg.secreto.user.common.Repository.PasswordCheckRepository;
 import com.pjg.secreto.user.common.Repository.RefreshTokenRepository;
 import com.pjg.secreto.user.common.dto.PrincipalUser;
 import com.pjg.secreto.user.common.dto.ProviderUser;
 import com.pjg.secreto.user.common.dto.UserInfo;
-import com.pjg.secreto.user.common.entity.PasswordCheck;
-import com.pjg.secreto.user.common.entity.RefreshToken;
-import com.pjg.secreto.user.common.entity.User;
+import com.pjg.secreto.user.common.entity.*;
 import com.pjg.secreto.user.common.exception.UserException;
 import com.pjg.secreto.user.common.service.JwtService;
 import com.pjg.secreto.user.query.dto.LogOutRequestDto;
@@ -24,6 +24,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -41,6 +42,9 @@ public class UserQueryServiceImpl implements UserQueryService {
     private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordCheckRepository passwordCheckRepository;
+    private final EmailConfirmRepository emailConfirmRepository;
+    private final EmailCheckRepository emailCheckRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -62,6 +66,11 @@ public class UserQueryServiceImpl implements UserQueryService {
                 .orElseThrow(() -> new UserException("해당 유저를 찾을 수 없습니다."));
 
         if(user.isWithdrawalYn()) throw new UserException("해당 유저는 탈퇴된 유저입니다.");
+
+
+        boolean isMatchPassword = passwordEncoder.matches(dto.getPassword(), user.getPassword());
+
+        if(!isMatchPassword) throw new UserException("비밀번호가 일치하지 않습니다.");
 
         UsernamePasswordAuthenticationToken authenticationToken
                 = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
@@ -142,6 +151,14 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     @Override
     public boolean validateDuplicatedEmail(ValidateCertRequestDto dto) {
+        String validateCode = dto.getValidateCode();
+
+        EmailCheck emailCheck = emailCheckRepository.findById(validateCode)
+                .orElseThrow(() -> new UserException("해당 유저의 이메일 검증 요청을 확인할 수 없습니다."));
+        EmailConfirm emailConfirm = emailConfirmRepository.findById(validateCode)
+                .orElseThrow(() -> new UserException("검증코드가 올바르지 않습니다."));
+        emailConfirm.setChecked(true);
+        EmailConfirm save = emailConfirmRepository.save(emailConfirm);
         return true;
     }
 

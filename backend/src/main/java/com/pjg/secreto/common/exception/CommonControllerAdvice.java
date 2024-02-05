@@ -5,9 +5,11 @@ import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.mission.common.exception.MissionException;
 import com.pjg.secreto.room.common.exception.RoomException;
 import com.pjg.secreto.user.common.exception.UserException;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -16,11 +18,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class CommonControllerAdvice {
 
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<?> ExpiredJwtExceptionHandler(Exception e) {
+        log.error("토큰 예외 발생", e);
+
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, "전송한 토큰이 만료되었습니다.");
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> commonExceptionHandler(Exception e) {
         log.error("예외발생", e);
 
-        return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러."));
+        return ResponseEntity.internalServerError().body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러."));
     }
 
     @ExceptionHandler(RoomException.class)
@@ -43,6 +53,7 @@ public class CommonControllerAdvice {
 
         return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
+
 
 
 }

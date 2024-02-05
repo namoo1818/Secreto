@@ -9,13 +9,8 @@ import javax.annotation.Nullable;
 
 @Data
 public class ModifyRequestDto {
-    @NotBlank
-    @Email
-    private String email;
-
-
-    @NotBlank
-    private String password;
+    @NotBlank(message = "닉네임이 정상적인 값이 아닙니다.")
+    private String nickname;
 
     @Nullable
     private String profileUrl;

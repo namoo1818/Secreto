@@ -15,4 +15,11 @@ public class RandomUtils {
 
         return generatedCode;
     }
+
+    public static String generateRandomNumericCode(int targetStringLength){
+        Long l = new Random().nextLong((long) Math.pow(10, targetStringLength));
+        String result = String.format("%06d", l);
+
+        return result;
+    }
 }

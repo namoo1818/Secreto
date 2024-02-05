@@ -12,13 +12,13 @@ public class UserInfo {
     private String email;
     private String nickname;
     private String profileUrl;
-    private String id;
+    private Long id;
 
     public UserInfo(ProviderUser providerUser) {
         this.provider = providerUser.getProvider();
         this.email = providerUser.getEmail();
         this.nickname = providerUser.getUsername();
         this.profileUrl = providerUser.getProfileUrl();
-        this.id = providerUser.getId();
+        this.id = Long.valueOf(providerUser.getId());
     }
 }

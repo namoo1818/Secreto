@@ -31,4 +31,6 @@ public class SearchRoomResponseDto {
 
     private Boolean roomStartYn;
 
+    private UserInfoDto userInfo;
+
 }

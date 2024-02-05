@@ -1,24 +1,40 @@
 package com.pjg.secreto.user.common.filter;
 
+import com.pjg.secreto.user.common.exception.UserException;
 import com.pjg.secreto.user.common.service.CustomUserDetailService;
 import com.pjg.secreto.user.common.service.JwtService;
+import com.pjg.secreto.user.query.service.UserQueryService;
+import io.netty.util.internal.StringUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.beans.Transient;
+import java.io.IOException;
+import java.security.Principal;
+import java.security.Security;
+import java.util.List;
+
+import jakarta.transaction.TransactionScoped;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -26,6 +42,8 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailService customUserDetailService;
+    private final AccessDeniedHandler accessDeniedHandler;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
     protected void doFilterInternal(
@@ -38,12 +56,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (isWhiteList(request)) {
             filterChain.doFilter(request, response);
+            return;
         }
 
 
         if (authorization == null || !authorization.startsWith("bearer ")) {
-
             log.info("token null");
+            authenticationEntryPoint.commence(request, response, null);
             return;
         }
 
@@ -53,7 +72,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         accessTokenType = request.getHeader("AccessToken").split(" ")[0];
         accessToken = request.getHeader("AccessToken").split(" ")[1];
 
-        if (!jwtService.isTokenValid(accessToken)){
+        if (!jwtService.validateToken(accessToken)){
+            authenticationEntryPoint.commence(request, response, null);
             return;
         }
 

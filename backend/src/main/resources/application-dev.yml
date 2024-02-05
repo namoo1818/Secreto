@@ -16,7 +16,8 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-#    generate-ddl: true
+    open-in-view: false
+  #    generate-ddl: true
   data:
     redis:
       host: i10a805.p.ssafy.io
@@ -24,5 +25,12 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+
+server:
+  port: 8080
+  ssl:
+    key-store: classpath:ssl/keystore.p12
+    key-store-type: PKCS12
+    key-store-password: manito
 
 

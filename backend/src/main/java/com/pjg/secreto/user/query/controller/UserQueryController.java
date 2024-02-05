@@ -47,7 +47,7 @@ public class UserQueryController {
     }
 
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/users")
     public ResponseEntity<?> detail(Authentication authentication){
         UserInfo detail = queryService.detail(authentication);
 
@@ -55,12 +55,12 @@ public class UserQueryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/users/password/{certCode}")
-    public ResponseEntity<?> allowChangePassword(@PathVariable @NotBlank String certCode){
-        String requestedEmail = queryService.allowChangePassword(certCode);
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호를 변경할 수 있습니다.", requestedEmail);
-        return ResponseEntity.ok(response);
-    }
+//    @GetMapping("/users/password/{certCode}")
+//    public ResponseEntity<?> allowChangePassword(@PathVariable @NotBlank String certCode){
+//        String requestedEmail = queryService.allowChangePassword(certCode);
+//        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호를 변경할 수 있습니다.", requestedEmail);
+//        return ResponseEntity.ok(response);
+//    }
 
     @PostMapping("/cert")
     public ResponseEntity<?> validateCertCode(@RequestBody @Valid ValidateCertRequestDto dto){

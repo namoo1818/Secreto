@@ -29,7 +29,6 @@ public class RoomQueryController {
 
     private final RoomQueryService roomQueryService;
 
-    // 완성
     @GetMapping("/enter")
     public ResponseEntity<?> enterRoom(@RequestBody CheckCodeDto checkCodeDto) {
 
@@ -74,7 +73,9 @@ public class RoomQueryController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-        SearchRoomResponseDto result = roomQueryService.searchRoom(roomNo);
+        Long userNo = com.pjg.secreto.common.Util.AuthUtils.getAuthenticatedUserId();
+
+        SearchRoomResponseDto result = roomQueryService.searchRoom(userNo, roomNo);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "방 정보를 조회하였습니다.", result));
     }
