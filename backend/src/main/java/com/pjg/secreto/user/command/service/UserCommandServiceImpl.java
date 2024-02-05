@@ -118,12 +118,9 @@ public class UserCommandServiceImpl implements UserCommandService {
         User user = userQueryRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UserException("해당 유저를 조회할 수 없습니다."));
 
-        boolean isYourPassword = passwordEncoder.matches(dto.getPassword(), user.getPassword());
-
-        if(!isYourPassword) throw new UserException("비밀번호를 잘못 입력하였습니다.");
-
         user.setWithdrawalAt(LocalDateTime.now().toString());
         user.setWithdrawalYn(true);
+
 
         userCommandRepository.save(user);
 
@@ -156,7 +153,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         if (byId.isPresent()) throw new UserException("비밀번호 변경 페이지가 이메일로 발송되었습니다. 발송되지 않았을 경우, 스팸 메일을 체크해주세요");
 
         String randomCode = RandomUtils.generateRandomCode(20);
-        passwordCheckRepository.save(new PasswordCheck(dto.getEmail(), randomCode));
+
 
         String url = UriComponentsBuilder.newInstance()
                 .scheme("https")
@@ -165,13 +162,16 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .queryParam("code", randomCode)
                 .build()
                 .toString();
-        
+
+
         EmailSendRequestDto emailSendDto = EmailSendRequestDto.builder()
                 .to(dto.getEmail())
                 .subject("비밀번호 변경 페이지로 안내합니다.")
                 .contents("<a href="+ url +"> 비밀번호 변경하기 </a>").build();
+        log.info(url);
 
         emailSenderService.sendMail(emailSendDto);
+        passwordCheckRepository.save(new PasswordCheck(dto.getEmail(), randomCode));
     }
 
     @Override
@@ -195,11 +195,9 @@ public class UserCommandServiceImpl implements UserCommandService {
         User user = userQueryRepository.findByEmail(authenticatedUserEmail)
                 .orElseThrow(() -> new UserException("해당 유저를 찾을 수 없습니다."));
 
-        boolean isYourPassword = passwordEncoder.matches(dto.getOldPassword(), user.getPassword());
-        boolean isSameCurrentPassword = passwordEncoder.matches(dto.getNewPassword(), user.getPassword());
+        boolean matches = passwordEncoder.matches(dto.getOldPassword(), user.getPassword());
 
-        if(!isYourPassword) throw new UserException("이전에 사용하던 비밀번호와 일치하지 않습니다.");
-        if(isSameCurrentPassword) throw new UserException("이전에 사용하던 비밀번호와 변경하고자 하는 비밀번호는 서로 달라야합니다.");
+        if(!matches) throw new UserException("이전에 사용하던 비밀번호와 일치하지 않습니다.");
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userCommandRepository.save(user);
@@ -212,8 +210,6 @@ public class UserCommandServiceImpl implements UserCommandService {
         if (byEmail.isPresent()) throw new UserException("이미 이메일이 발송되었습니다. 메일을 확인해주세요!");
 
         String randomCode = RandomUtils.generateRandomCode(6);
-        emailCheckRepository.save(new EmailCheck(userId, randomCode));
-        emailConfirmRepository.save(new EmailConfirm(userId, randomCode,false));
 
         EmailSendRequestDto emailSendDto = EmailSendRequestDto.builder()
                 .to(userId)
@@ -221,6 +217,9 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .contents(randomCode + "입니다.").build();
 
         emailSenderService.sendMail(emailSendDto);
+        emailCheckRepository.save(new EmailCheck(userId, randomCode));
+        emailConfirmRepository.save(new EmailConfirm(userId, randomCode,false));
+
 
         return new EmailValidationResponseDto();
 

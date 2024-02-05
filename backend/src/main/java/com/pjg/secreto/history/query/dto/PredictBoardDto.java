@@ -1,10 +1,10 @@
 package com.pjg.secreto.history.query.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class PredictBoardDto {
@@ -15,4 +15,10 @@ public class PredictBoardDto {
     private PlayerDto maniti;
     private boolean predict_result;
 
+    @QueryProjection
+    public PredictBoardDto(PlayerDto manito, PlayerDto maniti, boolean predict_result) {
+        this.manito = manito;
+        this.maniti = maniti;
+        this.predict_result = predict_result;
+    }
 }

@@ -59,7 +59,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/users/sign-up", "/users/log-in" ,"/users/refreshAccess",
-                                "/cert/**", "/users/password/**","/oauth2/**").permitAll()
+                                "/cert/**", "/users/password/**","/oauth2/**",
+                                "/chat/**").permitAll()
                         .anyRequest().permitAll());
 
         http.sessionManagement(session -> session.sessionCreationPolicy(STATELESS));
