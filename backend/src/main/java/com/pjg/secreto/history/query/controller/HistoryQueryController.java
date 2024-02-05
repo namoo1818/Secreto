@@ -2,142 +2,49 @@ package com.pjg.secreto.history.query.controller;
 
 import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.history.query.dto.*;
+import com.pjg.secreto.history.query.service.HistoryQueryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequestMapping("history")
+@RequiredArgsConstructor
 public class HistoryQueryController {
+    private final HistoryQueryService historyQueryService;
 
     @GetMapping("/{roomId}/predict")
     public ResponseEntity<?> predictManittoResult(@PathVariable Long roomId) {
         Map<String, Object> result = new HashMap<>();
-        List<Object> predictHistory = new ArrayList<>();
-
-        predictHistory.add(new PredictBoardDto(
-                new PlayerDto("망고망고", "https://naver.com", "admin@naver.com"),
-                new PlayerDto("이싸피", "https://naver.com", "user1@naver.com"),
-                true
-        ));
-
-        predictHistory.add(new PredictBoardDto(
-                new PlayerDto("이싸피", "https://naver.com", "user1@naver.com"),
-                new PlayerDto("김싸피", "https://naver.com", "user2@naver.com"),
-                false
-        ));
-
-        predictHistory.add(new PredictBoardDto(
-                new PlayerDto("김싸피", "https://naver.com", "user2@naver.com"),
-                new PlayerDto("김도현", "https://naver.com", "user3@naver.com"),
-                true
-        ));
-
-        predictHistory.add(new PredictBoardDto(
-                new PlayerDto("김싸피", "https://naver.com", "user3@naver.com"),
-                new PlayerDto("김도현", "https://naver.com", "admin1@naver.com"),
-                true
-        ));
-
-        result.put("predict_history", predictHistory);
-
-
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "", result);
+        List<PredictBoardDto> manitoResultList = historyQueryService.getManitoResultList(roomId);
+        result.put("predict_history", manitoResultList);
+        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 데이터를 로드하였습니다.", result);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{roomId}/summary")
     public ResponseEntity<?> summaryManitoResult(@PathVariable Long roomId) {
         Map<String, Object> result = new HashMap<>();
-        List<SummaryDto> summary_result = new ArrayList<>();
-
-        summary_result.add(new SummaryDto(
-                "가장 많이 받은 댓글은?",
-                new SummaryResultData(
-                        "집사는 오늘도 혼난다?",
-                        "망고노예",
-                        100000L,
-                        "<img src='http://www.naver.com'> 제가 혼나고 삽니다.",
-                        "2023-01-19 17:49:00",
-                        "https://www.nis.go.kr/main.do"
-                )
-        ));
-
-        summary_result.add(new SummaryDto(
-                "가장 많이 좋아요 받은 댓글은",
-                new SummaryResultData(
-                        "집사는 오늘도 혼난다?",
-                        "망고노예",
-                        100000L,
-                        "<img src='http://www.naver.com'> 제가 혼나고 삽니다.",
-                        "2023-01-19 17:49:00",
-                        "https://www.nis.go.kr/main.do"
-                )
-        ));
-
-        summary_result.add(new SummaryDto(
-                "가장 빨리 마니또를 맞춘 맴버는?",
-                new SummaryResultData(
-                        null,
-                        "이싸피",
-                        null,
-                        null,
-                        "2023-01-19 17:49:00",
-                        "https://www.nis.go.kr/main.do"
-                )
-        ));
-
-        summary_result.add(new SummaryDto(
-                "최고의 맴버는?",
-                new SummaryResultData(
-                        null,
-                        "이싸피",
-                        10000L,
-                        null,
-                        "2023-01-19 17:49:00",
-                        "https://www.nis.go.kr/main.do"
-                )
-        ));
-
-        summary_result.add(new SummaryDto(
-                "가장 많은 인증글을 작성한 맴버는?",
-                new SummaryResultData(
-                        null,
-                        "김싸피",
-                        null,
-                        null,
-                        "2023-01-19 17:49:00",
-                        "https://www.nis.go.kr/main.do"
-                )
-        ));
-
-        result.put("summary_result", summary_result);
-        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "", result);
+        List<SummaryDto> manitoStaticResult = historyQueryService.getManitoStaticResult(roomId);
+        result.put("summary_result", manitoStaticResult);
+        SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 데이터를 로드하였습니다.", result);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{roomId}/wordCloud")
     public ResponseEntity<?> searchManitoWorldCloud(@PathVariable Long roomId) {
-        Map<String, Object> result = new HashMap<>();
-        ArrayList<Object> words = new ArrayList<>();
-        words.add(new CloudDto("Vue", 1000L));
-        words.add(new CloudDto("js", 200L));
-        words.add(new CloudDto("is", 800L));
-        words.add(new CloudDto("text", 1000000L));
-        words.add(new CloudDto("lunch", 100L));
-
-        result.put("words", words);
-
+        List<List<?>> result = historyQueryService.getWorldCloudContents(roomId);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 데이터를 로드하였습니다.", result);
-
         return ResponseEntity.ok(response);
     }
 
