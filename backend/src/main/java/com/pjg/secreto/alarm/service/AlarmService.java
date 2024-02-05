@@ -1,79 +1,88 @@
 package com.pjg.secreto.alarm.service;
 
-import com.pjg.secreto.alarm.common.entity.Alarm;
-import com.pjg.secreto.alarm.common.exception.AlarmException;
-import com.pjg.secreto.alarm.dto.AlarmDataDto;
-import com.pjg.secreto.alarm.dto.ShowAlarmDto;
-import com.pjg.secreto.alarm.repository.AlarmRepository;
+import com.pjg.secreto.alarm.repository.EmitterRepository;
+import com.pjg.secreto.room.command.repository.RoomUserCommandRepository;
 import com.pjg.secreto.room.common.entity.RoomUser;
+import com.pjg.secreto.room.common.exception.RoomException;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 
-@Slf4j
-@Transactional
 @RequiredArgsConstructor
 @Service
 public class AlarmService {
 
-    private final AlarmRepository alarmRepository;
     private final RoomUserQueryRepository roomUserQueryRepository;
+    private final EmitterRepository emitterRepository;
 
-    public List<AlarmDataDto> showAlarmList(Long userNo, Long roomNo) {
+    private static final Long DEFAULT_TIMEOUT = 600L * 1000 * 60;
 
-        try {
+    public SseEmitter subscribe(Long roomUserNo) {
 
-            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo)
-                    .orElseThrow(() -> new AlarmException("유저가 존재하지 않습니다."));
+        SseEmitter emitter = createEmitter(roomUserNo);
 
-            List<Alarm> findAlarms = alarmRepository.findAllByRoomUserNo(findRoomUser.getId());
+        sendToClient(roomUserNo, "roomUserNo : " + roomUserNo + "과의 알람 연결 성공", "sse 접속 성공");
 
-            List<AlarmDataDto> results = new ArrayList<>();
-            for(Alarm a : findAlarms) {
+        return emitter;
 
-                results.add(AlarmDataDto.builder()
-                        .author(a.getAuthor())
-                        .content(a.getContent())
-                        .generatedAt(a.getGeneratedAt())
-                        .readYn(a.getReadYn())
-                        .roomUserNo(a.getRoomUser().getId()).build());
+    }
+
+    public <T> void alarm(Long userId, T data, String comment, String type) {
+        sendToClient(userId, data, comment, type);
+    }
+
+    private void sendToClient(Long roomUserNo, Object data, String comment) {
+
+        SseEmitter emitter = emitterRepository.get(roomUserNo);
+        if(emitter != null) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .id(String.valueOf(roomUserNo))
+                        .name("sse")
+                        .data(data)
+                        .comment(comment));
+
+            } catch (IOException e) {
+                emitterRepository.deleteById(roomUserNo);
+                emitter.completeWithError(e);
             }
-
-            return results;
-        } catch (Exception e) {
-            throw new AlarmException(e.getMessage());
-        }
-    }
-
-    public AlarmDataDto showAlarm(ShowAlarmDto showAlarmDto) {
-
-        try {
-
-            RoomUser findRoomUser = roomUserQueryRepository
-                    .findByUserNoAndRoomNo(showAlarmDto.getUserNo(), showAlarmDto.getRoomNo())
-                    .orElseThrow(() -> new AlarmException("해당 유저가 존재하지 않습니다."));
-
-            Alarm findAlarm = alarmRepository.findByAlarmNoAndRoomUserNo(showAlarmDto.getAlarmNo(), findRoomUser.getId());
-
-            findAlarm.readAlarm();
-
-            AlarmDataDto result = AlarmDataDto.builder()
-                    .roomUserNo(findAlarm.getId())
-                    .author(findAlarm.getAuthor())
-                    .content(findAlarm.getContent())
-                    .readYn(findAlarm.getReadYn())
-                    .generatedAt(findAlarm.getGeneratedAt()).build();
-
-            return result;
-
-        } catch (Exception e) {
-            throw new AlarmException(e.getMessage());
         }
 
     }
+
+    private <T> void sendToClient(Long roomUserNo, T data, String comment, String type) {
+        SseEmitter emitter = emitterRepository.get(roomUserNo);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .id(String.valueOf(roomUserNo))
+                        .name(type)
+                        .data(data)
+                        .comment(comment));
+            } catch (IOException e) {
+                emitterRepository.deleteById(roomUserNo);
+                emitter.completeWithError(e);
+            }
+        }
+    }
+
+    private SseEmitter createEmitter(Long roomUserNo) {
+        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
+        emitterRepository.save(roomUserNo, emitter);
+
+        emitter.onCompletion(() -> emitterRepository.deleteById(roomUserNo));
+        emitter.onTimeout(() -> emitterRepository.deleteById(roomUserNo));
+
+        return emitter;
+    }
+
+    private RoomUser validUser(Long roomUserNo) {
+
+        return roomUserQueryRepository.findById(roomUserNo).orElseThrow(() -> new RoomException("해당 유저가 존재하지 않습니다."));
+    }
+
+
 }
