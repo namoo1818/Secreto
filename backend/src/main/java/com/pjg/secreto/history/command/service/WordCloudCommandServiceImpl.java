@@ -33,6 +33,7 @@ public class WordCloudCommandServiceImpl implements WordCloudCommandService {
             throw new UserException("접근권한이 없습니다.");
         }
 
-        wordCloudCommandRepository.save(new WordCloud(user, dto.getContents(), new Random().nextLong(100)));
+        long value = new Random().nextLong(100L);
+        wordCloudCommandRepository.save(new WordCloud(user, dto.getContents(), value));
     }
 }
