@@ -15,6 +15,7 @@ import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.room.query.repository.RoomQueryRepository;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -136,6 +137,25 @@ public class MissionCommandServiceImpl implements MissionCommandService {
         } catch (Exception e) {
 
             throw new MissionException(e.getMessage());
+        }
+    }
+
+    // 정기 미션 날리기 기능, 방 끝나는 시각에 맞게 끝내는 기능 수행 메서드
+    @Scheduled(cron = "0 0 0-23 * * *") // 매일 정각마다 실행
+    public void throwRegularMission() {
+
+        /**
+         * 정기 미션 날리기 로직
+         */
+        // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
+        List<Room> findRooms = roomQueryRepository.findAllWithMissionScheduleAndRoomMission();
+
+        LocalDateTime now = LocalDateTime.now();
+        for(Room r : findRooms) {
+
+
+            LocalDateTime submitDateTime;
+
         }
     }
 }
