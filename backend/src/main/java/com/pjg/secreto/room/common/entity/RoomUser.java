@@ -1,5 +1,6 @@
 package com.pjg.secreto.room.common.entity;
 
+import com.pjg.secreto.alarm.common.entity.Alarm;
 import com.pjg.secreto.board.common.entity.Board;
 import com.pjg.secreto.board.common.entity.BoardEntryLog;
 import com.pjg.secreto.board.common.entity.Liked;
@@ -65,6 +66,9 @@ public class RoomUser {
 
     @OneToMany(mappedBy = "roomUser", fetch = FetchType.LAZY)
     private List<BoardEntryLog> boardEntryLogs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "roomUser", fetch = FetchType.LAZY)
+    private List<Alarm> alarms = new ArrayList<>();
 
     private LocalDateTime userEntryAt;
 
