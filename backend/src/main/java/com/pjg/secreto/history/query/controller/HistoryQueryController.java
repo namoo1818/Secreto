@@ -62,69 +62,9 @@ public class HistoryQueryController {
     @GetMapping("/{roomId}/summary")
     public ResponseEntity<?> summaryManitoResult(@PathVariable Long roomId) {
         Map<String, Object> result = new HashMap<>();
-        List<SummaryDto> summary_result = new ArrayList<>();
+        List<SummaryDto> manitoStaticResult = historyQueryService.getManitoStaticResult(roomId);
 
-        summary_result.add(new SummaryDto(
-                "가장 많이 받은 댓글은?",
-                new SummaryResultData(
-                        "집사는 오늘도 혼난다?",
-                        "망고노예",
-                        100000L,
-                        "<img src='http://www.naver.com'> 제가 혼나고 삽니다.",
-                        LocalDateTime.now(),
-                        "https://www.nis.go.kr/main.do"
-                )
-        ));
-
-        summary_result.add(new SummaryDto(
-                "가장 많이 좋아요 받은 댓글은",
-                new SummaryResultData(
-                        "집사는 오늘도 혼난다?",
-                        "망고노예",
-                        100000L,
-                        "<img src='http://www.naver.com'> 제가 혼나고 삽니다.",
-                        LocalDateTime.now(),
-                        "https://www.nis.go.kr/main.do"
-                )
-        ));
-
-        summary_result.add(new SummaryDto(
-                "가장 빨리 마니또를 맞춘 맴버는?",
-                new SummaryResultData(
-                        null,
-                        "이싸피",
-                        null,
-                        null,
-                        LocalDateTime.now(),
-                        "https://www.nis.go.kr/main.do"
-                )
-        ));
-
-        summary_result.add(new SummaryDto(
-                "최고의 맴버는?",
-                new SummaryResultData(
-                        null,
-                        "이싸피",
-                        10000L,
-                        null,
-                        LocalDateTime.now(),
-                        "https://www.nis.go.kr/main.do"
-                )
-        ));
-
-        summary_result.add(new SummaryDto(
-                "가장 많은 인증글을 작성한 맴버는?",
-                new SummaryResultData(
-                        null,
-                        "김싸피",
-                        null,
-                        null,
-                        LocalDateTime.now(),
-                        "https://www.nis.go.kr/main.do"
-                )
-        ));
-
-        result.put("summary_result", summary_result);
+        result.put("summary_result", manitoStaticResult);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "", result);
         return ResponseEntity.ok(response);
     }

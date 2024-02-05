@@ -21,6 +21,7 @@ public class SummaryResultData {
     private String contents;
     private LocalDateTime dateTime;
     private String profile_url;
+    private Long id;
 
     @QueryProjection
     public SummaryResultData(String title, String nickName, Long amount, String contents, LocalDateTime dateTime, String profile_url) {
@@ -30,6 +31,17 @@ public class SummaryResultData {
         this.contents = contents;
         this.dateTime = dateTime;
         this.profile_url = profile_url;
+    }
+
+    @QueryProjection
+    public SummaryResultData(String title, String nickName, Long amount, String contents, LocalDateTime dateTime, String profile_url, Long id) {
+        this.title = title;
+        this.nickName = nickName;
+        this.amount = amount;
+        this.contents = contents;
+        this.dateTime = dateTime;
+        this.profile_url = profile_url;
+        this.id = id;
     }
 
     @QueryProjection
@@ -43,6 +55,13 @@ public class SummaryResultData {
     public SummaryResultData(String nickName, LocalDateTime dateTime, String profile_url) {
         this.nickName = nickName;
         this.dateTime = dateTime;
+        this.profile_url = profile_url;
+    }
+
+    @QueryProjection
+    public SummaryResultData(String nickName, String contents, String profile_url) {
+        this.nickName = nickName;
+        this.contents = contents;
         this.profile_url = profile_url;
     }
 }
