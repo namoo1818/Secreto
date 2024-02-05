@@ -76,7 +76,9 @@ public class RoomQueryServiceImpl implements RoomQueryService{
             List<SearchRoomListResponseDto> result = new ArrayList<>();
             for(RoomUser ru : findRoomUsers) {
 
-                int findRoomUserCnt = roomUserQueryRepository.findParticipantCntById(ru.getId());
+                Long findRoomNo = ru.getId();
+
+                int findRoomUserCnt = roomUserQueryRepository.findParticipantCntByRoomNo(findRoomNo);
 
                 result.add(SearchRoomListResponseDto.builder()
                         .roomNo(ru.getRoom().getId())
