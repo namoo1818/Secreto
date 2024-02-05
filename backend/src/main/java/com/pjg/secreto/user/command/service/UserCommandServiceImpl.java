@@ -158,7 +158,6 @@ public class UserCommandServiceImpl implements UserCommandService {
         String url = UriComponentsBuilder.newInstance()
                 .scheme("https")
                 .host("i10a805.p.ssafy.io")
-                .path("/#")
                 .path("/find_password")
                 .queryParam("code", randomCode)
                 .build()
