@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface EmailCheckRepository extends CrudRepository<EmailCheck, String> {
     Optional<EmailCheck> findByEmail(String email);
+
+    void deleteByEmail(String email);
 }

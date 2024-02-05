@@ -9,9 +9,8 @@ import javax.annotation.Nullable;
 
 @Data
 public class ModifyRequestDto {
-    @NotBlank(message = "이메일의 양식에 맞지 않습니다.")
-    @Email(message = "이메일이 빈값으로 전달되었습니다.")
-    private String email;
+    @NotBlank(message = "닉네임이 정상적인 값이 아닙니다.")
+    private String nickname;
 
     @Nullable
     private String profileUrl;

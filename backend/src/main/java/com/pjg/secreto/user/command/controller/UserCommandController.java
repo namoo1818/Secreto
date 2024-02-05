@@ -28,7 +28,7 @@ public class UserCommandController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/users/delete/")
+    @PutMapping("/users/delete")
     public ResponseEntity<?> withdraw(@RequestBody @Valid WithdrawRequestDto dto,
                                       Authentication authentication){
 
@@ -37,7 +37,7 @@ public class UserCommandController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/users/modify/")
+    @PutMapping("/users/modify")
     public ResponseEntity<?> modify(@RequestBody @Valid  ModifyRequestDto dto, Authentication authentication){
         userCommandService.modify(dto, authentication);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 수정되었습니다.");
@@ -51,21 +51,21 @@ public class UserCommandController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/users/password/reset/")
+    @PutMapping("/users/password/reset")
     public ResponseEntity<?> resetPassword(@RequestBody @Valid PasswordResetRequestDto dto){
         userCommandService.resetPassword(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호 변경에 성공하였습니다.");
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/cert/{userId}")
-    public ResponseEntity<?> createCertCode(@PathVariable @NotBlank String userId){
-        EmailValidationResponseDto result = userCommandService.sendEmailValidationMail(userId);
+    @GetMapping("/cert/{email}")
+    public ResponseEntity<?> createCertCode(@PathVariable @NotBlank String email){
+        EmailValidationResponseDto result = userCommandService.sendEmailValidationMail(email);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "이메일에 검증코드가 발송되었습니다. 확인 해주세요", result);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/users/password")
+    @PutMapping("/users/change/password")
     public ResponseEntity<?> changePassword(@RequestBody @Valid ChangeLegacyPasswordRequestDto dto){
         userCommandService.changePassword(dto);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "비밀번호 변경에 성공하였습니다.");
