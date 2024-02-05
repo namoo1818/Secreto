@@ -2,8 +2,11 @@ package com.pjg.secreto.chatting.common.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,10 +26,23 @@ public class ChatMessage {
     @Column(columnDefinition = "TEXT")
     private String message;
 
-    private String sendAt;
+    private LocalDateTime sendAt;
 
-    private boolean readYn;
+    private Boolean readYn;
 
     private String sender;
+
+    @Builder
+    public ChatMessage(Chat chat, String message, LocalDateTime sendAt, Boolean readYn, String sender){
+        this.chat = chat;
+        this.message = message;
+        this.sendAt = sendAt;
+        this.readYn = readYn;
+        this.sender = sender;
+    }
+
+    public void update(Boolean readYn){
+        this.readYn = readYn;
+    }
 
 }

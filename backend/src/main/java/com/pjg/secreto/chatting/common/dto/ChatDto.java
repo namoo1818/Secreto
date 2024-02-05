@@ -1,16 +1,17 @@
 package com.pjg.secreto.chatting.common.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Repository;
+import lombok.Builder;
+import lombok.Data;
+import org.springframework.web.socket.WebSocketSession;
 
-@Getter
-@Repository
-@NoArgsConstructor
-@AllArgsConstructor
+import java.util.HashSet;
+import java.util.Set;
+
+@Builder
+@Data
 public class ChatDto {
-    long chatNo;
-    String firstTime;
+    private Long chatNo;
+    private String firstTime;
+    private Set<WebSocketSession> sessions = new HashSet<>();
 }
