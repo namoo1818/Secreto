@@ -1,5 +1,6 @@
 package com.pjg.secreto.history.command.service;
 
+import ch.qos.logback.core.testUtil.RandomUtil;
 import com.pjg.secreto.common.Util.AuthUtils;
 import com.pjg.secreto.history.command.dto.WriteManitoWordCloudRequest;
 import com.pjg.secreto.history.command.repository.WordCloudCommandRepository;
@@ -33,7 +34,7 @@ public class WordCloudCommandServiceImpl implements WordCloudCommandService {
             throw new UserException("접근권한이 없습니다.");
         }
 
-        long value = new Random().nextLong(100L);
+        long value = (long) (Math.random() * 100) + 1;
         wordCloudCommandRepository.save(new WordCloud(user, dto.getContents(), value));
     }
 }
