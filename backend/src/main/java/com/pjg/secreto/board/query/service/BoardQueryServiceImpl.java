@@ -17,7 +17,6 @@ import com.pjg.secreto.board.query.repository.ReplyQueryRepository;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import com.pjg.secreto.user.common.entity.User;
-import com.pjg.secreto.user.common.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -65,7 +64,7 @@ public class BoardQueryServiceImpl implements BoardQueryService{
             List<Board> boardList;
 
             if (boardCategory == null) {
-                throw new BoardException("게시판 카테고리를 선택해주세요");
+                new BoardException("게시판 카테고리를 선택해주세요");
             }
             if (title != null) {
                 boardList = boardQueryRepository.findBoardByBoardCategoryAndTitleContaining(boardCategory, title);
@@ -170,9 +169,14 @@ public class BoardQueryServiceImpl implements BoardQueryService{
     @Override
     public List<SearchReplyResponseDto> getRely(Long boardNo, Long roomNo, Long userNo) {
         try {
+
             RoomUser roomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo).orElseThrow(()->new BoardException("방에 참여한 유저가 아닙니다."));
 
             Board board = boardQueryRepository.getById(boardNo);
+
+            if(!board.getRoomUser().getRoom().equals(roomUser.getRoom())) {
+                throw new BoardException("댓글을 조회할 권한이 없습니다.");
+            }
 
             List<Reply> replyList = replyQueryRepository.findAllByBoard(board);
 
@@ -185,8 +189,8 @@ public class BoardQueryServiceImpl implements BoardQueryService{
                 String writerEmail = user.getEmail();
                 String writerProfileUrl = user.getProfileUrl();
 
-                Boolean annonymityYn = reply.getAnonymityYn();
-                if (annonymityYn) {
+                Boolean anonymityYn = reply.getAnonymityYn();
+                if (anonymityYn) {
                     writerEmail = null;
                     writerProfileUrl = null;
                 }
@@ -196,7 +200,7 @@ public class BoardQueryServiceImpl implements BoardQueryService{
 
                 if (tagUserNo != null) {
                     RoomUser tagUser = roomUserQueryRepository.findById(tagUserNo).orElseThrow(
-                            () -> new UserException("태그한 유저가 없습니다. id=" + tagUserNo)
+                            () -> new BoardException("태그한 유저가 없습니다. id=" + tagUserNo)
                     );
 
                     tagUserNickname = tagUser.getNickname();
@@ -230,7 +234,7 @@ public class BoardQueryServiceImpl implements BoardQueryService{
 
             return searchReplyResponseDtoList;
         }catch(Exception e){
-            throw new UserException(e.getMessage());
+            throw new BoardException(e.getMessage());
         }
     }
 }
