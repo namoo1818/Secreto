@@ -28,6 +28,7 @@ public final class UserDetailsProviderUserConverter implements ProviderUserConve
                 .username(user.getNickname())
                 .password(user.getPassword())
                 .authorities(null)
+                .profileUrl(user.getProfileUrl())
                 .email(user.getEmail())
                 .provider("none")
                 .build();

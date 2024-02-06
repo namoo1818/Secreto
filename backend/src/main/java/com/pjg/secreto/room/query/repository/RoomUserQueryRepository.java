@@ -42,4 +42,5 @@ public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, 
 
     @Query("select count(ru) from RoomUser ru where ru.standbyYn = false and ru.room.id = :roomNo")
     int findParticipantCntByRoomNo(Long roomNo);
+
 }
