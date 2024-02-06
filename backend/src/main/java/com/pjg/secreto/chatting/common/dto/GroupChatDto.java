@@ -1,15 +1,11 @@
 package com.pjg.secreto.chatting.common.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Repository;
+import lombok.Builder;
+import lombok.Data;
 
-@Getter
-@Repository
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
+@Data
 public class GroupChatDto {
-    long groupChatNo;
-    long roomNo;
+    private Long groupChatNo;
+    private Long roomNo;
 }

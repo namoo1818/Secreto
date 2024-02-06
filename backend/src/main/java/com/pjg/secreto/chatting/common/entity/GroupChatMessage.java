@@ -1,10 +1,11 @@
 package com.pjg.secreto.chatting.common.entity;
 
-import com.pjg.secreto.chatting.common.entity.GroupChat;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,7 +25,7 @@ public class GroupChatMessage {
     @Column(columnDefinition = "TEXT")
     private String message;
 
-    private String sendAt;
+    private LocalDateTime sendAt;
 
     private String sender;
 

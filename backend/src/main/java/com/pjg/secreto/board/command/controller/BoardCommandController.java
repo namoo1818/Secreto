@@ -82,7 +82,7 @@ public class BoardCommandController {
 
     // 댓글 삭제
     @DeleteMapping(value="/reply/{replyNo}/room/{roomNo}")
-    public ResponseEntity<?> deleteReply(@PathVariable("reply") Long replyNo, @PathVariable("roomNo")Long roomNo){
+    public ResponseEntity<?> deleteReply(@PathVariable("replyNo") Long replyNo, @PathVariable("roomNo")Long roomNo){
         Long userNo = AuthUtils.getAuthenticatedUserId();
 
         boardCommandService.deleteReply(roomNo, userNo, replyNo);

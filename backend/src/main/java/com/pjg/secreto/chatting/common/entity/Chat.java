@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,10 @@ public class Chat {
     @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY)
     private List<ChatMessage> chatMessages = new ArrayList<>();
 
-    private String firstTime;
+    private LocalDateTime firstTime;
+
+    public void updateFirstTime(LocalDateTime firstTime){
+        this.firstTime = firstTime;
+    }
 
 }
