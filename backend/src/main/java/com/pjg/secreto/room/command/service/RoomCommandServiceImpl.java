@@ -370,7 +370,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     }
 
     @Override
-    public void bookmarkRoom(BookmarkRoomRequestDto bookmarkRoomRequestDto) {
+    public Boolean bookmarkRoom(BookmarkRoomRequestDto bookmarkRoomRequestDto) {
 
         try {
 
@@ -378,7 +378,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, bookmarkRoomRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
 
-            findRoomUser.bookmark();
+            return findRoomUser.bookmark();
 
         } catch (Exception e) {
             throw new RoomException(e.getMessage());
