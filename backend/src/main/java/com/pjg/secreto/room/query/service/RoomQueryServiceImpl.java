@@ -6,6 +6,8 @@ import com.pjg.secreto.room.common.exception.RoomException;
 import com.pjg.secreto.room.query.dto.*;
 import com.pjg.secreto.room.query.repository.RoomQueryRepository;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
+import com.pjg.secreto.user.common.entity.User;
+import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,14 +73,28 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
         try {
 
-            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllWithUserAndRoomByUserNo(userNo);
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllWithUserAndRoomByUserNoWhereUserNotLeave(userNo);
 
             List<SearchRoomListResponseDto> result = new ArrayList<>();
             for(RoomUser ru : findRoomUsers) {
 
-                Long findRoomNo = ru.getId();
+                Long findRoomNo = ru.getRoom().getId();
+                RoomStatus roomStatus;
+                if(ru.getStandbyYn()) {
+                    roomStatus = RoomStatus.WAIT;
+                }
+                else {
+                    roomStatus = RoomStatus.PARTICIPANT;
+                }
+
+                if(ru.getRoom().getRoomEndAt() != null) {
+                    roomStatus = RoomStatus.END;
+                }
 
                 int findRoomUserCnt = roomUserQueryRepository.findParticipantCntByRoomNo(findRoomNo);
+
+                RoomUser findRoomUser = roomUserQueryRepository.findById(ru.getRoom().getHostNo())
+                        .orElseThrow(() -> new RoomException("해당 식별키를 가진 방장이 존재하지 않습니다."));
 
                 result.add(SearchRoomListResponseDto.builder()
                         .roomNo(ru.getRoom().getId())
@@ -93,8 +109,9 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                         .standbyYn(ru.getStandbyYn())
                         .nickname(ru.getNickname())
                         .participantCnt(findRoomUserCnt)
-                        .bookmarkYn(ru.getBookmarkYn()).build());
-
+                        .bookmarkYn(ru.getBookmarkYn())
+                        .roomStatus(roomStatus)
+                        .hostUserNo(findRoomUser.getUser().getId()).build());
             }
 
             return result;
@@ -110,7 +127,19 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
         try {
 
-            RoomUser findRoomUser = roomUserQueryRepository.findWithUserAndRoomByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new RoomException("해당 방 유저가 없습니다."));
+            RoomUser findRoomUser = roomUserQueryRepository.findWithUserAndRoomByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new RoomException("방에 속해있지 않은 유저입니다."));
+
+            RoomStatus roomStatus;
+            if(findRoomUser.getStandbyYn()) {
+                roomStatus = RoomStatus.WAIT;
+            }
+            else {
+                roomStatus = RoomStatus.PARTICIPANT;
+            }
+
+            if(findRoomUser.getRoom().getRoomEndAt() != null) {
+                roomStatus = RoomStatus.END;
+            }
 
             SearchRoomResponseDto result = SearchRoomResponseDto.builder()
                     .roomNo(findRoomUser.getRoom().getId())
@@ -123,6 +152,8 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                     .missionSubmitTime(findRoomUser.getRoom().getMissionSubmitTime())
                     .missionStartAt(findRoomUser.getRoom().getMissionStartAt())
                     .roomStartYn(findRoomUser.getRoom().getRoomStartYn())
+                    .roomStatus(roomStatus)
+                    .hostRoomUserNo(findRoomUser.getRoom().getHostNo())
                     .userInfo(new UserInfoDto(findRoomUser.getId(), findRoomUser.getNickname(), findRoomUser.getUser().getProfileUrl())).build();
 
             return result;
@@ -134,5 +165,3 @@ public class RoomQueryServiceImpl implements RoomQueryService{
     }
 
 }
-
-

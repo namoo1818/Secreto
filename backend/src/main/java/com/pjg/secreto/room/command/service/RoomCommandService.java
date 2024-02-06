@@ -15,7 +15,7 @@ public interface RoomCommandService {
 
     void deligateAdmin(DeligateAdminRequestDto deligateAdminRequestDto);
 
-    void bookmarkRoom(BookmarkRoomRequestDto bookmarkRoomRequestDto);
+    Boolean bookmarkRoom(BookmarkRoomRequestDto bookmarkRoomRequestDto);
 
     void terminateRoom(TerminateRoomRequestDto terminateRoomRequestDto);
 

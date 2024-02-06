@@ -29,7 +29,7 @@ public class SearchRoomUserListResponseDto {
 
     private String nickname;
 
-    private String profile_url;
+    private String profileUrl;
 
     public static SearchRoomUserListResponseDto of(RoomUser roomUser) {
         return SearchRoomUserListResponseDto.builder()
@@ -40,7 +40,7 @@ public class SearchRoomUserListResponseDto {
                 .userLeaveAt(roomUser.getUserLeaveAt())
                 .standbyYn(roomUser.getStandbyYn())
                 .nickname(roomUser.getNickname())
-                .profile_url(roomUser.getUser().getProfileUrl())
+                .profileUrl(roomUser.getUser().getProfileUrl())
                 .build();
     }
 }

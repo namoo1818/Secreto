@@ -20,7 +20,6 @@ import com.pjg.secreto.user.common.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,153 +51,164 @@ public class BoardQueryServiceImpl implements BoardQueryService{
     }
 
     @Override
-    public Page<SearchBoardResponseDto> getBoardBySpecification(SearchBoardRequestDto serachRequest, Pageable pageable) {
-        Long roomNo = serachRequest.getRoomNo();
-        BoardCategory boardCategory = serachRequest.getBoardCategory();
-        String title = serachRequest.getTitle();
-        String content = serachRequest.getContent();
-        String writer = serachRequest.getWriter();
+    public Page<SearchBoardResponseDto> getBoardBySpecification(Long roomNo, Long userNo, SearchBoardRequestDto serachRequest, Pageable pageable) {
 
-        List<Board> boardList;
+        try {
+            RoomUser roomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new BoardException("방에 참여한 유저가 아닙니다."));
+            BoardCategory boardCategory = serachRequest.getBoardCategory();
+            String title = serachRequest.getTitle();
+            String content = serachRequest.getContent();
+            String writer = serachRequest.getWriter();
 
-        if(boardCategory==null) {
-            throw new BoardException("게시판 카테고리를 선택해주세요");
-        }
-        if(title!=null) {
-            boardList = boardQueryRepository.findBoardByBoardCategoryAndTitleContaining(boardCategory, title);
-        }
-        else if(content!=null){
-            boardList = boardQueryRepository.findBoardByBoardCategoryAndContentContaining(boardCategory, content);
-        }
-        else if(writer!=null){
-            boardList = boardQueryRepository.findBoardByBoardCategoryAndWriterContaining(boardCategory, writer);
-        } else {
-            boardList = boardQueryRepository.findBoardByBoardCategory(boardCategory);
-        }
+            Page<Board> boardPage;
 
-        List<SearchBoardResponseDto> boardResponseDtoList = new ArrayList<>();
-
-        for(Board board:boardList){
-            if(board.getRoomUser().getRoom().getId()==roomNo) {
-                User user = board.getRoomUser().getUser();
-
-                String writerEmail = user.getEmail();
-                String writerProfileUrl = user.getProfileUrl();
-
-                Boolean publicYn = board.getPublicYn();
-
-                if (!publicYn) {
-                    writerEmail = null;
-                    writerProfileUrl = null;
-                }
-
-                SearchBoardResponseDto searchBoardResponseDto = SearchBoardResponseDto.builder()
-                        .boardNo(board.getId())
-                        .title(board.getTitle())
-                        .registerAt(board.getRegisterAt())
-                        .hit(board.getHit())
-                        .boardCategory(board.getBoardCategory())
-                        .publicYn(board.getPublicYn())
-                        .missionCategory(board.getMissionCategory())
-                        .likedCount(board.getLikedCount())
-                        .writer(board.getWriter())
-                        .writerEmail(writerEmail)
-                        .writerProfileUrl(writerProfileUrl)
-                        .replyCount(board.getReplies().size())
-                        .imgUrl(board.getImgUrl())
-                        .build();
-                boardResponseDtoList.add(searchBoardResponseDto);
+            if (boardCategory == null) {
+                new BoardException("게시판 카테고리를 선택해주세요");
             }
+            if (title != null) {
+                boardPage =   boardQueryRepository.findBoardByBoardCategoryAndTitleContaining(serachRequest.getBoardCategory(), serachRequest.getTitle() ,pageable);
+            } else if (content != null) {
+                boardPage =  boardQueryRepository.findBoardByBoardCategoryAndContentContaining(serachRequest.getBoardCategory(), serachRequest.getContent() ,pageable);
+            } else if (writer != null) {
+                boardPage =  boardQueryRepository.findBoardByBoardCategoryAndWriterContaining(serachRequest.getBoardCategory(), serachRequest.getWriter() ,pageable);
+            } else {
+                boardPage =  boardQueryRepository.findBoardByBoardCategory(serachRequest.getBoardCategory() ,pageable);
+            }
+
+            return boardPage.map(board -> SearchBoardResponseDto.builder()
+                    .boardNo(board.getId())
+                    .title(board.getTitle())
+                    .registerAt(board.getRegisterAt())
+                    .hit(board.getHit())
+                    .boardCategory(board.getBoardCategory())
+                    .publicYn(board.getPublicYn())
+                    .missionCategory(board.getMissionCategory())
+                    .likedCount(board.getLikedCount())
+                    .writer(board.getWriter())
+                    .writerEmail(null)
+                    .writerProfileUrl(null)
+                    .replyCount(board.getReplies().size())
+                    .imgUrl(board.getImgUrl())
+                    .build());
+        }catch (Exception e){
+            throw new BoardException(e.getMessage());
         }
-
-        int page = pageable.getPageNumber();
-        int size = pageable.getPageSize();
-        int start = (int)pageable.getOffset();
-        int end = Math.min((start+size),boardResponseDtoList.size());
-
-        Page<SearchBoardResponseDto> searchBoardResponseDto = new PageImpl<>(boardResponseDtoList.subList(start, end), pageable, boardResponseDtoList.size());
-
-        return searchBoardResponseDto;
     }
 
     @Override
-    public SearchPostResponseDto getPost(Long boardNo, Long roomUserNo) {
-        Board board = boardQueryRepository.findById(boardNo).orElseThrow();
-        RoomUser roomUser = roomUserQueryRepository.findById(roomUserNo).orElseThrow();
+    public SearchPostResponseDto getPost(Long boardNo, Long roomNo, Long userNo) {
+        try {
+            RoomUser roomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new BoardException("방에 참여한 유저가 아닙니다."));
+            Board board = boardQueryRepository.findById(boardNo).orElseThrow();
+            Optional boardEntryLog = boardEntryLogQueryRepository.findByBoardAndAndRoomUserAndAndEntryAt(board, roomUser, LocalDate.now());
 
-        Optional boardEntryLog = boardEntryLogQueryRepository.findByBoardAndAndRoomUserAndAndEntryAt(board, roomUser, LocalDate.now());
+            if (boardEntryLog.isEmpty()) {
+                boardEntryLogCommandRepository.save(new BoardEntryLog(board, roomUser, LocalDate.now()));
+                board.updateHit(board.getHit() + 1);
+            }
 
-        if(boardEntryLog.isEmpty()){
-            boardEntryLogCommandRepository.save(new BoardEntryLog(board, roomUser, LocalDate.now()));
-            board.updateHit(board.getHit()+1);
-        }
-
-        User user = board.getRoomUser().getUser();
-
-        String writerEmail = user.getEmail();
-        String writerProfileUrl = user.getProfileUrl();
-
-        Boolean publicYn = board.getPublicYn();
-
-        if(!publicYn){
-            writerEmail = null;
-            writerProfileUrl = null;
-        }
-
-        SearchPostResponseDto searchPostResponseDto = SearchPostResponseDto.builder()
-                .boardNo(board.getId())
-                .roomUserNo(board.getRoomUser().getId())
-                .title(board.getTitle())
-                .content(board.getContent())
-                .registerAt(board.getRegisterAt())
-                .hit(board.getHit())
-                .boardCategory(board.getBoardCategory())
-                .publicYn(board.getPublicYn())
-                .missionCategory(board.getMissionCategory())
-                .likedCount(board.getLikedCount())
-                .writer(board.getWriter())
-                .writerEmail(writerEmail)
-                .writerProfileUrl(writerProfileUrl)
-                .build();
-        return searchPostResponseDto;
-    }
-
-
-    @Override
-    public List<SearchReplyResponseDto> getRely(Long boardNo) {
-        Board board = boardQueryRepository.getById(boardNo);
-
-        List<Reply> replyList = replyQueryRepository.findAllByBoard(board);
-
-        List<SearchReplyResponseDto> searchReplyResponseDtoList = new ArrayList<>();
-
-        for(Reply reply:replyList){
-            RoomUser roomUser = roomUserQueryRepository.findById(reply.getRoomUser().getId()).orElseThrow();
-            User user = roomUser.getUser();
+            User user = board.getRoomUser().getUser();
 
             String writerEmail = user.getEmail();
             String writerProfileUrl = user.getProfileUrl();
 
-            Boolean annonymityYn = reply.getAnnonymityYn();
-            if(annonymityYn){
-                writerEmail = null;
-                writerProfileUrl = null;
+            Boolean publicYn = board.getPublicYn();
+
+            if (!publicYn && !board.getRoomUser().equals(roomUser)) {
+                throw new BoardException("비공개 게시글입니다.");
             }
 
-            SearchReplyResponseDto responseDto =  SearchReplyResponseDto.builder()
-                    .replyNo(reply.getId())
-                    .roomUserNo(reply.getRoomUser().getId())
-                    .content(reply.getContent())
-                    .registerAt(reply.getRegisterAt())
-                    .parentReplyNo(reply.getParentReplyNo())
-                    .tagUserNo(reply.getTagUserNo())
-                    .writer(reply.getWriter())
+            SearchPostResponseDto searchPostResponseDto = SearchPostResponseDto.builder()
+                    .boardNo(board.getId())
+                    .roomUserNo(board.getRoomUser().getId())
+                    .title(board.getTitle())
+                    .content(board.getContent())
+                    .registerAt(board.getRegisterAt())
+                    .hit(board.getHit())
+                    .boardCategory(board.getBoardCategory())
+                    .publicYn(board.getPublicYn())
+                    .missionCategory(board.getMissionCategory())
+                    .likedCount(board.getLikedCount())
+                    .writer(board.getWriter())
                     .writerEmail(writerEmail)
                     .writerProfileUrl(writerProfileUrl)
                     .build();
-            searchReplyResponseDtoList.add(responseDto);
+            return searchPostResponseDto;
+        } catch (Exception e){
+            throw new BoardException(e.getMessage());
         }
+    }
 
-        return searchReplyResponseDtoList;
+
+    @Override
+    public List<SearchReplyResponseDto> getRely(Long boardNo, Long roomNo, Long userNo) {
+        try {
+
+            RoomUser roomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo).orElseThrow(()->new BoardException("방에 참여한 유저가 아닙니다."));
+
+            Board board = boardQueryRepository.getById(boardNo);
+
+            if(!board.getRoomUser().getRoom().equals(roomUser.getRoom())) {
+                throw new BoardException("댓글을 조회할 권한이 없습니다.");
+            }
+
+            List<Reply> replyList = replyQueryRepository.findAllByBoard(board);
+
+            List<SearchReplyResponseDto> searchReplyResponseDtoList = new ArrayList<>();
+
+            for (Reply reply : replyList) {
+                RoomUser ru = roomUserQueryRepository.findById(reply.getRoomUser().getId()).orElseThrow();
+                User user = ru.getUser();
+
+                String writerEmail = user.getEmail();
+                String writerProfileUrl = user.getProfileUrl();
+
+                Boolean anonymityYn = reply.getAnonymityYn();
+                if (anonymityYn) {
+                    writerEmail = null;
+                    writerProfileUrl = null;
+                }
+
+                Long tagUserNo = reply.getTagUserNo();
+                String tagUserNickname = null;
+
+                if (tagUserNo != null) {
+                    RoomUser tagUser = roomUserQueryRepository.findById(tagUserNo).orElseThrow(
+                            () -> new BoardException("태그한 유저가 없습니다. id=" + tagUserNo)
+                    );
+
+                    tagUserNickname = tagUser.getNickname();
+                }
+
+                SearchReplyResponseDto responseDto;
+
+                if(!reply.getDeleteYn()) {
+                    responseDto = SearchReplyResponseDto.builder()
+                            .replyNo(reply.getId())
+                            .roomUserNo(reply.getRoomUser().getId())
+                            .content(reply.getContent())
+                            .registerAt(reply.getRegisterAt())
+                            .parentReplyNo(reply.getParentReplyNo())
+                            .tagUserNickname(tagUserNickname)
+                            .writer(reply.getWriter())
+                            .writerEmail(writerEmail)
+                            .writerProfileUrl(writerProfileUrl)
+                            .deleteYn(reply.getDeleteYn())
+                            .build();
+
+                } else{
+                    responseDto = SearchReplyResponseDto.builder()
+                            .replyNo(reply.getId())
+                            .parentReplyNo(reply.getParentReplyNo())
+                            .deleteYn(reply.getDeleteYn())
+                            .build();
+                }
+                searchReplyResponseDtoList.add(responseDto);
+            }
+
+            return searchReplyResponseDtoList;
+        }catch(Exception e){
+            throw new BoardException(e.getMessage());
+        }
     }
 }

@@ -29,7 +29,7 @@ public class RoomQueryController {
 
     private final RoomQueryService roomQueryService;
 
-    @GetMapping("/enter")
+    @PostMapping("/search")
     public ResponseEntity<?> enterRoom(@RequestBody CheckCodeDto checkCodeDto) {
 
         HttpHeaders headers = new HttpHeaders();

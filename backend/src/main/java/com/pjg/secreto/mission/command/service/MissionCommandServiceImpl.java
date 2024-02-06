@@ -1,14 +1,22 @@
 package com.pjg.secreto.mission.command.service;
 
+import com.pjg.secreto.alarm.common.entity.Alarm;
+import com.pjg.secreto.alarm.dto.AlarmDataDto;
+import com.pjg.secreto.alarm.repository.AlarmRepository;
+import com.pjg.secreto.alarm.service.AlarmService;
+import com.pjg.secreto.alarm.service.EmitterService;
 import com.pjg.secreto.history.command.repository.ManitoExpectLogCommandRepository;
 import com.pjg.secreto.history.command.repository.UserMemoCommandRepository;
 import com.pjg.secreto.history.common.entity.ManitoExpectLog;
 import com.pjg.secreto.history.common.entity.UserMemo;
 import com.pjg.secreto.history.query.repository.UserMemoQueryRepository;
 import com.pjg.secreto.mission.command.dto.*;
+import com.pjg.secreto.mission.command.repository.RoomMissionCommandRepository;
 import com.pjg.secreto.mission.command.repository.SuddenMissionCommandRepository;
-import com.pjg.secreto.mission.common.entity.SuddenMission;
+import com.pjg.secreto.mission.command.repository.UserMissionCommandRepository;
+import com.pjg.secreto.mission.common.entity.*;
 import com.pjg.secreto.mission.common.exception.MissionException;
+import com.pjg.secreto.mission.query.repository.RoomMissionQueryRepository;
 import com.pjg.secreto.mission.query.repository.SuddenMissionQueryRepository;
 import com.pjg.secreto.room.common.entity.Room;
 import com.pjg.secreto.room.common.entity.RoomUser;
@@ -20,7 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 @RequiredArgsConstructor
 @Transactional
@@ -34,6 +45,10 @@ public class MissionCommandServiceImpl implements MissionCommandService {
     private final ManitoExpectLogCommandRepository manitoExpectLogCommandRepository;
     private final UserMemoCommandRepository userMemoCommandRepository;
     private final UserMemoQueryRepository userMemoQueryRepository;
+    private final RoomMissionQueryRepository roomMissionQueryRepository;
+    private final UserMissionCommandRepository userMissionCommandRepository;
+    private final EmitterService emitterService;
+    private final AlarmRepository alarmRepository;
 
     @Override
     public void addSuddenMission(AddSuddenMissionRequestDto addSuddenMissionRequestDto) {
@@ -43,11 +58,48 @@ public class MissionCommandServiceImpl implements MissionCommandService {
             Room findRoom = roomQueryRepository.findById(addSuddenMissionRequestDto.getRoomNo())
                     .orElseThrow(() -> new MissionException("해당 방이 없습니다."));
 
+            // 돌발 미션 저장 로직
             SuddenMission suddenMission = SuddenMission.builder().room(findRoom)
                     .missionSubmitAt(addSuddenMissionRequestDto.getMissionSubmitAt())
                     .content(addSuddenMissionRequestDto.getContent()).build();
 
             suddenMissionCommandRepository.save(suddenMission);
+
+            // 유저 미션 생성 로직
+            for(RoomUser ru : findRoom.getRoomUsers()) {
+
+                UserMission userMission = UserMission.builder()
+                        .missionReceivedAt(LocalDateTime.now())
+                        .missionCertifyYn(false)
+                        .missionType(MissionType.SUDDEN)
+                        .missionRerollCount(0)
+                        .roomUser(ru)
+                        .content(suddenMission.getContent())
+                        .roomMissionNo(suddenMission.getId()).build();
+
+                userMissionCommandRepository.save(userMission);
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content(userMission.getContent())
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author("방장")
+                        .roomUserNo(ru.getId()).build();
+
+                emitterService.alarm(ru.getId(), alarmDataDto, "돌발 미션이 생성되었습니다.", "sudden");
+
+                Alarm alarm = Alarm.builder()
+                        .author(alarmDataDto.getAuthor())
+                        .content(alarmDataDto.getContent())
+                        .readYn(alarmDataDto.getReadYn())
+                        .generatedAt(alarmDataDto.getGeneratedAt())
+                        .roomUser(ru).build();
+
+                alarmRepository.save(alarm);
+            }
+
+
 
         } catch (Exception e) {
 
@@ -159,12 +211,89 @@ public class MissionCommandServiceImpl implements MissionCommandService {
         // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
         List<Room> findRooms = roomQueryRepository.findAllWithMissionScheduleAndRoomMission();
 
+        List<Room> hasMissionRooms = new ArrayList<>();
+
         LocalDateTime now = LocalDateTime.now();
         for(Room r : findRooms) {
 
+            boolean hasMissionToday = false;
+            for(MissionSchedule ms : r.getMissionSchedules()) {
 
-            LocalDateTime submitDateTime;
+                if(now.isEqual(ms.getMissionSubmitAt())) {
+                    hasMissionToday = true;
+                    break;
+                }
+            }
+
+            // 일자가 같을 경우 방 저장
+            if(hasMissionToday) {
+                hasMissionRooms.add(r);
+            }
+        }
+
+        for(Room r : hasMissionRooms) {
+
+            List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNO(r.getId());
+
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(r.getId());
+
+            Collections.shuffle(roomMissions);
+
+            // 방의 유저들에게 미션 던지기 로직
+            for(RoomUser ru : findRoomUsers) {
+
+                // 개별 미션이면 미션 랜덤으로
+                if(!r.getCommonYn()) {
+                    Collections.shuffle(roomMissions);
+                }
+
+                // 유저 미션 생성
+                RoomMission roomMission = roomMissions.get(0);
+
+                UserMission userMission = UserMission.builder()
+                        .missionReceivedAt(LocalDateTime.now())
+                        .missionCertifyYn(false)
+                        .missionType(MissionType.REGULAR)
+                        .missionRerollCount(0)
+                        .roomUser(ru)
+                        .content(roomMission.getContent())
+                        .roomMissionNo(roomMission.getId()).build();
+
+                userMissionCommandRepository.save(userMission);
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content(userMission.getContent())
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author("시스템")
+                        .roomUserNo(ru.getId()).build();
+
+                emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "regular");
+
+                Alarm alarm = Alarm.builder()
+                        .author(alarmDataDto.getAuthor())
+                        .content(alarmDataDto.getContent())
+                        .readYn(alarmDataDto.getReadYn())
+                        .generatedAt(alarmDataDto.getGeneratedAt())
+                        .roomUser(ru).build();
+
+                alarmRepository.save(alarm);
+            }
 
         }
+
+        // 방 끝내는 로직
+        List<Room> rooms = roomQueryRepository.findAll();
+
+        for(Room r : rooms) {
+
+            if(r.getRoomEndAt().equals(now)) {
+                r.terminateRoom();
+            }
+        }
+
     }
 }
+
+

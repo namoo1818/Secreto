@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class WriteBoardRequestDto {
-    private Long roomUserNo;
     private String title;
     private String content;
     private String imgUrl;

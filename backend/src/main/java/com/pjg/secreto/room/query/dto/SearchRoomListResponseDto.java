@@ -40,5 +40,9 @@ public class SearchRoomListResponseDto {
 
     private Boolean bookmarkYn;
 
+    private RoomStatus roomStatus;
+
+    private Long hostUserNo;
 
 }
+

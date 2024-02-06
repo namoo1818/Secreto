@@ -5,11 +5,11 @@ import lombok.Data;
 
 @Builder
 @Data
-public class GroupChatMessageDto {
-    private Long groupChatMessageNo;
-    private Long groupChatNo;
-    private Long roomNo;
-    private String message;
+public class ChatMessageResponseDto {
+    private Long chatMessageNo;
+    private Long chatNo;
+    private String content;
     private String sendAt;
+    private Boolean readYn;
     private String sender;
 }
