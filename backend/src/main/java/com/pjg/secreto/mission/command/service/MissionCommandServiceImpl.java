@@ -1,6 +1,8 @@
 package com.pjg.secreto.mission.command.service;
 
+import com.pjg.secreto.alarm.common.entity.Alarm;
 import com.pjg.secreto.alarm.dto.AlarmDataDto;
+import com.pjg.secreto.alarm.repository.AlarmRepository;
 import com.pjg.secreto.alarm.service.AlarmService;
 import com.pjg.secreto.alarm.service.EmitterService;
 import com.pjg.secreto.history.command.repository.ManitoExpectLogCommandRepository;
@@ -46,6 +48,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
     private final RoomMissionQueryRepository roomMissionQueryRepository;
     private final UserMissionCommandRepository userMissionCommandRepository;
     private final EmitterService emitterService;
+    private final AlarmRepository alarmRepository;
 
     @Override
     public void addSuddenMission(AddSuddenMissionRequestDto addSuddenMissionRequestDto) {
@@ -85,6 +88,15 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                         .roomUserNo(ru.getId()).build();
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "돌발 미션이 생성되었습니다.", "sudden");
+
+                Alarm alarm = Alarm.builder()
+                        .author(alarmDataDto.getAuthor())
+                        .content(alarmDataDto.getContent())
+                        .readYn(alarmDataDto.getReadYn())
+                        .generatedAt(alarmDataDto.getGeneratedAt())
+                        .roomUser(ru).build();
+
+                alarmRepository.save(alarm);
             }
 
 
@@ -249,6 +261,15 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                         .roomUserNo(ru.getId()).build();
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "regular");
+
+                Alarm alarm = Alarm.builder()
+                        .author(alarmDataDto.getAuthor())
+                        .content(alarmDataDto.getContent())
+                        .readYn(alarmDataDto.getReadYn())
+                        .generatedAt(alarmDataDto.getGeneratedAt())
+                        .roomUser(ru).build();
+
+                alarmRepository.save(alarm);
             }
 
         }
