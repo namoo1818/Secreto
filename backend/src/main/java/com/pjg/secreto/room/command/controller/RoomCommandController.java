@@ -128,9 +128,9 @@ public class RoomCommandController {
 
         Long userNo = AuthUtils.getAuthenticatedUserId();
         bookmarkRoomRequestDto.setUserNo(userNo);
-        roomCommandService.bookmarkRoom(bookmarkRoomRequestDto);
+        Boolean result = roomCommandService.bookmarkRoom(bookmarkRoomRequestDto);
 
-        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "방을 즐겨찾기 하였습니다.", null));
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "방을 즐겨찾기 or 취소 하였습니다.", result));
     }
 
     @PutMapping("/terminate")
@@ -169,3 +169,4 @@ public class RoomCommandController {
     }
 
 }
+

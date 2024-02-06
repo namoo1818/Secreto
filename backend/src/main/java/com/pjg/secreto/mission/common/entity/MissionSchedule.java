@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,10 +25,10 @@ public class MissionSchedule {
     @JoinColumn(name = "room_no")
     private Room room;
 
-    private LocalDate missionSubmitAt;
+    private LocalDateTime missionSubmitAt;
 
     @Builder
-    public MissionSchedule (Room room, LocalDate missionSubmitAt) {
+    public MissionSchedule (Room room, LocalDateTime missionSubmitAt) {
 
         this.room = room;
         this.missionSubmitAt = missionSubmitAt;
