@@ -3,8 +3,11 @@ package com.pjg.secreto.mission.common.entity;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,7 +24,7 @@ public class UserMission {
     @JoinColumn(name = "room_user_no")
     private RoomUser roomUser;
 
-    private String missionReceivedAt;
+    private LocalDateTime missionReceivedAt;
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -33,5 +36,21 @@ public class UserMission {
     private int missionRerollCount;
 
     private Boolean missionCertifyYn;
+
+    private Long roomMissionNo;
+
+    @Builder
+    public UserMission(RoomUser roomUser, LocalDateTime missionReceivedAt, String content,
+                       MissionType missionType, int missionRerollCount,
+                       Boolean missionCertifyYn, Long roomMissionNo) {
+
+        this.roomUser = roomUser;
+        this.missionReceivedAt = missionReceivedAt;
+        this.content = content;
+        this.missionType = missionType;
+        this.missionRerollCount = missionRerollCount;
+        this.missionCertifyYn = missionCertifyYn;
+        this.roomMissionNo = roomMissionNo;
+    }
 
 }
