@@ -21,6 +21,7 @@ import com.pjg.secreto.user.common.exception.UserException;
 import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -157,7 +158,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             for(int i=0; i<totalDays; i+=period) {
 
-                LocalDate date = missionStartDate.plusDays(i);
+                LocalDateTime missionStartDateTime = LocalDateTime.of(missionStartDate, setRoomRequestDto.getMissionSubmitTime());
+                LocalDateTime date = missionStartDateTime.plusDays(i);
                 MissionSchedule missionSchedule = MissionSchedule.builder().room(room).missionSubmitAt(date).build();
                 missionScheduleCommandRepository.save(missionSchedule);
             }
@@ -578,7 +580,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         }
     }
 
-
     /**
      * 방 입장 코드 생성 메서드
      */
@@ -597,3 +598,4 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     }
 
 }
+
