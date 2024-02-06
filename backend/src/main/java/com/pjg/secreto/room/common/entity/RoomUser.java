@@ -107,8 +107,10 @@ public class RoomUser {
         this.standbyYn = false;
     }
 
-    public void bookmark() {
-        this.bookmarkYn = true;
+    public Boolean bookmark() {
+        this.bookmarkYn = !this.bookmarkYn;
+
+        return this.bookmarkYn;
     }
 
     public void setMatchingInfo(Long usersManito, Long usersManiti) {
