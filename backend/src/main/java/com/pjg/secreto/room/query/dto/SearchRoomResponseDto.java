@@ -31,8 +31,11 @@ public class SearchRoomResponseDto {
 
     private Boolean roomStartYn;
 
+    private RoomStatus roomStatus;
+
+    private Long hostRoomUserNo;
+
     private UserInfoDto userInfo;
 
-    private RoomStatus roomStatus;
 
 }
