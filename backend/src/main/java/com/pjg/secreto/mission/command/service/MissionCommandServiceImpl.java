@@ -143,35 +143,42 @@ public class MissionCommandServiceImpl implements MissionCommandService {
     }
 
     // 정기 미션 날리기 기능, 방 끝나는 시각에 맞게 끝내는 기능 수행 메서드
-    @Scheduled(cron = "0 0 0-23 * * *") // 매일 정각마다 실행
-    public void throwRegularMission() {
-
-        /**
-         * 정기 미션 날리기 로직
-         */
-        // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
-        List<Room> findRooms = roomQueryRepository.findAllWithMissionScheduleAndRoomMission();
-
-        List<Room> hasMissionRooms = new ArrayList<>();
-
-        LocalDateTime now = LocalDateTime.now();
-        for(Room r : findRooms) {
-
-            boolean hasMissionToday = false;
-            for(MissionSchedule ms : r.getMissionSchedules()) {
-
-                if(now.isEqual(ms.getMissionSubmitAt())) {
-                    hasMissionToday = true;
-                    break;
-                }
-            }
-
-            if(hasMissionToday) {
-
-            }
-
-        }
-    }
+//    @Scheduled(cron = "0 0 0-23 * * *") // 매일 정각마다 실행
+//    public void throwRegularMission() {
+//
+//        /**
+//         * 정기 미션 날리기 로직
+//         */
+//        // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
+//        List<Room> findRooms = roomQueryRepository.findAllWithMissionScheduleAndRoomMission();
+//
+//        List<Room> hasMissionRooms = new ArrayList<>();
+//
+//        LocalDateTime now = LocalDateTime.now();
+//        for(Room r : findRooms) {
+//
+//            boolean hasMissionToday = false;
+//            for(MissionSchedule ms : r.getMissionSchedules()) {
+//
+//                if(now.isEqual(ms.getMissionSubmitAt())) {
+//                    hasMissionToday = true;
+//                    break;
+//                }
+//            }
+//
+//            // 일자가 같을 경우 방 저장
+//            if(hasMissionToday) {
+//                hasMissionRooms.add(r);
+//            }
+//        }
+//
+//        for(Room r : hasMissionRooms) {
+//
+//
+//        }
+//
+//
+//    }
 }
 
 
