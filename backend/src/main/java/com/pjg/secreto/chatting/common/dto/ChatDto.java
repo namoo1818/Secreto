@@ -9,6 +9,5 @@ import lombok.Data;
 public class ChatDto {
     private Long chatNo;
     private String firstTime;
-//    private Set<WebSocketSession> sessions = new HashSet<>();
 }
 
