@@ -1,14 +1,20 @@
 package com.pjg.secreto.history.query.service;
 
+import com.pjg.secreto.board.common.entity.BoardCategory;
 import com.pjg.secreto.history.query.dto.*;
+import com.pjg.secreto.history.query.repository.ManitoActivityRepository;
 import com.pjg.secreto.history.query.repository.ManitoExpectRepository;
 import com.pjg.secreto.history.query.repository.StaticRepository;
 import com.pjg.secreto.history.query.repository.WordCloudQueryRepository;
+import com.pjg.secreto.room.common.entity.RoomUser;
+import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +22,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
     private final WordCloudQueryRepository wordCloudQueryRepository;
     private final ManitoExpectRepository manitoExpectRepository;
     private final StaticRepository staticRepository;
+    private final RoomUserQueryRepository roomUserQueryRepository;
+    private final ManitoActivityRepository manitoActivityRepository;
 
     @Override
     public List<List<?>> getWorldCloudContents(Long roomId) {
@@ -24,7 +32,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
     @Override
     public List<PredictBoardDto> getManitoResultList(Long roomId) {
-        return manitoExpectRepository.getPredictResult(roomId);
+        return manitoExpectRepository.getMatchingResult(roomId);
     }
 
     @Override
@@ -38,6 +46,111 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
                 getMostWroteBoastUser(roomId)
         );
     }
+
+    @Override
+    public Map<String, Object> getMyManitoActivity(Long roomId, Long roomUserId) {
+        Long authenticatedUserId = roomUserId;
+        RoomUser principal = roomUserQueryRepository.findById(authenticatedUserId).orElseThrow();
+        List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManiti(roomId, authenticatedUserId);
+
+        List<PostDto> myCerticiationActivity = manitoActivityRepository
+                .getBoardActivity(roomId, targets, BoardCategory.CERTIFICATE);
+        List<PostDto> targetsBoastActivity = manitoActivityRepository
+                .getBoardActivity(roomId, List.of(principal), BoardCategory.BOAST);
+
+        List<PredictorDto> targetsPredictor = manitoExpectRepository.getPredictResult(roomId, List.of(principal));
+
+        List<? super Object> manitos = new ArrayList<>();
+        manitos.addAll(targetsBoastActivity);
+        manitos.addAll(targetsPredictor);
+
+
+        List<? super Object> manitis = new ArrayList<>();
+        manitis.addAll(myCerticiationActivity);
+
+        TreeMap<Object, List<Object>> manito = getTreeMap(manitos);
+        TreeMap<Object, List<Object>> maniti = getTreeMap(manitis);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("maniti", getClassification(maniti));
+        result.put("manito", getClassification(manito));
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getMyManitiActivity(Long roomId, Long roomUserId) {
+        Long authenticatedUserId = roomUserId;
+        RoomUser principal = roomUserQueryRepository.findById(authenticatedUserId).orElseThrow();
+        List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManito(roomId, authenticatedUserId);
+
+        List<PostDto> myCerticiationActivity = manitoActivityRepository
+                .getBoardActivity(roomId, List.of(principal), BoardCategory.CERTIFICATE);
+        List<PostDto> targetsBoastActivity = manitoActivityRepository
+                .getBoardActivity(roomId, targets, BoardCategory.BOAST);
+
+        System.out.println("타겟" + targetsBoastActivity);
+        List<PredictorDto> targetsPredictor = manitoExpectRepository.getPredictResult(roomId, targets);
+
+        List<? super Object> manitos = new ArrayList<>();
+        manitos.addAll(targetsBoastActivity);
+        manitos.addAll(targetsPredictor);
+
+
+        List<? super Object> manitis = new ArrayList<>();
+        manitis.addAll(myCerticiationActivity);
+
+        TreeMap<Object, List<Object>> manito = getTreeMap(manitos);
+        TreeMap<Object, List<Object>> maniti = getTreeMap(manitis);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("maniti", getClassification(maniti));
+        result.put("manito", getClassification(manito));
+
+        return result;
+    }
+
+    private TreeMap<Object, List<Object>> getTreeMap(List<?> collection){
+        TreeMap<Object, List<Object>> result  = collection
+                .stream()
+                .collect(TreeMap::new,
+                        (map, obj) -> {
+                            LocalDate date;
+                            if (obj instanceof PostDto) {
+                                date = ((PostDto) obj).getEntryAt().toLocalDate();
+                            } else if (obj instanceof PredictorDto) {
+                                date = ((PredictorDto) obj).getEntryAt().toLocalDate();
+                            } else {
+                                throw new IllegalArgumentException("Unsupported type: " + obj.getClass());
+                            }
+
+                            map.computeIfAbsent(date, k -> new ArrayList<>() {}).add(obj);
+                        },  TreeMap::putAll);
+
+        return result;
+    }
+
+    private Map<Object, Map<String, List<Object>>> getClassification(TreeMap<Object, List<Object>> collections){
+        Map<Object, Map<String, List<Object>>> result = new LinkedHashMap<>();
+
+        for (Map.Entry<Object, List<Object>> entry : collections.entrySet()) {
+
+            Object key = entry.getKey();
+            List<Object> value = entry.getValue();
+
+            Map<String, List<Object>> collect = value.stream()
+                    .collect(Collectors.groupingBy(
+                            d -> d.getClass().getSimpleName().substring(0, d.getClass().getSimpleName().length() - 3).toLowerCase(),
+                            LinkedHashMap::new,
+                            Collectors.toList()
+                    ));
+
+            result.put(key, collect);
+        }
+
+        return result;
+    }
+
 
     private SummaryDto getBestMember(Long roomId) {
         List<Tuple> bestMemberCandidate = staticRepository.getBestMember(roomId);

@@ -79,9 +79,18 @@ public class MissionCommandServiceImpl implements MissionCommandService {
             Long userNo = predictManitoRequestDto.getUserNo();
 
             RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, predictManitoRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
+            UserMemo userMemo = userMemoQueryRepository.findByMemoTo(predictManitoRequestDto.getExpectedManito())
+                    .orElseGet(() -> {
+                        return UserMemo.builder()
+                                .memoTo(predictManitoRequestDto.getExpectedManito())
+                                .memo("사유 없음")
+                                .build();
+            });
 
             ManitoExpectLog manitoExpectLog = ManitoExpectLog.builder()
-                    .roomUser(findRoomUser).expectedUser(predictManitoRequestDto.getExpectedManito())
+                    .roomUser(findRoomUser)
+                    .expectedUser(predictManitoRequestDto.getExpectedManito())
+                    .expectedReason(userMemo.getMemo())
                     .expectedAt(LocalDateTime.now()).build();
 
             manitoExpectLogCommandRepository.save(manitoExpectLog);

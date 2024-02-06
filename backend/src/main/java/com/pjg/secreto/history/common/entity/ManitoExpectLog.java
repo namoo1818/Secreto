@@ -28,11 +28,14 @@ public class ManitoExpectLog {
 
     private Long expectedUser;
 
+    private String expectedReason;
+
     @Builder
-    public ManitoExpectLog(RoomUser roomUser, LocalDateTime expectedAt, Long expectedUser) {
+    public ManitoExpectLog(RoomUser roomUser, LocalDateTime expectedAt, Long expectedUser, String expectedReason) {
         this.roomUser = roomUser;
         this.expectedAt = expectedAt;
         this.expectedUser = expectedUser;
+        this.expectedReason = expectedReason;
     }
 
 }

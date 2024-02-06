@@ -41,6 +41,7 @@ public class StaticRepository {
                 .join(board.roomUser.user, user)
                 .orderBy(board.likedCount.desc(), board.registerAt.asc())
                 .where(board.roomUser.room.id.eq(roomId))
+                .where(board.registerAt.before(board.roomUser.room.roomEndAt))
                 .fetchFirst();
 
         return result;
@@ -65,6 +66,7 @@ public class StaticRepository {
                 .join(board.roomUser.user, user)
                 .orderBy(board.likedCount.desc(), board.registerAt.asc())
                 .where(board.roomUser.room.id.eq(roomId))
+                .where(board.registerAt.before(board.roomUser.room.roomEndAt))
                 .fetchFirst();
 
         return result;
@@ -85,6 +87,7 @@ public class StaticRepository {
                 .join(board.roomUser.user, user)
                 .where(board.roomUser.room.id.eq(roomId))
                 .where(board.boardCategory.eq(BoardCategory.CERTIFICATE))
+                .where(board.registerAt.before(board.roomUser.room.roomEndAt))
                 .groupBy(board.roomUser)
                 .orderBy(board.count().desc())
                 .fetchFirst();
@@ -107,6 +110,7 @@ public class StaticRepository {
                 .join(board.roomUser.user, user)
                 .where(board.roomUser.room.id.eq(roomId))
                 .where(board.boardCategory.eq(BoardCategory.BOAST))
+                .where(board.registerAt.before(board.roomUser.room.roomEndAt))
                 .groupBy(board.roomUser)
                 .orderBy(board.count().desc())
                 .fetchFirst();
@@ -124,6 +128,7 @@ public class StaticRepository {
                 .join(board.roomUser, roomUser)
                 .join(board.roomUser.user, user).fetchJoin()
                 .where(board.boardCategory.eq(BoardCategory.NOTICE).not())
+                .where(board.registerAt.before(board.roomUser.room.roomEndAt))
                 .where(roomUser.room.id.eq(roomId))
                 .groupBy(board.roomUser)
                 .fetch();
