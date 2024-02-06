@@ -33,4 +33,6 @@ public class SearchRoomResponseDto {
 
     private UserInfoDto userInfo;
 
+    private RoomStatus roomStatus;
+
 }

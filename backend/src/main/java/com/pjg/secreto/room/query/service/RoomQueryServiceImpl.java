@@ -124,6 +124,18 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
             RoomUser findRoomUser = roomUserQueryRepository.findWithUserAndRoomByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new RoomException("해당 방 유저가 없습니다."));
 
+            RoomStatus roomStatus;
+            if(findRoomUser.getStandbyYn()) {
+                roomStatus = RoomStatus.WAIT;
+            }
+            else {
+                roomStatus = RoomStatus.PARTICIPANT;
+            }
+
+            if(findRoomUser.getRoom().getRoomEndAt() != null) {
+                roomStatus = RoomStatus.END;
+            }
+
             SearchRoomResponseDto result = SearchRoomResponseDto.builder()
                     .roomNo(findRoomUser.getRoom().getId())
                     .roomName(findRoomUser.getRoom().getRoomName())
@@ -135,6 +147,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                     .missionSubmitTime(findRoomUser.getRoom().getMissionSubmitTime())
                     .missionStartAt(findRoomUser.getRoom().getMissionStartAt())
                     .roomStartYn(findRoomUser.getRoom().getRoomStartYn())
+                    .roomStatus(roomStatus)
                     .userInfo(new UserInfoDto(findRoomUser.getId(), findRoomUser.getNickname(), findRoomUser.getUser().getProfileUrl())).build();
 
             return result;

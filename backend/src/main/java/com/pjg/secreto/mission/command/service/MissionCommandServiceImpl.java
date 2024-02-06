@@ -7,6 +7,7 @@ import com.pjg.secreto.history.common.entity.UserMemo;
 import com.pjg.secreto.history.query.repository.UserMemoQueryRepository;
 import com.pjg.secreto.mission.command.dto.*;
 import com.pjg.secreto.mission.command.repository.SuddenMissionCommandRepository;
+import com.pjg.secreto.mission.common.entity.MissionSchedule;
 import com.pjg.secreto.mission.common.entity.SuddenMission;
 import com.pjg.secreto.mission.common.exception.MissionException;
 import com.pjg.secreto.mission.query.repository.SuddenMissionQueryRepository;
@@ -153,8 +154,14 @@ public class MissionCommandServiceImpl implements MissionCommandService {
         LocalDateTime now = LocalDateTime.now();
         for(Room r : findRooms) {
 
+            boolean isMissionToday = false;
+            for(MissionSchedule ms : r.getMissionSchedules()) {
 
-            LocalDateTime submitDateTime;
+                if(now.isEqual(ms.getMissionSubmitAt())) {
+                    isMissionToday = true;
+                    break;
+                }
+            }
 
         }
     }
