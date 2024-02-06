@@ -20,7 +20,6 @@ import com.pjg.secreto.user.common.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,61 +60,36 @@ public class BoardQueryServiceImpl implements BoardQueryService{
             String content = serachRequest.getContent();
             String writer = serachRequest.getWriter();
 
-            List<Board> boardList;
+            Page<Board> boardPage;
 
             if (boardCategory == null) {
                 new BoardException("게시판 카테고리를 선택해주세요");
             }
             if (title != null) {
-                boardList = boardQueryRepository.findBoardByBoardCategoryAndTitleContaining(boardCategory, title);
+                boardPage =   boardQueryRepository.findBoardByBoardCategoryAndTitleContaining(serachRequest.getBoardCategory(), serachRequest.getTitle() ,pageable);
             } else if (content != null) {
-                boardList = boardQueryRepository.findBoardByBoardCategoryAndContentContaining(boardCategory, content);
+                boardPage =  boardQueryRepository.findBoardByBoardCategoryAndContentContaining(serachRequest.getBoardCategory(), serachRequest.getContent() ,pageable);
             } else if (writer != null) {
-                boardList = boardQueryRepository.findBoardByBoardCategoryAndWriterContaining(boardCategory, writer);
+                boardPage =  boardQueryRepository.findBoardByBoardCategoryAndWriterContaining(serachRequest.getBoardCategory(), serachRequest.getWriter() ,pageable);
             } else {
-                boardList = boardQueryRepository.findBoardByBoardCategory(boardCategory);
+                boardPage =  boardQueryRepository.findBoardByBoardCategory(serachRequest.getBoardCategory() ,pageable);
             }
 
-            List<SearchBoardResponseDto> boardResponseDtoList = new ArrayList<>();
-
-            for (Board board : boardList) {
-                if (board.getRoomUser().getRoom().getId() == roomNo) {
-                    User user = board.getRoomUser().getUser();
-
-                    String writerEmail = user.getEmail();
-                    String writerProfileUrl = user.getProfileUrl();
-
-                    Boolean publicYn = board.getPublicYn();
-
-                    if (publicYn || (!publicYn && board.getRoomUser().equals(roomUser))) {
-
-                        SearchBoardResponseDto searchBoardResponseDto = SearchBoardResponseDto.builder()
-                                .boardNo(board.getId())
-                                .title(board.getTitle())
-                                .registerAt(board.getRegisterAt())
-                                .hit(board.getHit())
-                                .boardCategory(board.getBoardCategory())
-                                .publicYn(board.getPublicYn())
-                                .missionCategory(board.getMissionCategory())
-                                .likedCount(board.getLikedCount())
-                                .writer(board.getWriter())
-                                .writerEmail(writerEmail)
-                                .writerProfileUrl(writerProfileUrl)
-                                .replyCount(board.getReplies().size())
-                                .imgUrl(board.getImgUrl())
-                                .build();
-                        boardResponseDtoList.add(searchBoardResponseDto);
-                    }
-                }
-            }
-
-            int size = pageable.getPageSize();
-            int start = (int) pageable.getOffset();
-            int end = Math.min((start + size), boardResponseDtoList.size());
-
-            Page<SearchBoardResponseDto> searchBoardResponseDto = new PageImpl<>(boardResponseDtoList.subList(start, end), pageable, boardResponseDtoList.size());
-
-            return searchBoardResponseDto;
+            return boardPage.map(board -> SearchBoardResponseDto.builder()
+                    .boardNo(board.getId())
+                    .title(board.getTitle())
+                    .registerAt(board.getRegisterAt())
+                    .hit(board.getHit())
+                    .boardCategory(board.getBoardCategory())
+                    .publicYn(board.getPublicYn())
+                    .missionCategory(board.getMissionCategory())
+                    .likedCount(board.getLikedCount())
+                    .writer(board.getWriter())
+                    .writerEmail(null)
+                    .writerProfileUrl(null)
+                    .replyCount(board.getReplies().size())
+                    .imgUrl(board.getImgUrl())
+                    .build());
         }catch (Exception e){
             throw new BoardException(e.getMessage());
         }

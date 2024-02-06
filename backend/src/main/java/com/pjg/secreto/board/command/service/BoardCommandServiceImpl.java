@@ -193,6 +193,13 @@ public class BoardCommandServiceImpl implements BoardCommandService {
             Board board = boardQueryRepository.findById(boardNo)
                     .orElseThrow(() -> new BoardException("해당 게시글이 없습니다. id=" + boardNo));
 
+            if(writeReplyRequestDto.getParentReplyNo()!=null) {
+                Reply parentReply = replyQueryRepository.findById(writeReplyRequestDto.getParentReplyNo()).orElseThrow(() -> new BoardException("부모 댓글이 존재하지 않습니다."));
+                if(parentReply.getParentReplyNo()!=null){
+                    throw new BoardException("대댓글에 댓글을 달 수 없습니다.");
+                }
+            }
+
             Boolean annonymityYn = writeReplyRequestDto.isAnonymityYn();
             String writer = "";
 
