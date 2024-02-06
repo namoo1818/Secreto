@@ -1,18 +1,7 @@
 package com.pjg.secreto.history.query.repository;
 
-import com.pjg.secreto.history.common.entity.QManitoExpectLog;
-import com.pjg.secreto.history.common.entity.QMatching;
 import com.pjg.secreto.history.query.dto.PredictBoardDto;
-import com.pjg.secreto.history.query.dto.QPlayerDto;
-import com.pjg.secreto.history.query.dto.QPredictBoardDto;
-import com.pjg.secreto.room.common.entity.QRoomUser;
-import com.pjg.secreto.user.common.entity.QUser;
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +18,7 @@ class ManitoExpectRepositoryTest {
 
     @Test
     void getPredictResult() {
-        List<PredictBoardDto> predictResult = manitoExpectRepository.getPredictResult(1L);
+        List<PredictBoardDto> predictResult = manitoExpectRepository.getMatchingResult(1L);
         for (PredictBoardDto predict : predictResult) {
             System.out.println(predict.toString());
         }

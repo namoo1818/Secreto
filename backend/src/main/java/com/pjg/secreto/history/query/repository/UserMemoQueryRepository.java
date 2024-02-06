@@ -6,9 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserMemoQueryRepository extends JpaRepository<UserMemo, Long> {
 
     @Query("select um from UserMemo um where um.roomUser.id = :roomUserNo")
     UserMemo findByRoomUserNo(Long roomUserNo);
+
+    Optional<UserMemo> findByMemoTo(Long memoTo);
 }
