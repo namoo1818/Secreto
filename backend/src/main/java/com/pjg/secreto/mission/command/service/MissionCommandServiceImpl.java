@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -151,16 +152,22 @@ public class MissionCommandServiceImpl implements MissionCommandService {
         // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
         List<Room> findRooms = roomQueryRepository.findAllWithMissionScheduleAndRoomMission();
 
+        List<Room> hasMissionRooms = new ArrayList<>();
+
         LocalDateTime now = LocalDateTime.now();
         for(Room r : findRooms) {
 
-            boolean isMissionToday = false;
+            boolean hasMissionToday = false;
             for(MissionSchedule ms : r.getMissionSchedules()) {
 
                 if(now.isEqual(ms.getMissionSubmitAt())) {
-                    isMissionToday = true;
+                    hasMissionToday = true;
                     break;
                 }
+            }
+
+            if(hasMissionToday) {
+
             }
 
         }
