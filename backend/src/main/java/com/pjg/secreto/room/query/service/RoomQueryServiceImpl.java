@@ -94,7 +94,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
                 int findRoomUserCnt = roomUserQueryRepository.findParticipantCntByRoomNo(findRoomNo);
 
-                User findUser = userQueryRepository.findByhostNo(ru.getRoom().getHostNo());
+//                User findUser = userQueryRepository.findByhostNo(ru.getRoom().getHostNo());
 
                 result.add(SearchRoomListResponseDto.builder()
                         .roomNo(ru.getRoom().getId())
@@ -110,9 +110,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                         .nickname(ru.getNickname())
                         .participantCnt(findRoomUserCnt)
                         .bookmarkYn(ru.getBookmarkYn())
-                        .roomStatus(roomStatus)
-                        .hostUserNo(findUser.getId()).build());
-
+                        .roomStatus(roomStatus).build());
             }
 
             return result;
