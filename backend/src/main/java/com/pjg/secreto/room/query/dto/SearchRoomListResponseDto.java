@@ -42,7 +42,7 @@ public class SearchRoomListResponseDto {
 
     private RoomStatus roomStatus;
 
-//    private Long hostUserNo;
+    private Long hostUserNo;
 
 }
 

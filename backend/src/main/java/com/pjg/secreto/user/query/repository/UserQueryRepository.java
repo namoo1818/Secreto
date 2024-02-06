@@ -20,6 +20,4 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmailAndPassword(String email, String password);
 
-    @Query("select u from User u join fetch u.roomUsers ru join fetch ru.room r where r.hostNo = :hostNo")
-    User findByhostNo(Long hostNo);
 }
