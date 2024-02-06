@@ -76,7 +76,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
             List<SearchRoomListResponseDto> result = new ArrayList<>();
             for(RoomUser ru : findRoomUsers) {
 
-                Long findRoomNo = ru.getId();
+                Long findRoomNo = ru.getRoom().getId();
                 RoomStatus roomStatus;
                 if(ru.getStandbyYn()) {
                     roomStatus = RoomStatus.WAIT;

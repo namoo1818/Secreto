@@ -40,7 +40,7 @@ public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, 
     @Query("select ru from RoomUser ru join fetch ru.user u join fetch ru.room r where ru.user.id = :userNo")
     List<RoomUser> findAllWithUserAndRoomByUserNo(Long userNo);
 
-    @Query("select count(ru) from RoomUser ru where ru.standbyYn = false and ru.room.id = :roomNo")
+    @Query("select count(*) from RoomUser ru where ru.standbyYn = false and ru.room.id = :roomNo")
     int findParticipantCntByRoomNo(Long roomNo);
 
     @Query("select ru from RoomUser ru where ru.user.id = :userNo and ru.room.id = :roomNo")
