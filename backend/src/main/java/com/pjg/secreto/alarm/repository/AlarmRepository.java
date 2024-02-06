@@ -15,3 +15,4 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     @Query("select a from Alarm a where a.id = :alarmNo and a.roomUser.id = :roomUserNo")
     Alarm findByAlarmNoAndRoomUserNo(Long alarmNo, Long roomUserNo);
 }
+

@@ -27,3 +27,4 @@ public interface RoomCommandService {
 
     void insertMatching(InsertMatchingRequestDto insertMatchingRequestDto);
 }
+

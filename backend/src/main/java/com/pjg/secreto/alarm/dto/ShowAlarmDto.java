@@ -12,3 +12,4 @@ public class ShowAlarmDto {
     private Long roomNo;
 
 }
+
