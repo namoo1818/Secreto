@@ -273,17 +273,25 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             Room findRoom = roomQueryRepository.findByEntryCode(enterRoomRequestDto.getEntryCode());
             User findUser = userQueryRepository.findById(userNo).orElseThrow(() -> new UserException("유저가 존재하지 않습니다."));
 
-            RoomUser roomUser = RoomUser.builder()
-                    .nickname(enterRoomRequestDto.getNickname())
-                    .room(findRoom)
-                    .user(findUser)
-                    .userEntryAt(null)
-                    .userLeaveAt(null)
-                    .standByYn(true)
-                    .bookmarkYn(false)
-                    .build();
+            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByUserNoAndRoomNo(findUser.getId(), findRoom.getId());
 
-            roomUserCommandRepository.save(roomUser);
+            if(!roomUsers.isEmpty()) {
+                throw new RoomException("해당 유저는 이미 방에 속해있습니다.");
+            }
+            else {
+
+                RoomUser roomUser = RoomUser.builder()
+                        .nickname(enterRoomRequestDto.getNickname())
+                        .room(findRoom)
+                        .user(findUser)
+                        .userEntryAt(null)
+                        .userLeaveAt(null)
+                        .standByYn(true)
+                        .bookmarkYn(false)
+                        .build();
+
+                roomUserCommandRepository.save(roomUser);
+            }
 
             return findRoom.getId();
 
@@ -362,7 +370,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     }
 
     @Override
-    public void bookmarkRoom(BookmarkRoomRequestDto bookmarkRoomRequestDto) {
+    public Boolean bookmarkRoom(BookmarkRoomRequestDto bookmarkRoomRequestDto) {
 
         try {
 
@@ -370,7 +378,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, bookmarkRoomRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
 
-            findRoomUser.bookmark();
+            return findRoomUser.bookmark();
 
         } catch (Exception e) {
             throw new RoomException(e.getMessage());
