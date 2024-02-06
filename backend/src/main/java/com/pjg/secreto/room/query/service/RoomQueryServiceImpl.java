@@ -77,6 +77,17 @@ public class RoomQueryServiceImpl implements RoomQueryService{
             for(RoomUser ru : findRoomUsers) {
 
                 Long findRoomNo = ru.getId();
+                RoomStatus roomStatus;
+                if(ru.getStandbyYn()) {
+                    roomStatus = RoomStatus.WAIT;
+                }
+                else {
+                    roomStatus = RoomStatus.PARTICIPANT;
+                }
+
+                if(ru.getRoom().getRoomEndAt() != null) {
+                    roomStatus = RoomStatus.END;
+                }
 
                 int findRoomUserCnt = roomUserQueryRepository.findParticipantCntByRoomNo(findRoomNo);
 
@@ -93,7 +104,8 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                         .standbyYn(ru.getStandbyYn())
                         .nickname(ru.getNickname())
                         .participantCnt(findRoomUserCnt)
-                        .bookmarkYn(ru.getBookmarkYn()).build());
+                        .bookmarkYn(ru.getBookmarkYn())
+                        .roomStatus(roomStatus).build());
 
             }
 
