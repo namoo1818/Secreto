@@ -4,7 +4,6 @@ import com.pjg.secreto.common.exception.StompExceptionHandler;
 import com.pjg.secreto.user.common.filter.StompHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -33,9 +32,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();
     }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(stompHandler);
-    }
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(stompHandler);
+//    }
 }
 
