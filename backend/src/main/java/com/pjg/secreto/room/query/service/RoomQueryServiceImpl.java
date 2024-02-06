@@ -6,6 +6,8 @@ import com.pjg.secreto.room.common.exception.RoomException;
 import com.pjg.secreto.room.query.dto.*;
 import com.pjg.secreto.room.query.repository.RoomQueryRepository;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
+import com.pjg.secreto.user.common.entity.User;
+import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,7 +78,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
             List<SearchRoomListResponseDto> result = new ArrayList<>();
             for(RoomUser ru : findRoomUsers) {
 
-                Long findRoomNo = ru.getId();
+                Long findRoomNo = ru.getRoom().getId();
                 RoomStatus roomStatus;
                 if(ru.getStandbyYn()) {
                     roomStatus = RoomStatus.WAIT;
@@ -90,6 +92,9 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                 }
 
                 int findRoomUserCnt = roomUserQueryRepository.findParticipantCntByRoomNo(findRoomNo);
+
+                RoomUser findRoomUser = roomUserQueryRepository.findById(ru.getRoom().getHostNo())
+                        .orElseThrow(() -> new RoomException("해당 식별키를 가진 방장이 존재하지 않습니다."));
 
                 result.add(SearchRoomListResponseDto.builder()
                         .roomNo(ru.getRoom().getId())
@@ -105,8 +110,8 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                         .nickname(ru.getNickname())
                         .participantCnt(findRoomUserCnt)
                         .bookmarkYn(ru.getBookmarkYn())
-                        .roomStatus(roomStatus).build());
-
+                        .roomStatus(roomStatus)
+                        .hostUserNo(findRoomUser.getUser().getId()).build());
             }
 
             return result;
@@ -122,7 +127,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
         try {
 
-            RoomUser findRoomUser = roomUserQueryRepository.findWithUserAndRoomByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new RoomException("해당 방 유저가 없습니다."));
+            RoomUser findRoomUser = roomUserQueryRepository.findWithUserAndRoomByUserNoAndRoomNo(userNo, roomNo).orElseThrow(() -> new RoomException("방에 속해있지 않은 유저입니다."));
 
             RoomStatus roomStatus;
             if(findRoomUser.getStandbyYn()) {
@@ -148,6 +153,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                     .missionStartAt(findRoomUser.getRoom().getMissionStartAt())
                     .roomStartYn(findRoomUser.getRoom().getRoomStartYn())
                     .roomStatus(roomStatus)
+                    .hostRoomUserNo(findRoomUser.getRoom().getHostNo())
                     .userInfo(new UserInfoDto(findRoomUser.getId(), findRoomUser.getNickname(), findRoomUser.getUser().getProfileUrl())).build();
 
             return result;

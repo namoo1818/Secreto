@@ -8,8 +8,10 @@ import com.pjg.secreto.history.query.repository.UserMemoQueryRepository;
 import com.pjg.secreto.mission.command.dto.*;
 import com.pjg.secreto.mission.command.repository.SuddenMissionCommandRepository;
 import com.pjg.secreto.mission.common.entity.MissionSchedule;
+import com.pjg.secreto.mission.common.entity.RoomMission;
 import com.pjg.secreto.mission.common.entity.SuddenMission;
 import com.pjg.secreto.mission.common.exception.MissionException;
+import com.pjg.secreto.mission.query.repository.RoomMissionQueryRepository;
 import com.pjg.secreto.mission.query.repository.SuddenMissionQueryRepository;
 import com.pjg.secreto.room.common.entity.Room;
 import com.pjg.secreto.room.common.entity.RoomUser;
@@ -21,7 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @RequiredArgsConstructor
 @Transactional
@@ -35,6 +39,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
     private final ManitoExpectLogCommandRepository manitoExpectLogCommandRepository;
     private final UserMemoCommandRepository userMemoCommandRepository;
     private final UserMemoQueryRepository userMemoQueryRepository;
+    private final RoomMissionQueryRepository roomMissionQueryRepository;
 
     @Override
     public void addSuddenMission(AddSuddenMissionRequestDto addSuddenMissionRequestDto) {
@@ -151,19 +156,46 @@ public class MissionCommandServiceImpl implements MissionCommandService {
         // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
         List<Room> findRooms = roomQueryRepository.findAllWithMissionScheduleAndRoomMission();
 
+        List<Room> hasMissionRooms = new ArrayList<>();
+
         LocalDateTime now = LocalDateTime.now();
         for(Room r : findRooms) {
 
-            boolean isMissionToday = false;
+            boolean hasMissionToday = false;
             for(MissionSchedule ms : r.getMissionSchedules()) {
 
                 if(now.isEqual(ms.getMissionSubmitAt())) {
-                    isMissionToday = true;
+                    hasMissionToday = true;
                     break;
                 }
             }
 
+            // 일자가 같을 경우 방 저장
+            if(hasMissionToday) {
+                hasMissionRooms.add(r);
+            }
         }
+
+        for(Room r : hasMissionRooms) {
+
+            List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNO(r.getId());
+
+            // key 랜덤으로 섞기
+//            int keys[] = new int[roomMissions.size()];
+//            Random r = new Random();
+//            for(int i=0; i<roomMissions.size(); i++) {
+//                keys[i] = r.nextInt(roomMissions.size()) + 1;
+//
+//                for(int j=0; j<i; j++) {
+//                    if(keys[i] == keys[j]) {
+//                        i--;
+//                    }
+//                }
+//            }
+
+        }
+
+
     }
 }
 
