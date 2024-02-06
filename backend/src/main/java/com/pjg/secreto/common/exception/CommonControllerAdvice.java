@@ -1,6 +1,7 @@
 package com.pjg.secreto.common.exception;
 
 import com.pjg.secreto.board.common.exception.BoardException;
+import com.pjg.secreto.chatting.common.exception.ChatException;
 import com.pjg.secreto.common.response.ErrorResponse;
 import com.pjg.secreto.mission.common.exception.MissionException;
 import com.pjg.secreto.room.common.exception.RoomException;
@@ -55,6 +56,13 @@ public class CommonControllerAdvice {
     @ExceptionHandler(BoardException.class)
     public ResponseEntity<?> BoardExceptionHandler(Exception e) {
         log.error("게시판 예외 발생", e);
+
+        return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
+    }
+
+    @ExceptionHandler(ChatException.class)
+    public ResponseEntity<?> ChatExceptionHandler(Exception e) {
+        log.error("채팅 예외 발생", e);
 
         return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
