@@ -13,9 +13,10 @@ public class SearchReplyResponseDto {
     String content;
     LocalDateTime registerAt;
     Long parentReplyNo;
-    Long tagUserNo;
+    String tagUserNickname;
     String writer;
     String writerEmail;
     String writerProfileUrl;
     Boolean annonymityYn;
+    Boolean deleteYn;
 }
