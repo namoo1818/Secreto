@@ -25,7 +25,6 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
     private final RoomQueryRepository roomQueryRepository;
     private final RoomUserQueryRepository roomUserQueryRepository;
-    private final UserQueryRepository userQueryRepository;
 
     @Override
     public boolean enterRoom(CheckCodeDto checkCodeDto) {
@@ -94,7 +93,8 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
                 int findRoomUserCnt = roomUserQueryRepository.findParticipantCntByRoomNo(findRoomNo);
 
-//                User findUser = userQueryRepository.findByhostNo(ru.getRoom().getHostNo());
+                RoomUser findRoomUser = roomUserQueryRepository.findById(ru.getRoom().getHostNo())
+                        .orElseThrow(() -> new RoomException("해당 식별키를 가진 방장이 존재하지 않습니다."));
 
                 result.add(SearchRoomListResponseDto.builder()
                         .roomNo(ru.getRoom().getId())
@@ -110,7 +110,8 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                         .nickname(ru.getNickname())
                         .participantCnt(findRoomUserCnt)
                         .bookmarkYn(ru.getBookmarkYn())
-                        .roomStatus(roomStatus).build());
+                        .roomStatus(roomStatus)
+                        .hostUserNo(findRoomUser.getUser().getId()).build());
             }
 
             return result;
