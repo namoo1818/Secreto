@@ -71,7 +71,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
         try {
 
-            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllWithUserAndRoomByUserNo(userNo);
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllWithUserAndRoomByUserNoWhereUserNotLeave(userNo);
 
             List<SearchRoomListResponseDto> result = new ArrayList<>();
             for(RoomUser ru : findRoomUsers) {
@@ -159,5 +159,3 @@ public class RoomQueryServiceImpl implements RoomQueryService{
     }
 
 }
-
-
