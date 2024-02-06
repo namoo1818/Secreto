@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Builder
 @AllArgsConstructor
 @Data
@@ -12,7 +14,7 @@ public class SearchUserMissionListResponseDto {
 
     private String content;
 
-    private String missionReceivedAt;
+    private LocalDateTime missionReceivedAt;
 
     private MissionType missionType;
 
