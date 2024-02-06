@@ -11,3 +11,4 @@ public class ChatDto {
     private String firstTime;
 //    private Set<WebSocketSession> sessions = new HashSet<>();
 }
+
