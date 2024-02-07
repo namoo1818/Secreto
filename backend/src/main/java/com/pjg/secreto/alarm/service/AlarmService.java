@@ -37,6 +37,7 @@ public class AlarmService {
             for(Alarm a : findAlarms) {
 
                 results.add(AlarmDataDto.builder()
+                        .alarmNo(a.getId())
                         .author(a.getAuthor())
                         .content(a.getContent())
                         .generatedAt(a.getGeneratedAt())
