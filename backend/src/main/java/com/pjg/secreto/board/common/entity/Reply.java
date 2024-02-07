@@ -36,18 +36,14 @@ public class Reply {
     private LocalDateTime registerAt;
 
     private Long parentReplyNo;
-
     private Long tagUserNo;
-
-    private String writer;
-
     private Boolean anonymityYn;
     private Boolean deleteYn;
     private Boolean updateYn;
 
     @Builder
     public Reply(RoomUser roomUser, Board board, String content, LocalDateTime registerAt,
-                 Long parentReplyNo, Long tagUserNo, String writer, Boolean anonymityYn,
+                 Long parentReplyNo, Long tagUserNo, Boolean anonymityYn,
                  Boolean deleteYn, Boolean updateYn) {
         this.roomUser = roomUser;
         this.board = board;
@@ -55,7 +51,6 @@ public class Reply {
         this.registerAt = registerAt;
         this.parentReplyNo = parentReplyNo;
         this.tagUserNo = tagUserNo;
-        this.writer = writer;
         this.anonymityYn = anonymityYn;
         this.deleteYn = deleteYn;
         this.updateYn= updateYn;

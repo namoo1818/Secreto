@@ -58,9 +58,8 @@ public class Board {
 
     private Long likedCount;
 
-    private String writer;
     @Builder
-    public Board(RoomUser roomUser, String title, String content, String imgUrl, LocalDateTime registerAt, Long hit, BoardCategory boardCategory, Boolean publicYn, UserMission userMission, Long likedCount, String writer, String missionCategory) {
+    public Board(RoomUser roomUser, String title, String content, String imgUrl, LocalDateTime registerAt, Long hit, BoardCategory boardCategory, Boolean publicYn, UserMission userMission, Long likedCount, String missionCategory) {
         this.roomUser = roomUser;
         this.title = title;
         this.content = content;
@@ -71,17 +70,14 @@ public class Board {
         this.publicYn = publicYn;
         this.userMission = userMission;
         this.likedCount = likedCount;
-        this.writer = writer;
         this.missionCategory = missionCategory;
     }
 
-    public void updateBoard(String writer, Long id, String title, String content, String imgUrl, BoardCategory boardCategory, Boolean publicYn, UserMission userMission){
-        this.writer = writer;
+    public void updateBoard(Long id, String title, String content, String imgUrl, Boolean publicYn, UserMission userMission){
         this.id = id;
         this.title = title;
         this.content = content;
         this.imgUrl = imgUrl;
-        this.boardCategory = boardCategory;
         this.publicYn = publicYn;
         this.userMission = userMission;
     }
