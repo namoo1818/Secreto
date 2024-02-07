@@ -12,16 +12,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -33,6 +30,18 @@ public class BoardQueryController {
     // 게시판 카테고리에 속한 모든 게시글 조회
     @GetMapping(value="/board/{roomNo}")
     public ResponseEntity<?> readBoard(
+            @PathVariable Long roomNo,
+            @ModelAttribute("searchRequest") SearchBoardRequestDto searchRequest,
+            @PageableDefault(size = 5, sort = "registerAt", direction = Sort.Direction.DESC) Pageable pageable){
+        Long userNo = AuthUtils.getAuthenticatedUserId();
+
+        Page<SearchBoardResponseDto> result = boardQueryService.getBoardBySpecification(roomNo, userNo, searchRequest, pageable);
+
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "게시글 전체 조회 성공", result));
+    }
+    // 게시판 카테고리에 속한 모든 게시글 조회
+    @GetMapping(value="/board-test/{roomNo}")
+    public ResponseEntity<?> readBoard2(
             @PathVariable Long roomNo,
             @ModelAttribute("searchRequest") SearchBoardRequestDto searchRequest,
             @PageableDefault(size = 5, sort = "registerAt", direction = Sort.Direction.DESC) Pageable pageable){
