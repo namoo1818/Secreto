@@ -204,105 +204,118 @@ public class MissionCommandServiceImpl implements MissionCommandService {
     }
 
     // 정기 미션 날리기 기능, 방 끝나는 시각에 맞게 끝내는 기능 수행 메서드
-//    @Scheduled(cron = "0 * 0-23 * * *") // 매일 정각마다 실행
-//    public void throwRegularMission() {
-//
-//        /**
-//         * 정기 미션 날리기 로직
-//         */
-//        LocalDateTime now = LocalDateTime.now();
-//        log.info("현재 시각 : " + now);
-//
-//        // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
-////        List<Room> findRooms = roomQueryRepository.findAllWithMissionScheduleAndRoomMission();
-//        List<Room> findRoomsWithMissionSchedule = roomQueryRepository.findAllWithMissionSchedule();
-//
-//        List<Room> hasMissionRooms = new ArrayList<>();
-//
-//        for(Room r : findRoomsWithMissionSchedule) {
-//
-//            boolean hasMissionToday = false;
-//            for(MissionSchedule ms : r.getMissionSchedules()) {
-//
-//                if(now.isEqual(ms.getMissionSubmitAt())) {
-//                    hasMissionToday = true;
-//                    break;
+    @Scheduled(cron = "0 * 0-23 * * *") // 매일 정각마다 실행
+    public void throwRegularMission() {
+
+        log.info("스케쥴러 발동");
+
+        /**
+         * 정기 미션 날리기 로직
+         */
+        LocalDateTime now = LocalDateTime.now();
+        log.info("현재 시각 : " + now);
+
+        // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
+//        List<Room> findRooms = roomQueryRepository.findAllWithMissionScheduleAndRoomMission();
+        List<Room> findRoomsWithMissionSchedule = roomQueryRepository.findAllWithMissionSchedule();
+
+        List<Room> hasMissionRooms = new ArrayList<>();
+
+        for(Room r : findRoomsWithMissionSchedule) {
+
+            log.info("룸의 아이디 : " + r.getId());
+            boolean hasMissionToday = false;
+            for(MissionSchedule ms : r.getMissionSchedules()) {
+
+                log.info("미션 던져지는 날짜 : " + ms.getMissionSubmitAt());
+                if(now.isEqual(ms.getMissionSubmitAt())) {
+                    hasMissionToday = true;
+                    break;
+                }
+//                if(ms.getMissionSubmitAt() != null) {
+//                    if(now.isEqual(ms.getMissionSubmitAt())) {
+//                        hasMissionToday = true;
+//                        break;
+//                    }
+//                } else {
+//                    log.info("mission submit time is null!");
 //                }
-//            }
-//
-//            // 일자가 같을 경우 방 저장
-//            if(hasMissionToday) {
-//                hasMissionRooms.add(r);
-//            }
-//        }
-//
-//        log.info("일자 조회 완료");
-//        List<Room> findRoomsWithRoomMissions = roomQueryRepository.findAllWithRoomMission(hasMissionRooms);
-//
-//        log.info("룸 미션 가지고있는 룸 조회 완료");
-//        for(Room r : hasMissionRooms) {
-//
-//            List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNO(r.getId());
-//
-//            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(r.getId());
-//
-//            Collections.shuffle(roomMissions);
-//
-//            // 방의 유저들에게 미션 던지기 로직
-//            for(RoomUser ru : findRoomUsers) {
-//
-//                // 개별 미션이면 미션 랜덤으로
-//                if(!r.getCommonYn()) {
-//                    Collections.shuffle(roomMissions);
-//                }
-//
-//                // 유저 미션 생성
-//                RoomMission roomMission = roomMissions.get(0);
-//
-//                UserMission userMission = UserMission.builder()
-//                        .missionReceivedAt(LocalDateTime.now())
-//                        .missionCertifyYn(false)
-//                        .missionType(MissionType.REGULAR)
-//                        .missionRerollCount(0)
-//                        .roomUser(ru)
-//                        .content(roomMission.getContent())
-//                        .roomMissionNo(roomMission.getId()).build();
-//
-//                userMissionCommandRepository.save(userMission);
-//
-//                // 유저에게 알림 발송
-//                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
-//                        .content(userMission.getContent())
-//                        .readYn(false)
-//                        .generatedAt(LocalDateTime.now())
-//                        .author("시스템")
-//                        .roomUserNo(ru.getId()).build();
-//
-//                emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "regular");
-//
-//                Alarm alarm = Alarm.builder()
-//                        .author(alarmDataDto.getAuthor())
-//                        .content(alarmDataDto.getContent())
-//                        .readYn(alarmDataDto.getReadYn())
-//                        .generatedAt(alarmDataDto.getGeneratedAt())
-//                        .roomUser(ru).build();
-//
-//                alarmRepository.save(alarm);
-//            }
-//
-//        }
-//
-//        // 방 끝내는 로직
-//        List<Room> rooms = roomQueryRepository.findAll();
-//
-//        for(Room r : rooms) {
-//
-//            if(r.getRoomEndAt().equals(now)) {
-//                r.terminateRoom();
-//            }
-//        }
-//
-//    }
+            }
+
+            // 일자가 같을 경우 방 저장
+            if(hasMissionToday) {
+                hasMissionRooms.add(r);
+            }
+        }
+
+        log.info("룸 미션 가지고 있는 룸 조회 완료");
+        for(Room r : hasMissionRooms) {
+
+            List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNO(r.getId());
+            log.info("방의 미션들 조회 완료");
+
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(r.getId());
+            log.info("방의 유저들 조회 완료");
+
+            Collections.shuffle(roomMissions);
+
+            // 방의 유저들에게 미션 던지기 로직
+            for(RoomUser ru : findRoomUsers) {
+
+                // 개별 미션이면 미션 랜덤으로
+                if(!r.getCommonYn()) {
+                    Collections.shuffle(roomMissions);
+                }
+
+                // 유저 미션 생성
+                RoomMission roomMission = roomMissions.get(0);
+                log.info("생성된 유저 미션 : " + roomMissions.get(0).getContent());
+
+                UserMission userMission = UserMission.builder()
+                        .missionReceivedAt(LocalDateTime.now())
+                        .missionCertifyYn(false)
+                        .missionType(MissionType.REGULAR)
+                        .missionRerollCount(0)
+                        .roomUser(ru)
+                        .content(roomMission.getContent())
+                        .roomMissionNo(roomMission.getId()).build();
+
+                userMissionCommandRepository.save(userMission);
+                log.info("유저 별 미션 생성 완료");
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content(userMission.getContent())
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author("시스템")
+                        .roomUserNo(ru.getId()).build();
+
+                emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "regular");
+
+                Alarm alarm = Alarm.builder()
+                        .author(alarmDataDto.getAuthor())
+                        .content(alarmDataDto.getContent())
+                        .readYn(alarmDataDto.getReadYn())
+                        .generatedAt(alarmDataDto.getGeneratedAt())
+                        .roomUser(ru).build();
+
+                alarmRepository.save(alarm);
+            }
+
+        }
+
+        // 방 끝내는 로직
+        List<Room> rooms = roomQueryRepository.findAll();
+
+        for(Room r : rooms) {
+
+            if(r.getRoomEndAt().equals(now)) {
+                r.terminateRoom();
+            }
+        }
+
+    }
 }
 
 
