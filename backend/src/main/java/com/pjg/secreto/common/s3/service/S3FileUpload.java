@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.File;
@@ -30,65 +31,51 @@ public class S3FileUpload implements FileUpload {
     private final S3Client s3Client;
 
     @Override
-    public UploadFile uploadFile(MultipartFile file) throws IOException {
-        File uploadFile = convert(file)
-                .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
+    public UploadFile uploadFile(MultipartFile multipartFile) {
 
-        String originalFilename = file.getOriginalFilename();
-        String storedLink = upload(uploadFile, "image");
+        if (multipartFile.isEmpty()) {
+            log.info("file is null");
+            throw new RuntimeException("파일이 없습니다.");
+        }
 
-        UploadFile target = UploadFile.builder()
-                .originalFile(originalFilename)
-                .saveFile(storedLink)
+        String originalFile = getFileName(multipartFile);
+        String uploadedFile = uploadToS3(multipartFile);
+
+        UploadFile result = UploadFile.builder()
+                .originalFile(originalFile)
+                .saveFile(uploadedFile)
                 .build();
 
-        return target;
+        return result;
     }
 
-    private String upload(File uploadFile, String dirName) {
-        String s3FileName = UUID.randomUUID() + "-" + uploadFile.getName();
-        String fileName = dirName + "/" + s3FileName;
-        String uploadImageUrl = putS3(uploadFile, fileName);
+    private String uploadToS3(MultipartFile multipartFile) {
+        String s3FileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
 
-        removeNewFile(uploadFile);  // 로컬에 생성된 File 삭제 (MultipartFile -> File 전환 하며 로컬에 파일 생성됨)
-
-        return uploadImageUrl;      // 업로드된 파일의 S3 URL 주소 반환
-    }
-
-    private String putS3(File uploadFile, String fileName) {
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucket)
-                .key(fileName)
-                .build();
-
-        RequestBody requestBody = RequestBody.fromFile(uploadFile);
-        s3Client.putObject(putObjectRequest, requestBody);
+        try {
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .acl(ObjectCannedACL.PUBLIC_READ)
+                    .contentType(multipartFile.getContentType())
+                    .contentLength(multipartFile.getSize())
+                    .key(s3FileName)
+                    .build();
+            RequestBody requestBody = RequestBody.fromBytes(multipartFile.getBytes());
+            s3Client.putObject(putObjectRequest, requestBody);
+        } catch (IOException e) {
+            log.error("cannot upload image", e);
+            throw new RuntimeException("파일을 업로드 할 수 없습니다.");
+        }
 
         GetUrlRequest getUrlRequest = GetUrlRequest.builder()
                 .bucket(bucket)
-                .key(fileName)
+                .key(s3FileName)
                 .build();
 
         return s3Client.utilities().getUrl(getUrlRequest).toString();
     }
 
-    private void removeNewFile(File targetFile) {
-        if(targetFile.delete()) {
-            log.info("파일이 삭제되었습니다.");
-        }else {
-            log.info("파일이 삭제되지 못했습니다.");
-        }
-    }
-
-    private Optional<File> convert(MultipartFile file) throws IOException {
-        log.info(file.toString());
-        File convertFile = new File(file.getOriginalFilename());
-        if(convertFile.createNewFile()) {
-            try (FileOutputStream fos = new FileOutputStream(convertFile)) {
-                fos.write(file.getBytes());
-            }
-            return Optional.of(convertFile);
-        }
-        return Optional.empty();
+    private String getFileName(MultipartFile multipartFile) {
+        return multipartFile.getOriginalFilename();
     }
 }
