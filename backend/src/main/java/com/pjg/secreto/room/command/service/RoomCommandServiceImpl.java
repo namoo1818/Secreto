@@ -30,10 +30,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -91,7 +88,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             // 방 생성
             Room room = Room.builder().roomName(createRoomRequestDto.getRoomName())
-                    .entryCode(newToken).build();
+                    .entryCode(newToken)
+                    .roomEndAt(LocalDateTime.now().plusWeeks(1)).build();
             roomCommandRepository.save(room);
 
             log.info("방 식별키 : " + room.getId());
@@ -140,7 +138,15 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         log.info("방 세팅 api");
 
         try {
+
             Room room = roomQueryRepository.findById(setRoomRequestDto.getRoomNo()).orElseThrow(() -> new RoomException("해당 방이 없습니다."));
+
+            RoomUser findRoomUserNo = roomUserQueryRepository.findByUserNoAndRoomNo(setRoomRequestDto.getUserNo(), room.getId())
+                    .orElseThrow(() -> new RoomException("해당 유저는 방에 속해있지 않습니다."));
+
+            if(!Objects.equals(room.getHostNo(), findRoomUserNo.getId())) {
+                throw new RoomException("해당 유저는 방장이 아닙니다.");
+            }
 
             // 현재 날짜
             LocalDate today = LocalDateTime.now().toLocalDate();
