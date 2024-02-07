@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @RequiredArgsConstructor
 @Transactional
@@ -243,7 +244,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                     .roomUser(roomUser)
                     .board(board)
                     .content(writeReplyRequestDto.getContent())
-                    .registerAt(LocalDateTime.now())
+                    .registerAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                     .parentReplyNo(parentReplyNo)
                     .tagUserNo(tagUserNo)
                     .anonymityYn(writeReplyRequestDto.isAnonymityYn())
