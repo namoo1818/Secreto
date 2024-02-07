@@ -54,6 +54,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     @Override
     public CreateRoomResponseDto createRoom(CreateRoomRequestDto createRoomRequestDto) {
 
+        log.info("방 생성 api");
+
         try {
 
             Long userNo = createRoomRequestDto.getUserNo();
@@ -118,6 +120,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     @Override
     public void changeRoomName(ChangeRoomNameRequestDto changeRoomNameRequestDto) {
 
+        log.info("방 이름 변경 api");
+
         try {
             Room room = roomQueryRepository.findById(changeRoomNameRequestDto.getRoomNo()).orElseThrow(() -> new UserException("해당 유저가 없습니다."));
 
@@ -131,6 +135,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
     @Override
     public SetRoomResponseDto setRoom(SetRoomRequestDto setRoomRequestDto) {
+
+        log.info("방 세팅 api");
 
         try {
             Room room = roomQueryRepository.findById(setRoomRequestDto.getRoomNo()).orElseThrow(() -> new RoomException("해당 방이 없습니다."));
@@ -265,6 +271,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     @Override
     public Long enterRoom(EnterRoomRequestDto enterRoomRequestDto) {
 
+        log.info("방 입장 api");
+
         try {
 
             Long userNo = enterRoomRequestDto.getUserNo();
@@ -303,6 +311,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     @Override
     public void exitRoom(ExitRoomRequestDto exitRoomRequestDto) {
 
+        log.info("방 나가기 api");
+
         try {
 
             // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
@@ -327,6 +337,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     @Override
     public void acceptUser(AcceptUserRequestDto acceptUserRequestDto) {
 
+        log.info("유저 수락 api");
         try {
 
             List<RoomUser> findRoomUsers = roomUserQueryRepository.findByRoomUserNos(acceptUserRequestDto.getRoomUserNos());
@@ -345,6 +356,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     @Override
     public void denyUser(DenyUserRequestDto denyUserRequestDto) {
 
+        log.info("유저 거절 api");
         try {
             roomUserCommandRepository.deleteAllByIds(denyUserRequestDto.getRoomUserNos());
 
@@ -356,6 +368,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     @Override
     public void deligateAdmin(DeligateAdminRequestDto deligateAdminRequestDto) {
 
+        log.info("방장 위임 api");
         try {
 
             Room findRoom = roomQueryRepository.findById(deligateAdminRequestDto.getRoomNo())
@@ -371,6 +384,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
     @Override
     public Boolean bookmarkRoom(BookmarkRoomRequestDto bookmarkRoomRequestDto) {
+
+        log.info("즐겨찾기 api");
 
         try {
 
@@ -388,6 +403,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     @Override
     public void terminateRoom(TerminateRoomRequestDto terminateRoomRequestDto) {
 
+        log.info("방 종료 api");
+
         try {
 
             Room findRoom = roomQueryRepository.findById(terminateRoomRequestDto.getRoomNo())
@@ -403,6 +420,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
     @Override
     public void initMatching(InitMatchingRequestDto initMatchingRequestDto) {
+
+        log.info("모두 랜덤 매칭 api");
 
         try {
 
@@ -462,6 +481,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
     @Override
     public void insertMatching(InsertMatchingRequestDto insertMatchingRequestDto) {
+
+        log.info("사이 매칭 api");
 
         try {
 
