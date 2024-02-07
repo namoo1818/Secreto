@@ -17,6 +17,6 @@ public class SearchReplyResponseDto {
     String writer;
     String writerEmail;
     String writerProfileUrl;
-    Boolean annonymityYn;
+    Boolean anonymityYn;
     Boolean deleteYn;
 }
