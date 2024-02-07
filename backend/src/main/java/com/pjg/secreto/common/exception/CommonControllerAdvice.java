@@ -1,5 +1,6 @@
 package com.pjg.secreto.common.exception;
 
+import com.pjg.secreto.alarm.common.exception.AlarmException;
 import com.pjg.secreto.board.common.exception.BoardException;
 import com.pjg.secreto.chatting.common.exception.ChatException;
 import com.pjg.secreto.common.response.ErrorResponse;
@@ -42,6 +43,13 @@ public class CommonControllerAdvice {
     @ExceptionHandler(MissionException.class)
     public ResponseEntity<ErrorResponse> MissionExceptionHandler(Exception e) {
         log.error("미션 예외발생", e);
+
+        return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
+    }
+
+    @ExceptionHandler(AlarmException.class)
+    public ResponseEntity<ErrorResponse> AlarmExceptionHandler(Exception e) {
+        log.error("알림 예외발생", e);
 
         return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
