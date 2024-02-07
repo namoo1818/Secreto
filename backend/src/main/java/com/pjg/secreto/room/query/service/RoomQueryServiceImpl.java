@@ -137,7 +137,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                 roomStatus = RoomStatus.PARTICIPANT;
             }
 
-            if(findRoomUser.getRoom().getRoomEndAt().isBefore(LocalDateTime.now())) {
+            if(findRoomUser.getRoom().getRoomEndAt().isAfter(LocalDateTime.now())) {
                 roomStatus = RoomStatus.END;
             }
 
