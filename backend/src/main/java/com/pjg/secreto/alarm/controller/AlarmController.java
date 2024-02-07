@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -34,7 +35,8 @@ public class AlarmController {
     @PostMapping("/send-data/{id}")
     public void sendDataTest(@PathVariable Long id, @RequestBody AlarmDataDto alarmDataDto) {
 
-        emitterService.alarm(id, alarmDataDto, "알림 갔니 인성아", "test");
+        alarmDataDto.setGeneratedAt(LocalDateTime.now());
+        emitterService.alarm(id, alarmDataDto, "알림 갔니 인성아", "message");
     }
 
     @GetMapping("/alarm-list/{roomNo}")

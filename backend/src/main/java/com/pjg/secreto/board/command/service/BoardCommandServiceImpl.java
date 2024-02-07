@@ -244,7 +244,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                     .roomUser(roomUser)
                     .board(board)
                     .content(writeReplyRequestDto.getContent())
-                    .registerAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                    .registerAt(LocalDateTime.now())
                     .parentReplyNo(parentReplyNo)
                     .tagUserNo(tagUserNo)
                     .anonymityYn(writeReplyRequestDto.isAnonymityYn())
