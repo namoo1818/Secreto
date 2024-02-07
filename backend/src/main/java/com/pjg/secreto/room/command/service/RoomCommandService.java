@@ -2,6 +2,8 @@ package com.pjg.secreto.room.command.service;
 
 import com.pjg.secreto.room.command.dto.*;
 
+import java.util.List;
+
 public interface RoomCommandService {
     CreateRoomResponseDto createRoom(CreateRoomRequestDto createRoomRequestDto);
 
@@ -11,7 +13,7 @@ public interface RoomCommandService {
 
     Long enterRoom(EnterRoomRequestDto enterRoomRequestDto);
 
-    void acceptUser(AcceptUserRequestDto acceptUserRequestDto);
+    List<Long> acceptUser(AcceptUserRequestDto acceptUserRequestDto);
 
     void deligateAdmin(DeligateAdminRequestDto deligateAdminRequestDto);
 

@@ -335,17 +335,23 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     }
 
     @Override
-    public void acceptUser(AcceptUserRequestDto acceptUserRequestDto) {
+    public List<Long> acceptUser(AcceptUserRequestDto acceptUserRequestDto) {
 
         log.info("유저 수락 api");
         try {
 
             List<RoomUser> findRoomUsers = roomUserQueryRepository.findByRoomUserNos(acceptUserRequestDto.getRoomUserNos());
 
+            List<Long> roomUserNos = new ArrayList<>();
+
             // 방 유저 정보 변경
             for(RoomUser ru : findRoomUsers) {
                 ru.accepted();
+                roomUserNos.add(ru.getId());
             }
+
+
+            return roomUserNos;
 
         } catch (Exception e) {
 

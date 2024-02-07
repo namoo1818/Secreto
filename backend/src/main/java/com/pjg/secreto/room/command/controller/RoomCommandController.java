@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/room")
@@ -93,9 +94,9 @@ public class RoomCommandController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-        roomCommandService.acceptUser(acceptUserRequestDto);
+        List<Long> roomUserNos = roomCommandService.acceptUser(acceptUserRequestDto);
 
-        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "유저를 수락하였습니다.", null));
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "유저를 수락하였습니다.", roomUserNos));
     }
 
     @DeleteMapping("/deny")
