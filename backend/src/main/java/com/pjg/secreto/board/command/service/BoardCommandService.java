@@ -10,7 +10,7 @@ public interface BoardCommandService {
 
     public void deletePost(Long roomNo, Long userNo, Long boardNo);
 
-    public void writePost(Long roomNo, Long userNo, WriteBoardRequestDto writeBoardRequestDto);
+    public Long writePost(Long roomNo, Long userNo, WriteBoardRequestDto writeBoardRequestDto);
 
     public void updateLike(Long roomNo, Long userNo, Long boardNo);
 

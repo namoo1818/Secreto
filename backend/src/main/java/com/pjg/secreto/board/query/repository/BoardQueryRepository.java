@@ -8,11 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
 public interface BoardQueryRepository extends JpaRepository<Board, Long>, JpaSpecificationExecutor<Board> {
     @Query("select b from Board b join fetch b.roomUser ru where ru.room.id = :roomNo and b.boardCategory = :boardCategory")
     Page<Board> findByBoardCategory(@Param("boardCategory") BoardCategory boardCategory,
@@ -31,11 +29,18 @@ public interface BoardQueryRepository extends JpaRepository<Board, Long>, JpaSpe
                                                            @Param("roomNo") Long roomNo,
                                                            Pageable pageable);
 
-    @Query("select b from Board b join fetch b.roomUser ru where ru.room.id = :roomNo and b.boardCategory = :boardCategory and b.writer like %:writer%")
+    @Query("select b from Board b join fetch b.roomUser ru where ru.room.id = :roomNo and b.boardCategory = :boardCategory and ru.nickname like %:writer%")
     Page<Board> findBywriter(@Param("boardCategory") BoardCategory boardCategory,
                                                              @Param("writer") String writer,
                                                              @Param("roomNo") Long roomNo,
                                                              Pageable pageable);
+
+    @Query("select b from Board b join fetch b.roomUser ru join fetch ru.matchings m where ru.room.id = :roomNo and b.boardCategory = :boardCategory " +
+            "and ru.id = m.manitiNo and ru.nickname like %:writer%")
+    Page<Board> findBymaniti(@Param("boardCategory") BoardCategory boardCategory,
+                             @Param("writer") String writer,
+                             @Param("roomNo") Long roomNo,
+                             Pageable pageable);
 
     Optional<Board> findById(Long boardNo);
 }

@@ -45,9 +45,9 @@ public class BoardCommandController {
 
         Long userNo = AuthUtils.getAuthenticatedUserId();
 
-        boardCommandService.writePost(roomNo, userNo, writeBoardRequestDto);
+        Long result = boardCommandService.writePost(roomNo, userNo, writeBoardRequestDto);
 
-        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "게시글 작성 성공"));
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "게시글 작성 성공", result));
     }
 
     // 게시글에 좋아요 
