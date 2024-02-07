@@ -548,9 +548,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 }
             }
 
-            for(RoomUser ru : newRelationList) {
-                System.out.println(ru.getId());
-            }
+//            for()
 
 
 
