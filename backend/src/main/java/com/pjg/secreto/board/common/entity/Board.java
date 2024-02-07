@@ -50,6 +50,8 @@ public class Board {
 
     private Boolean publicYn;
 
+    private String missionCategory;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_mission_no")
     private UserMission userMission;
@@ -58,7 +60,7 @@ public class Board {
 
     private String writer;
     @Builder
-    public Board(RoomUser roomUser, String title, String content, String imgUrl, LocalDateTime registerAt, Long hit, BoardCategory boardCategory, Boolean publicYn, UserMission userMission, Long likedCount, String writer) {
+    public Board(RoomUser roomUser, String title, String content, String imgUrl, LocalDateTime registerAt, Long hit, BoardCategory boardCategory, Boolean publicYn, UserMission userMission, Long likedCount, String writer, String missionCategory) {
         this.roomUser = roomUser;
         this.title = title;
         this.content = content;
@@ -70,6 +72,7 @@ public class Board {
         this.userMission = userMission;
         this.likedCount = likedCount;
         this.writer = writer;
+        this.missionCategory = missionCategory;
     }
 
     public void updateBoard(String writer, Long id, String title, String content, String imgUrl, BoardCategory boardCategory, Boolean publicYn, UserMission userMission){
@@ -89,4 +92,5 @@ public class Board {
     public void updateHit(Long hit){
         this.hit = hit;
     }
+
 }
