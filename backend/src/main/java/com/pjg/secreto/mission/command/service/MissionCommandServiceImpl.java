@@ -101,8 +101,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                 alarmRepository.save(alarm);
             }
 
-
-
         } catch (Exception e) {
 
             throw new MissionException(e.getMessage());
@@ -232,14 +230,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                     hasMissionToday = true;
                     break;
                 }
-//                if(ms.getMissionSubmitAt() != null) {
-//                    if(now.isEqual(ms.getMissionSubmitAt())) {
-//                        hasMissionToday = true;
-//                        break;
-//                    }
-//                } else {
-//                    log.info("mission submit time is null!");
-//                }
             }
 
             // 일자가 같을 경우 방 저장
