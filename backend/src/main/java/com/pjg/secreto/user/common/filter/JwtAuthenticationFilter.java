@@ -97,7 +97,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 new AntPathRequestMatcher("/users/refreshAccess"),
                 new AntPathRequestMatcher("/cert/**"),
                 new AntPathRequestMatcher("/users/password/**"),
-                new AntPathRequestMatcher("/oauth2/**")
+                new AntPathRequestMatcher("/oauth2/**"),
+                new AntPathRequestMatcher("/login/oauth2/code/**")
         );
 
         String servletPath = request.getServletPath();
