@@ -13,7 +13,7 @@ public class WriteBoardRequestDto {
     private String content;
     private String imgUrl;
     private BoardCategory boardCategory;
-    private String missionCategory;
+    private Long userMissionNo;
     private Boolean publicYn;
 
 }
