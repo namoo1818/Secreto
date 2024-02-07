@@ -62,7 +62,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
             // 돌발 미션 저장 로직
             SuddenMission suddenMission = SuddenMission.builder().room(findRoom)
-                    .missionSubmitAt(addSuddenMissionRequestDto.getMissionSubmitAt())
+                    .missionSubmitAt(LocalDateTime.now())
                     .content(addSuddenMissionRequestDto.getContent()).build();
 
             suddenMissionCommandRepository.save(suddenMission);
