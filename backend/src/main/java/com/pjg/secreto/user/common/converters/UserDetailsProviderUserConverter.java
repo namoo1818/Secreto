@@ -30,7 +30,7 @@ public final class UserDetailsProviderUserConverter implements ProviderUserConve
                 .authorities(null)
                 .profileUrl(user.getProfileUrl())
                 .email(user.getEmail())
-                .provider("none")
+                .provider(user.getProvider())
                 .build();
     }
 }
