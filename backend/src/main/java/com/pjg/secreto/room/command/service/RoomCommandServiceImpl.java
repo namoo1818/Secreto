@@ -308,19 +308,42 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         try {
 
-            // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
-            Long userNo = exitRoomRequestDto.getUserNo();
-
             // 방 유저 조회
-            Room findRoom = roomQueryRepository.findById(exitRoomRequestDto.getRoomNo())
-                    .orElseThrow(() -> new RoomException("해당 방이 존재하지 않습니다."));
-            User findUser = userQueryRepository.findById(userNo)
-                    .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
-            RoomUser roomUser = roomUserQueryRepository.findRoomUserByRoomAndUser(findRoom, findUser);
-            log.info("방 유저 식별키 : " + roomUser);
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(exitRoomRequestDto.getUserNo(),
+                    exitRoomRequestDto.getRoomNo())
+                    .orElseThrow(() -> new RoomException("해당 유저는 방에 속해있지 않습니다."));
+
+            log.info("방 유저 식별키 : " + findRoomUser.getId());
 
             // 방 유저 정보 변경
-            roomUser.leave();
+            findRoomUser.leave();
+
+            // 나간 유저의 마니또와 마니띠 매칭
+            RoomUser usersManito = roomUserQueryRepository.findById(findRoomUser.getUsersManito())
+                    .orElseThrow(() -> new RoomException("해당 유저는 마니또가 없습니다."));
+
+            RoomUser usersManiti = roomUserQueryRepository.findById(findRoomUser.getUsersManiti())
+                    .orElseThrow(() -> new RoomException("해당 유저는 마니띠가 없습니다."));
+
+            usersManito.setManiti(usersManiti.getId());
+            usersManiti.setManito(usersManito.getId());
+
+            Matching manitosMatching = Matching.builder()
+                    .roomUser(usersManito)
+                    .matchingAt(LocalDateTime.now())
+                    .manitoNo(usersManito.getUsersManito())
+                    .manitiNo(usersManito.getUsersManiti())
+                    .build();
+
+            Matching manitisMatching = Matching.builder()
+                    .roomUser(usersManiti)
+                    .matchingAt(LocalDateTime.now())
+                    .manitoNo(usersManiti.getUsersManito())
+                    .manitiNo(usersManiti.getUsersManiti())
+                    .build();
+
+            matchingCommandRepository.save(manitosMatching);
+            matchingCommandRepository.save(manitisMatching);
 
         } catch (Exception e) {
             throw new RoomException(e.getMessage());
@@ -548,10 +571,31 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 }
             }
 
-//            for()
+            // 매칭 정보 저장
+            for(int i=0; i<newRelationList.size(); i++) {
 
+                RoomUser findRoomUser = newRelationList.get(i);
 
+                Matching matching = Matching.builder()
+                        .roomUser(findRoomUser).matchingAt(LocalDateTime.now()).deprecatedAt(null)
+                        .manitoNo(null).manitiNo(null).build();
 
+                if(i == 0) {
+                    matching.changeMatchingInfo(newRelationList.get(newRelationList.size()-1).getId(), newRelationList.get(i+1).getId());
+                    findRoomUser.setMatchingInfo(newRelationList.get(newRelationList.size()-1).getId(), newRelationList.get(i+1).getId());
+                }
+                else if(i == newRelationList.size()-1) {
+                    matching.changeMatchingInfo(newRelationList.get(i-1).getId(), newRelationList.get(0).getId());
+                    findRoomUser.setMatchingInfo(newRelationList.get(i-1).getId(), newRelationList.get(0).getId());
+                }
+                else {
+                    matching.changeMatchingInfo(newRelationList.get(i-1).getId(), newRelationList.get(i+1).getId());
+                    findRoomUser.setMatchingInfo(newRelationList.get(i-1).getId(), newRelationList.get(i+1).getId());
+                }
+
+                matchingCommandRepository.save(matching);
+
+            }
 
         } catch (Exception e) {
 
