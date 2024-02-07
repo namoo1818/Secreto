@@ -9,6 +9,5 @@ import lombok.Data;
 public class WriteReplyRequestDto {
     private String content;
     private Long parentReplyNo;
-    private Long tagUserNo;
     private boolean anonymityYn;
 }
