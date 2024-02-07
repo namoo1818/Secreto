@@ -9,5 +9,6 @@ public class UpdateBoardRequestDto {
     private String content;
     private String imgUrl;
     private BoardCategory boardCategory;
+    private Long userMissionNo;
     private Boolean publicYn;
 }

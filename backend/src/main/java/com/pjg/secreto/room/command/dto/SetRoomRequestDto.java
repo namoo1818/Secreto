@@ -12,15 +12,18 @@ public class SetRoomRequestDto {
 
     private Long roomNo;
 
-    private LocalDateTime roomEndAt;
+//    private LocalDateTime roomEndAt;
+    private String roomEndAt;
 
     private Boolean hostParticipantYn;
 
     private Boolean commonYn;
 
-    private LocalTime missionSubmitTime;
+//    private LocalTime missionSubmitTime;
+    private String missionSubmitTime;
 
-    private LocalDate missionStartAt;
+//    private LocalDate missionStartAt;
+    private String missionStartAt;
 
     private Integer period;
 

@@ -16,6 +16,8 @@ import com.pjg.secreto.board.query.repository.BoardQueryRepository;
 import com.pjg.secreto.board.query.repository.LikedQueryRepository;
 import com.pjg.secreto.board.query.repository.ReplyQueryRepository;
 import com.pjg.secreto.history.query.repository.MatchingQueryRepository;
+import com.pjg.secreto.mission.common.entity.UserMission;
+import com.pjg.secreto.mission.query.repository.UserMissionQueryRepository;
 import com.pjg.secreto.room.common.entity.Room;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
@@ -40,9 +42,16 @@ public class BoardCommandServiceImpl implements BoardCommandService {
     private LikedQueryRepository likedQueryRepository;
     private LikedCommandRepository likedCommandRepository;
     private MatchingQueryRepository matchingQueryRepository;
+    private UserMissionQueryRepository userMissionQueryRepository;
 
     @Autowired
-    public BoardCommandServiceImpl(UserQueryRepository userQueryRepository, RoomUserQueryRepository roomUserQueryRepository, BoardQueryRepository boardQueryRepository, BoardCommandRepository boardCommandRepository, ReplyQueryRepository replyQueryRepository, ReplyCommandRepository replyCommandRepository, LikedQueryRepository likedQueryRepository, LikedCommandRepository likedCommandRepository, MatchingQueryRepository matchingQueryRepository) {
+    public BoardCommandServiceImpl(UserQueryRepository userQueryRepository, RoomUserQueryRepository roomUserQueryRepository,
+                                   BoardQueryRepository boardQueryRepository, BoardCommandRepository boardCommandRepository,
+                                   ReplyQueryRepository replyQueryRepository, ReplyCommandRepository replyCommandRepository,
+                                   LikedQueryRepository likedQueryRepository, LikedCommandRepository likedCommandRepository,
+                                   MatchingQueryRepository matchingQueryRepository, UserMissionQueryRepository userMissionQueryRepository
+
+    ) {
         this.userQueryRepository = userQueryRepository;
         this.roomUserQueryRepository = roomUserQueryRepository;
         this.boardQueryRepository = boardQueryRepository;
@@ -52,18 +61,21 @@ public class BoardCommandServiceImpl implements BoardCommandService {
         this.likedQueryRepository = likedQueryRepository;
         this.likedCommandRepository = likedCommandRepository;
         this.matchingQueryRepository = matchingQueryRepository;
+        this.userMissionQueryRepository = userMissionQueryRepository;
     }
 
     @Override
     public Long updatePost(Long boardNo, Long roomNo, Long userNo, UpdateBoardRequestDto updateBoardRequestDto) {
         try {
             RoomUser roomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo).orElseThrow(()->new BoardException("방에 참여한 유저가 아닙니다."));
-
+            Room room = roomUser.getRoom();
             BoardCategory newCategory = updateBoardRequestDto.getBoardCategory();
             String newTitle = updateBoardRequestDto.getTitle();
             String newContent = updateBoardRequestDto.getContent();
             String newImgUrl = updateBoardRequestDto.getImgUrl();
             Boolean newPublicYn = updateBoardRequestDto.getPublicYn();
+            String newWriter = roomUser.getNickname();
+            UserMission newUserMission = null;
 
             Board post = boardQueryRepository.findById(boardNo).orElseThrow(() -> new BoardException("해당 게시글이 존재하지 않습니다. id=" + boardNo));
 
@@ -71,7 +83,37 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                 new BoardException("수정 권한이 없습니다.");
             }
 
-            post.updateBoard(boardNo, newTitle, newContent, newImgUrl, newCategory, newPublicYn);
+            if (newCategory.equals("NOTICE")) {
+                if(room.getHostNo()!=roomUser.getUser().getId()){
+                    new BoardException("공지를 작성할 권한이 없습니다.");
+                }
+                if(!newPublicYn){
+                    new BoardException("공지는 공개 설정만 할 수 있습니다.");
+                }
+                //인증
+            } else if (newCategory.equals("CERTIFICATE")) {
+                if(updateBoardRequestDto.getUserMissionNo()==null){
+                    new BoardException("미션을 선택해주세요.");
+                }
+                Long manitiNo = matchingQueryRepository.findByRoomUser(roomUser).get().getManitiNo();
+                RoomUser maniti = roomUserQueryRepository.findByUserNoAndRoomNo(manitiNo, roomNo).orElseThrow(()->new BoardException("해당 유저가 없습니다."));
+                String manitiNickname = maniti.getNickname();
+                newWriter = manitiNickname+"님의 마니또";
+
+                newUserMission = userMissionQueryRepository.findById(updateBoardRequestDto.getUserMissionNo()).orElseThrow(()->new BoardException("해당 미션이 존재하지 않습니다."));
+                if(newUserMission.getMissionCertifyYn()){
+                    throw new BoardException("이미 인증한 미션입니다.");
+                }
+                post.getUserMission().updateUserMission();
+                newUserMission.updateUserMission();
+                //자랑
+            } else {
+                if(!updateBoardRequestDto.getPublicYn()){
+                    new BoardException("자랑글은 공개 설정만 할 수 있습니다.");
+                }
+            }
+
+            post.updateBoard(newWriter, boardNo, newTitle, newContent, newImgUrl, newCategory, newPublicYn, newUserMission);
 
             return boardNo;
         }catch (Exception e) {
@@ -90,6 +132,10 @@ public class BoardCommandServiceImpl implements BoardCommandService {
             if (!roomUser.equals(board.getRoomUser())) {
                 new BoardException("해당 게시글을 삭제할 권한이 없습니다.");
             }
+
+            if(board.getBoardCategory().equals("CERTIFICATE"))
+                board.getUserMission().updateUserMission();
+
             boardCommandRepository.delete(board);
         } catch (Exception e){
             throw new BoardException(e.getMessage());
@@ -105,6 +151,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
             Room room = roomUser.getRoom();
 
             BoardCategory boardCategory = writeBoardRequestDto.getBoardCategory();
+            UserMission userMission = null;
 
             //공지
             if (boardCategory.equals("NOTICE")) {
@@ -116,13 +163,19 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                 }
                 //인증
             } else if (boardCategory.equals("CERTIFICATE")) {
-                    if(writeBoardRequestDto.getMissionCategory()==null){
+                    if(writeBoardRequestDto.getUserMissionNo()==null){
                         new BoardException("미션을 선택해주세요.");
                     }
                     Long manitiNo = matchingQueryRepository.findByRoomUser(roomUser).get().getManitiNo();
                     RoomUser maniti = roomUserQueryRepository.findByUserNoAndRoomNo(manitiNo, roomNo).orElseThrow(()->new BoardException("해당 유저가 없습니다."));
                     String manitiNickname = maniti.getNickname();
                     writer = manitiNickname+"님의 마니또";
+
+                    userMission = userMissionQueryRepository.findById(writeBoardRequestDto.getUserMissionNo()).orElseThrow(()->new BoardException("해당 미션이 존재하지 않습니다."));
+                    if(userMission.getMissionCertifyYn()){
+                        throw new BoardException("이미 인증한 미션입니다.");
+                    }
+                    userMission.updateUserMission();
                 //자랑
             } else {
                 if(!writeBoardRequestDto.getPublicYn()){
@@ -138,7 +191,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                     .registerAt(LocalDateTime.now())
                     .boardCategory(writeBoardRequestDto.getBoardCategory())
                     .publicYn(writeBoardRequestDto.getPublicYn())
-                    .missionCategory(writeBoardRequestDto.getMissionCategory())
+                    .userMission(userMission)
                     .writer(writer)
                     .hit(0L)
                     .likedCount(0L)
@@ -247,14 +300,13 @@ public class BoardCommandServiceImpl implements BoardCommandService {
         try {
             RoomUser roomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo).orElseThrow(()->new BoardException("방에 참여한 유저가 아닙니다."));
             String newContent = updateReplyRequestDto.getContent();
-            Long tagUserNo = updateReplyRequestDto.getTagUserNo();
             Boolean newAnnonymityYn = updateReplyRequestDto.getAnonymityYn();
 
             Reply reply = replyQueryRepository.findById(replyNo).orElseThrow(
                     () -> new BoardException("해당 댓글이 없습니다. id=" + replyNo));
 
             if(reply.getRoomUser().equals(roomUser))
-                reply.updateReply(newContent, tagUserNo, newAnnonymityYn);
+                reply.updateReply(newContent, newAnnonymityYn);
             else
                 new BoardException("해당 댓글을 수정할 권할이 없습니다.");
             return replyNo;
