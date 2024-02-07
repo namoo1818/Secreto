@@ -3,10 +3,7 @@ package com.pjg.secreto.board.common.entity;
 import com.pjg.secreto.mission.common.entity.UserMission;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Getter
+@Data
 @Table(name = "tbl_board")
 public class Board {
 
