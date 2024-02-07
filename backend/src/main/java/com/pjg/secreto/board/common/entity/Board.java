@@ -1,5 +1,6 @@
 package com.pjg.secreto.board.common.entity;
 
+import com.pjg.secreto.mission.common.entity.UserMission;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -51,13 +52,15 @@ public class Board {
 
     private Boolean publicYn;
 
-    private String missionCategory;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_mission_no")
+    private UserMission userMission;
 
     private Long likedCount;
 
     private String writer;
     @Builder
-    public Board(RoomUser roomUser, String title, String content, String imgUrl, LocalDateTime registerAt, Long hit, BoardCategory boardCategory, Boolean publicYn, String missionCategory, Long likedCount, String writer) {
+    public Board(RoomUser roomUser, String title, String content, String imgUrl, LocalDateTime registerAt, Long hit, BoardCategory boardCategory, Boolean publicYn, UserMission userMission, Long likedCount, String writer) {
         this.roomUser = roomUser;
         this.title = title;
         this.content = content;
@@ -66,18 +69,20 @@ public class Board {
         this.hit = hit;
         this.boardCategory = boardCategory;
         this.publicYn = publicYn;
-        this.missionCategory = missionCategory;
+        this.userMission = userMission;
         this.likedCount = likedCount;
         this.writer = writer;
     }
 
-    public void updateBoard(Long id, String title, String content, String imgUrl, BoardCategory boardCategory, Boolean publicYn){
+    public void updateBoard(String writer, Long id, String title, String content, String imgUrl, BoardCategory boardCategory, Boolean publicYn, UserMission userMission){
+        this.writer = writer;
         this.id = id;
         this.title = title;
         this.content = content;
         this.imgUrl = imgUrl;
         this.boardCategory = boardCategory;
         this.publicYn = publicYn;
+        this.userMission = userMission;
     }
     public void updateLikedCount(Long likedCount){
         this.likedCount = likedCount;

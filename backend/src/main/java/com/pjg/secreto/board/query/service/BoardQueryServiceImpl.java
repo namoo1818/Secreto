@@ -66,13 +66,13 @@ public class BoardQueryServiceImpl implements BoardQueryService{
                 new BoardException("게시판 카테고리를 선택해주세요");
             }
             if (title != null) {
-                boardPage =   boardQueryRepository.findBoardByBoardCategoryAndTitleContaining(serachRequest.getBoardCategory(), serachRequest.getTitle() ,pageable);
+                boardPage =   boardQueryRepository.findBytitle(serachRequest.getBoardCategory(), serachRequest.getTitle() ,roomUser.getRoom().getId(), pageable);
             } else if (content != null) {
-                boardPage =  boardQueryRepository.findBoardByBoardCategoryAndContentContaining(serachRequest.getBoardCategory(), serachRequest.getContent() ,pageable);
+                boardPage =  boardQueryRepository.findBycontent(serachRequest.getBoardCategory(), serachRequest.getContent() ,roomUser.getRoom().getId(),pageable);
             } else if (writer != null) {
-                boardPage =  boardQueryRepository.findBoardByBoardCategoryAndWriterContaining(serachRequest.getBoardCategory(), serachRequest.getWriter() ,pageable);
+                boardPage =  boardQueryRepository.findBywriter(serachRequest.getBoardCategory(), serachRequest.getWriter() ,roomUser.getRoom().getId(),pageable);
             } else {
-                boardPage =  boardQueryRepository.findBoardByBoardCategory(serachRequest.getBoardCategory() ,pageable);
+                boardPage =  boardQueryRepository.findByBoardCategory(serachRequest.getBoardCategory() ,roomUser.getRoom().getId(), pageable);
             }
 
             return boardPage.map(board -> SearchBoardResponseDto.builder()
@@ -82,12 +82,13 @@ public class BoardQueryServiceImpl implements BoardQueryService{
                     .hit(board.getHit())
                     .boardCategory(board.getBoardCategory())
                     .publicYn(board.getPublicYn())
-                    .missionCategory(board.getMissionCategory())
+                    .missionCategory(board.getUserMission() != null ? board.getUserMission().getContent() : null)
                     .likedCount(board.getLikedCount())
                     .writer(board.getWriter())
-                    .writerEmail(null)
-                    .writerProfileUrl(null)
-                    .replyCount(board.getReplies().size())
+                    .writerEmail(board.getRoomUser().getUser().getEmail())
+                    .writerProfileUrl(board.getRoomUser().getUser().getProfileUrl())
+                    .replyCount((int) board.getReplies().stream().filter(reply -> !reply.getDeleteYn())
+                            .count())
                     .imgUrl(board.getImgUrl())
                     .build());
         }catch (Exception e){
@@ -127,7 +128,7 @@ public class BoardQueryServiceImpl implements BoardQueryService{
                     .hit(board.getHit())
                     .boardCategory(board.getBoardCategory())
                     .publicYn(board.getPublicYn())
-                    .missionCategory(board.getMissionCategory())
+                    .missionCategory(board.getUserMission() != null ? board.getUserMission().getContent() : null)
                     .likedCount(board.getLikedCount())
                     .writer(board.getWriter())
                     .writerEmail(writerEmail)
