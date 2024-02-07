@@ -50,8 +50,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     private final RoomMissionCommandRepository roomMissionCommandRepository;
     private final RoomUserQueryRepository roomUserQueryRepository;
     private final MatchingCommandRepository matchingCommandRepository;
-//    private final EmitterService emitterService;
-//    private final AlarmRepository alarmRepository;
+    private final EmitterService emitterService;
+    private final AlarmRepository alarmRepository;
 
 
     // 방 생성 api (user 개발 완료 시 개발 예정)
@@ -160,13 +160,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             log.info("현재 날짜 : " + today);
 
-            // 미션 일정 생성 (미션 시작일과 방 끝나는 날짜를 기준으로 주기마다 날짜 생성해야 함)
-//            LocalDateTime startDT = LocalDateTime.of(2024, 1, 10, 18, 40, 25);
-//            LocalDateTime endDT = LocalDateTime.of(2024, 2, 1, 14, 30, 55);
-//            int period = 3;
-//            LocalDate missionStartDate = startDT.toLocalDate();
-//            LocalDate roomEndDate = endDT.toLocalDate();
-
             // 방 끝나는 일정
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime roomEndDateTime = LocalDateTime.parse(setRoomRequestDto.getRoomEndAt(), formatter);
@@ -181,8 +174,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             log.info("미션이 주어지는 시간 : " + missionSubmitTime);
 
             int period = setRoomRequestDto.getPeriod();
-//            LocalDate missionStartDate = setRoomRequestDto.getMissionStartAt();
-//            LocalDate roomEndDate = setRoomRequestDto.getRoomEndAt().toLocalDate();
 
             Period diff = Period.between(missionStartDate, roomEndDateTime.toLocalDate());
             int totalDays = diff.getDays();
@@ -261,31 +252,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                     missionSubmitTime, missionStartDate, true);
 
             SetRoomResponseDto result = SetRoomResponseDto.builder().roomNo(setRoomRequestDto.getRoomNo()).build();
-
-
-            // 방 생성 알림
-            for(RoomUser ru : roomUsers) {
-
-//                // 유저에게 알림 발송
-//                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
-//                        .content("방이 시작되었습니다.")
-//                        .readYn(false)
-//                        .generatedAt(LocalDateTime.now())
-//                        .author("시스템")
-//                        .roomUserNo(ru.getId()).build();
-//
-//                emitterService.alarm(ru.getId(), alarmDataDto, "방이 시작되었습니다.", "room-start");
-//
-//                Alarm alarm = Alarm.builder()
-//                        .author(alarmDataDto.getAuthor())
-//                        .content(alarmDataDto.getContent())
-//                        .readYn(alarmDataDto.getReadYn())
-//                        .generatedAt(alarmDataDto.getGeneratedAt())
-//                        .roomUser(ru).build();
-//
-//                alarmRepository.save(alarm);
-
-            }
 
             return result;
 
@@ -519,19 +485,73 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         try {
 
-//            // 방 입장이 수락된 유저 리스트 조회
-//            List<RoomUser> acceptedUsers = roomUserQueryRepository
-//                    .findAllByRoomUserNosAndRoomNo(insertMatchingRequestDto.getRoomUserNos(), insertMatchingRequestDto.getRoomNo());
-//
-//            // 방 유저 전체 리스트 조회
-//            RoomUser firstRoomUser = roomUserQueryRepository.findByRoomNoLimitOne(insertMatchingRequestDto.getRoomNo());
-//
-//            List<RoomUser> existsRoomUserList = new ArrayList<>();
+            // 방 유저 전체 리스트 조회
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(insertMatchingRequestDto.getRoomNo());
 
+            RoomUser firstRoomUser = findRoomUsers.get(0);
 
-//            while()
+            List<RoomUser> existsRoomUserList = new ArrayList<>();
+            existsRoomUserList.add(firstRoomUser);
 
-            // 순서대로(원형으로)
+            RoomUser usersManiti = roomUserQueryRepository.findById(firstRoomUser.getUsersManiti())
+                    .orElseThrow(() -> new RoomException("해당 유저는 존재하지 않습니다."));
+
+            // 마니또 -> 자신 -> 마니띠로 정렬
+            while(!Objects.equals(usersManiti.getUsersManiti(), firstRoomUser.getId())) {
+                existsRoomUserList.add(usersManiti);
+                usersManiti = roomUserQueryRepository.findById(usersManiti.getUsersManiti())
+                        .orElseThrow(() -> new RoomException("해당 유저는 존재하지 않습니다."));
+            }
+            existsRoomUserList.add(usersManiti);
+
+            // 방 입장이 수락된 유저 리스트 조회
+            List<RoomUser> acceptedUserList = roomUserQueryRepository
+                    .findAllByRoomUserNosAndRoomNo(insertMatchingRequestDto.getRoomUserNos(), insertMatchingRequestDto.getRoomNo());
+
+            int totalRoomUserCnt = existsRoomUserList.size() + acceptedUserList.size();
+
+            log.info("유저 수 : " + totalRoomUserCnt);
+            // index 랜덤으로 섞기
+            int indexs[] = new int[acceptedUserList.size()];
+            Random r = new Random();
+            for(int i=0; i<acceptedUserList.size(); i++) {
+                indexs[i] = r.nextInt(totalRoomUserCnt);
+
+                for(int j=0; j<i; j++) {
+                    if(indexs[i] == indexs[j]) {
+                        i--;
+                    }
+                }
+            }
+
+            Arrays.sort(indexs);
+            log.info("indexs : " + Arrays.toString(indexs));
+
+            List<RoomUser> newRelationList = new ArrayList<>();
+
+            int existMemberIdx = 0;
+            int newMemberIdx = 0;
+            for(int i=0; i<totalRoomUserCnt; i++) {
+
+                if(i == indexs[newMemberIdx]) {
+                    log.info("newMemberIdx : " + newMemberIdx);
+                    newRelationList.add(acceptedUserList.get(newMemberIdx));
+                    if(newMemberIdx+1 != acceptedUserList.size()) {
+                        newMemberIdx++;
+                    }
+                } else {
+                    log.info("existMemberIdx : " + existMemberIdx);
+                    newRelationList.add(existsRoomUserList.get(existMemberIdx));
+                    if(existMemberIdx+1 != existsRoomUserList.size()) {
+                        existMemberIdx++;
+                    }
+                }
+            }
+
+            for(RoomUser ru : newRelationList) {
+                System.out.println(ru.getId());
+            }
+
 
 
 

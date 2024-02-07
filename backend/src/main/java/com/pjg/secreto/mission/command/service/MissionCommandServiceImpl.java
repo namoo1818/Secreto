@@ -49,8 +49,8 @@ public class MissionCommandServiceImpl implements MissionCommandService {
     private final UserMemoQueryRepository userMemoQueryRepository;
     private final RoomMissionQueryRepository roomMissionQueryRepository;
     private final UserMissionCommandRepository userMissionCommandRepository;
-//    private final EmitterService emitterService;
-//    private final AlarmRepository alarmRepository;
+    private final EmitterService emitterService;
+    private final AlarmRepository alarmRepository;
 
     @Override
     public void addSuddenMission(AddSuddenMissionRequestDto addSuddenMissionRequestDto) {
@@ -81,24 +81,24 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
                 userMissionCommandRepository.save(userMission);
 
-//                // 유저에게 알림 발송
-//                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
-//                        .content(userMission.getContent())
-//                        .readYn(false)
-//                        .generatedAt(LocalDateTime.now())
-//                        .author("방장")
-//                        .roomUserNo(ru.getId()).build();
-//
-//                emitterService.alarm(ru.getId(), alarmDataDto, "돌발 미션이 생성되었습니다.", "sudden");
-//
-//                Alarm alarm = Alarm.builder()
-//                        .author(alarmDataDto.getAuthor())
-//                        .content(alarmDataDto.getContent())
-//                        .readYn(alarmDataDto.getReadYn())
-//                        .generatedAt(alarmDataDto.getGeneratedAt())
-//                        .roomUser(ru).build();
-//
-//                alarmRepository.save(alarm);
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content(userMission.getContent())
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author("방장")
+                        .roomUserNo(ru.getId()).build();
+
+                emitterService.alarm(ru.getId(), alarmDataDto, "돌발 미션이 생성되었습니다.", "message");
+
+                Alarm alarm = Alarm.builder()
+                        .author(alarmDataDto.getAuthor())
+                        .content(alarmDataDto.getContent())
+                        .readYn(alarmDataDto.getReadYn())
+                        .generatedAt(alarmDataDto.getGeneratedAt())
+                        .roomUser(ru).build();
+
+                alarmRepository.save(alarm);
             }
 
         } catch (Exception e) {
@@ -273,24 +273,24 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                 userMissionCommandRepository.save(userMission);
                 log.info("유저 별 미션 생성 완료");
 
-//                // 유저에게 알림 발송
-//                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
-//                        .content(userMission.getContent())
-//                        .readYn(false)
-//                        .generatedAt(LocalDateTime.now())
-//                        .author("시스템")
-//                        .roomUserNo(ru.getId()).build();
-//
-//                emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "regular");
-//
-//                Alarm alarm = Alarm.builder()
-//                        .author(alarmDataDto.getAuthor())
-//                        .content(alarmDataDto.getContent())
-//                        .readYn(alarmDataDto.getReadYn())
-//                        .generatedAt(alarmDataDto.getGeneratedAt())
-//                        .roomUser(ru).build();
-//
-//                alarmRepository.save(alarm);
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content(userMission.getContent())
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author("시스템")
+                        .roomUserNo(ru.getId()).build();
+
+                emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "message");
+
+                Alarm alarm = Alarm.builder()
+                        .author(alarmDataDto.getAuthor())
+                        .content(alarmDataDto.getContent())
+                        .readYn(alarmDataDto.getReadYn())
+                        .generatedAt(alarmDataDto.getGeneratedAt())
+                        .roomUser(ru).build();
+
+                alarmRepository.save(alarm);
             }
 
         }
