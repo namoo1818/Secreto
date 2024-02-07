@@ -1,5 +1,9 @@
 package com.pjg.secreto.room.command.service;
 
+import com.pjg.secreto.alarm.common.entity.Alarm;
+import com.pjg.secreto.alarm.dto.AlarmDataDto;
+import com.pjg.secreto.alarm.repository.AlarmRepository;
+import com.pjg.secreto.alarm.service.EmitterService;
 import com.pjg.secreto.history.command.repository.MatchingCommandRepository;
 import com.pjg.secreto.history.common.entity.Matching;
 import com.pjg.secreto.mission.command.repository.MissionScheduleCommandRepository;
@@ -46,6 +50,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     private final RoomMissionCommandRepository roomMissionCommandRepository;
     private final RoomUserQueryRepository roomUserQueryRepository;
     private final MatchingCommandRepository matchingCommandRepository;
+    private final EmitterService emitterService;
+    private final AlarmRepository alarmRepository;
 
 
     // 방 생성 api (user 개발 완료 시 개발 예정)
@@ -154,13 +160,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             log.info("현재 날짜 : " + today);
 
-            // 미션 일정 생성 (미션 시작일과 방 끝나는 날짜를 기준으로 주기마다 날짜 생성해야 함)
-//            LocalDateTime startDT = LocalDateTime.of(2024, 1, 10, 18, 40, 25);
-//            LocalDateTime endDT = LocalDateTime.of(2024, 2, 1, 14, 30, 55);
-//            int period = 3;
-//            LocalDate missionStartDate = startDT.toLocalDate();
-//            LocalDate roomEndDate = endDT.toLocalDate();
-
             // 방 끝나는 일정
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime roomEndDateTime = LocalDateTime.parse(setRoomRequestDto.getRoomEndAt(), formatter);
@@ -175,8 +174,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             log.info("미션이 주어지는 시간 : " + missionSubmitTime);
 
             int period = setRoomRequestDto.getPeriod();
-//            LocalDate missionStartDate = setRoomRequestDto.getMissionStartAt();
-//            LocalDate roomEndDate = setRoomRequestDto.getRoomEndAt().toLocalDate();
 
             Period diff = Period.between(missionStartDate, roomEndDateTime.toLocalDate());
             int totalDays = diff.getDays();
@@ -248,30 +245,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             }
 
-//            for(int i=0; i<keys.length; i++) {
-//
-//                RoomUser findRoomUser = roomUserQueryRepository.findById(keys[i])
-//                        .orElseThrow(() -> new RoomException("해당 유저가 존재하지 않습니다."));
-//
-//                Matching matching = Matching.builder()
-//                        .roomUser(findRoomUser).matchingAt(LocalDateTime.now()).deprecatedAt(null)
-//                        .manitoNo(null).manitiNo(null).build();
-//                if(i == 0) {
-//                    matching.changeMatchingInfo(keys[keys.length-1], keys[i+1]);
-//                    findRoomUser.setMatchingInfo(keys[keys.length-1], keys[i+1]);
-//                }
-//                else if(i == keys.length-1) {
-//                    matching.changeMatchingInfo(keys[i-1], keys[0]);
-//                    findRoomUser.setMatchingInfo(keys[i-1], keys[0]);
-//                }
-//                else {
-//                    matching.changeMatchingInfo(keys[i-1], keys[i+1]);
-//                    findRoomUser.setMatchingInfo(keys[i-1], keys[i+1]);
-//                }
-//
-//                matchingCommandRepository.save(matching);
-//
-//            }
 
             // 방 정보 수정
             room.startRoom(LocalDateTime.now(), roomEndDateTime,
@@ -279,6 +252,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                     missionSubmitTime, missionStartDate, true);
 
             SetRoomResponseDto result = SetRoomResponseDto.builder().roomNo(setRoomRequestDto.getRoomNo()).build();
+
             return result;
 
         } catch (Exception e) {
@@ -334,19 +308,42 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         try {
 
-            // 방 생성 유저 id 꺼내기 (security 세팅 완료 시 수정)
-            Long userNo = exitRoomRequestDto.getUserNo();
-
             // 방 유저 조회
-            Room findRoom = roomQueryRepository.findById(exitRoomRequestDto.getRoomNo())
-                    .orElseThrow(() -> new RoomException("해당 방이 존재하지 않습니다."));
-            User findUser = userQueryRepository.findById(userNo)
-                    .orElseThrow(() -> new UserException("해당 유저가 존재하지 않습니다."));
-            RoomUser roomUser = roomUserQueryRepository.findRoomUserByRoomAndUser(findRoom, findUser);
-            log.info("방 유저 식별키 : " + roomUser);
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(exitRoomRequestDto.getUserNo(),
+                    exitRoomRequestDto.getRoomNo())
+                    .orElseThrow(() -> new RoomException("해당 유저는 방에 속해있지 않습니다."));
+
+            log.info("방 유저 식별키 : " + findRoomUser.getId());
 
             // 방 유저 정보 변경
-            roomUser.leave();
+            findRoomUser.leave();
+
+            // 나간 유저의 마니또와 마니띠 매칭
+            RoomUser usersManito = roomUserQueryRepository.findById(findRoomUser.getUsersManito())
+                    .orElseThrow(() -> new RoomException("해당 유저는 마니또가 없습니다."));
+
+            RoomUser usersManiti = roomUserQueryRepository.findById(findRoomUser.getUsersManiti())
+                    .orElseThrow(() -> new RoomException("해당 유저는 마니띠가 없습니다."));
+
+            usersManito.setManiti(usersManiti.getId());
+            usersManiti.setManito(usersManito.getId());
+
+            Matching manitosMatching = Matching.builder()
+                    .roomUser(usersManito)
+                    .matchingAt(LocalDateTime.now())
+                    .manitoNo(usersManito.getUsersManito())
+                    .manitiNo(usersManito.getUsersManiti())
+                    .build();
+
+            Matching manitisMatching = Matching.builder()
+                    .roomUser(usersManiti)
+                    .matchingAt(LocalDateTime.now())
+                    .manitoNo(usersManiti.getUsersManito())
+                    .manitiNo(usersManiti.getUsersManiti())
+                    .build();
+
+            matchingCommandRepository.save(manitosMatching);
+            matchingCommandRepository.save(manitisMatching);
 
         } catch (Exception e) {
             throw new RoomException(e.getMessage());
@@ -511,122 +508,94 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         try {
 
+            // 방 유저 전체 리스트 조회
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(insertMatchingRequestDto.getRoomNo());
+
+            RoomUser firstRoomUser = findRoomUsers.get(0);
+
+            List<RoomUser> existsRoomUserList = new ArrayList<>();
+            existsRoomUserList.add(firstRoomUser);
+
+            RoomUser usersManiti = roomUserQueryRepository.findById(firstRoomUser.getUsersManiti())
+                    .orElseThrow(() -> new RoomException("해당 유저는 존재하지 않습니다."));
+
+            // 마니또 -> 자신 -> 마니띠로 정렬
+            while(!Objects.equals(usersManiti.getUsersManiti(), firstRoomUser.getId())) {
+                existsRoomUserList.add(usersManiti);
+                usersManiti = roomUserQueryRepository.findById(usersManiti.getUsersManiti())
+                        .orElseThrow(() -> new RoomException("해당 유저는 존재하지 않습니다."));
+            }
+            existsRoomUserList.add(usersManiti);
+
             // 방 입장이 수락된 유저 리스트 조회
-            List<RoomUser> acceptedUsers = roomUserQueryRepository
+            List<RoomUser> acceptedUserList = roomUserQueryRepository
                     .findAllByRoomUserNosAndRoomNo(insertMatchingRequestDto.getRoomUserNos(), insertMatchingRequestDto.getRoomNo());
 
-            // 방 유저 전체 리스트 조회
-            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(insertMatchingRequestDto.getRoomNo());
+            int totalRoomUserCnt = existsRoomUserList.size() + acceptedUserList.size();
 
-            // 순서대로(원형으로)
+            log.info("유저 수 : " + totalRoomUserCnt);
+            // index 랜덤으로 섞기
+            int indexs[] = new int[acceptedUserList.size()];
+            Random r = new Random();
+            for(int i=0; i<acceptedUserList.size(); i++) {
+                indexs[i] = r.nextInt(totalRoomUserCnt);
 
-            Random random = new Random();
-            for (RoomUser acceptedUser: acceptedUsers) {
-                int randomIdx = random.nextInt(roomUsers.size());
-                roomUsers.add(randomIdx, acceptedUser);
+                for(int j=0; j<i; j++) {
+                    if(indexs[i] == indexs[j]) {
+                        i--;
+                    }
+                }
             }
 
-            for (int i = 0, end = roomUsers.size(); i < end; ++i) {
-                RoomUser roomUser = roomUsers.get(i);
-                RoomUser manito = roomUsers.get((i - 1 + end) % end);
-                RoomUser maniti = roomUsers.get((i + 1) % end);
-                roomUser.setManito(manito.getId());
-                roomUser.setManiti(maniti.getId());
+            Arrays.sort(indexs);
+            log.info("indexs : " + Arrays.toString(indexs));
+
+            List<RoomUser> newRelationList = new ArrayList<>();
+
+            int existMemberIdx = 0;
+            int newMemberIdx = 0;
+            for(int i=0; i<totalRoomUserCnt; i++) {
+
+                if(i == indexs[newMemberIdx]) {
+                    log.info("newMemberIdx : " + newMemberIdx);
+                    newRelationList.add(acceptedUserList.get(newMemberIdx));
+                    if(newMemberIdx+1 != acceptedUserList.size()) {
+                        newMemberIdx++;
+                    }
+                } else {
+                    log.info("existMemberIdx : " + existMemberIdx);
+                    newRelationList.add(existsRoomUserList.get(existMemberIdx));
+                    if(existMemberIdx+1 != existsRoomUserList.size()) {
+                        existMemberIdx++;
+                    }
+                }
             }
 
-            
-//
-//            for(int matchingCnt=0; matchingCnt < acceptedUsers.size(); matchingCnt++) {
-//
-//                log.info("모든 방 유저 : ");
-//                for(RoomUser ru : roomUsers) {
-//                    log.info(ru.getId() + " ");
-//                }
-//
-//                // 새로 들어온 유저를 제외한 기존 유저 리스트를 구하는 로직
-//                List<Long> existsUserNos = new ArrayList<>();
-//                for(int i=0; i< roomUsers.size(); i++) {
-//
-//                    boolean isDuplicate = false;
-//                    for(int j=0; j<acceptedUsers.size(); j++) {
-//                        if(roomUsers.get(i).getId() == acceptedUsers.get(j).getId()) {
-//                            isDuplicate = true;
-//                        }
-//                    }
-//
-//                    if(!isDuplicate) {
-//                        existsUserNos.add(roomUsers.get(i).getId());
-//                    }
-//                }
-//
-//                log.info("기존 방 유저 : ");
-//                for(Long nos : existsUserNos) {
-//                    log.info(nos + " ");
-//                }
-//
-//                // 랜덤 유저 픽을 위한 로직(기존 유저들을 랜덤으로 돌린 뒤 인덱스 0번재 유저의 마니또 관계를 파괴할 예정
-//                int indexs[] = new int[existsUserNos.size()];
-//                Random r = new Random();
-//                for(int i=0; i<existsUserNos.size(); i++) {
-//                    indexs[i] = r.nextInt(existsUserNos.size()) + 1;
-//
-//                    for(int j=0; j<i; j++) {
-//                        if(indexs[i] == indexs[j]) {
-//                            i--;
-//                        }
-//                    }
-//                }
-//
-//                log.info("indexs : ");
-//                for(int i=0; i<indexs.length; i++) {
-//                    log.info(indexs[i] + " ");
-//                }
-//
-//                // 랜덤으로 고른 한명의 유저
-//                RoomUser findRoomUser = roomUserQueryRepository.findById(existsUserNos.get(indexs[0]))
-//                        .orElseThrow(() -> new RoomException("해당 유저가 존재하지 않습니다."));
-//
-//                // 랜덤 유저의 마니또
-//                RoomUser findUsersManito = roomUserQueryRepository.findById(findRoomUser.getUsersManito())
-//                        .orElseThrow(() -> new RoomException("해당 유저가 존재하지 않습니다."));
-//
-//                // 새로 매칭될 유저
-//                RoomUser newUser = roomUserQueryRepository.findById(acceptedUsers.get(matchingCnt).getId())
-//                        .orElseThrow(() -> new RoomException("해당 유저가 존재하지 않습니다."));
-//
-//                findUsersManito.setManiti(newUser.getId());
-//                findRoomUser.setManito(newUser.getId());
-//
-//                newUser.setManito(findUsersManito.getId());
-//                newUser.setManiti(findRoomUser.getId());
-//
-//                // 새로운 매칭 기록 저장
-//                Matching matching1 = Matching.builder()
-//                        .roomUser(findRoomUser)
-//                        .matchingAt(LocalDateTime.now())
-//                        .manitoNo(findRoomUser.getUsersManito())
-//                        .manitiNo(findRoomUser.getUsersManiti())
-//                        .build();
-//
-//                Matching matching2 = Matching.builder()
-//                        .roomUser(findUsersManito)
-//                        .matchingAt(LocalDateTime.now())
-//                        .manitoNo(findUsersManito.getUsersManito())
-//                        .manitiNo(findUsersManito.getUsersManiti())
-//                        .build();
-//
-//                Matching matching3 = Matching.builder()
-//                        .roomUser(newUser)
-//                        .matchingAt(LocalDateTime.now())
-//                        .manitoNo(newUser.getUsersManito())
-//                        .manitiNo(newUser.getUsersManiti())
-//                        .build();
-//
-//                matchingCommandRepository.save(matching1);
-//                matchingCommandRepository.save(matching2);
-//                matchingCommandRepository.save(matching3);
-//
-//            }
+            // 매칭 정보 저장
+            for(int i=0; i<newRelationList.size(); i++) {
+
+                RoomUser findRoomUser = newRelationList.get(i);
+
+                Matching matching = Matching.builder()
+                        .roomUser(findRoomUser).matchingAt(LocalDateTime.now()).deprecatedAt(null)
+                        .manitoNo(null).manitiNo(null).build();
+
+                if(i == 0) {
+                    matching.changeMatchingInfo(newRelationList.get(newRelationList.size()-1).getId(), newRelationList.get(i+1).getId());
+                    findRoomUser.setMatchingInfo(newRelationList.get(newRelationList.size()-1).getId(), newRelationList.get(i+1).getId());
+                }
+                else if(i == newRelationList.size()-1) {
+                    matching.changeMatchingInfo(newRelationList.get(i-1).getId(), newRelationList.get(0).getId());
+                    findRoomUser.setMatchingInfo(newRelationList.get(i-1).getId(), newRelationList.get(0).getId());
+                }
+                else {
+                    matching.changeMatchingInfo(newRelationList.get(i-1).getId(), newRelationList.get(i+1).getId());
+                    findRoomUser.setMatchingInfo(newRelationList.get(i-1).getId(), newRelationList.get(i+1).getId());
+                }
+
+                matchingCommandRepository.save(matching);
+
+            }
 
         } catch (Exception e) {
 

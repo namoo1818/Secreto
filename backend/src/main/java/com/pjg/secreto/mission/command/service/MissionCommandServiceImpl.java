@@ -89,7 +89,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                         .author("방장")
                         .roomUserNo(ru.getId()).build();
 
-                emitterService.alarm(ru.getId(), alarmDataDto, "돌발 미션이 생성되었습니다.", "sudden");
+                emitterService.alarm(ru.getId(), alarmDataDto, "돌발 미션이 생성되었습니다.", "message");
 
                 Alarm alarm = Alarm.builder()
                         .author(alarmDataDto.getAuthor())
@@ -281,7 +281,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                         .author("시스템")
                         .roomUserNo(ru.getId()).build();
 
-                emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "regular");
+                emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "message");
 
                 Alarm alarm = Alarm.builder()
                         .author(alarmDataDto.getAuthor())

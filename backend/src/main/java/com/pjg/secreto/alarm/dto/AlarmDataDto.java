@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 @Data
 public class AlarmDataDto {
 
+    private Long alarmNo;
+
     private Long roomUserNo;
 
     private String author;
