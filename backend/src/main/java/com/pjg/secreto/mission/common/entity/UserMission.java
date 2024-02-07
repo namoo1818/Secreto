@@ -53,4 +53,8 @@ public class UserMission {
         this.roomMissionNo = roomMissionNo;
     }
 
+    public void updateUserMission() {
+        this.missionCertifyYn = !this.missionCertifyYn;
+    }
+
 }
