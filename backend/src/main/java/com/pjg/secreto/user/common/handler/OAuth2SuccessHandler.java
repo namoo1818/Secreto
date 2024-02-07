@@ -29,7 +29,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final String redirectUrl = SecurityUtilConfig.RESPONSE_REDIRECT_URL;
+    private final String redirectUrl = "https://i10a805.p.ssafy.io/oauth/redirect";
     private final JwtService jwtService;
     private final UserQueryRepository userQueryRepository;
     private final UserCommandRepository userCommandRepository;

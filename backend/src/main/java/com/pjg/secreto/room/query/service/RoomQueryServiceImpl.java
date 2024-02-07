@@ -87,7 +87,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                     roomStatus = RoomStatus.PARTICIPANT;
                 }
 
-                if(ru.getRoom().getRoomEndAt() != null) {
+                if(ru.getRoom().getRoomEndAt().isBefore(LocalDateTime.now())) {
                     roomStatus = RoomStatus.END;
                 }
 
@@ -137,7 +137,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                 roomStatus = RoomStatus.PARTICIPANT;
             }
 
-            if(findRoomUser.getRoom().getRoomEndAt() != null) {
+            if(findRoomUser.getRoom().getRoomEndAt().isAfter(LocalDateTime.now())) {
                 roomStatus = RoomStatus.END;
             }
 
