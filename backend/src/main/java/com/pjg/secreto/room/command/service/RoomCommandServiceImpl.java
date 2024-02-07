@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -154,22 +155,36 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 //            LocalDate missionStartDate = startDT.toLocalDate();
 //            LocalDate roomEndDate = endDT.toLocalDate();
 
-            int period = setRoomRequestDto.getPeriod();
-            LocalDate missionStartDate = setRoomRequestDto.getMissionStartAt();
-            LocalDate roomEndDate = setRoomRequestDto.getRoomEndAt().toLocalDate();
+            // 방 끝나는 일정
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime roomEndDateTime = LocalDateTime.parse(setRoomRequestDto.getRoomEndAt(), formatter);
+            log.info("방 끝나는 일정 : " + roomEndDateTime);
 
-            Period diff = Period.between(missionStartDate, roomEndDate);
+            // 미션이 처음으로 주어지는 날짜
+            LocalDate missionStartDate = LocalDate.parse(setRoomRequestDto.getMissionStartAt(), DateTimeFormatter.ISO_DATE);
+            log.info("미션이 처음으로 주어지는 날짜 : " + missionStartDate);
+
+            // 미션이 주어지는 시간
+            LocalTime missionSubmitTime = LocalTime.parse(setRoomRequestDto.getMissionSubmitTime());
+            log.info("미션이 주어지는 시간 : " + missionSubmitTime);
+
+            int period = setRoomRequestDto.getPeriod();
+//            LocalDate missionStartDate = setRoomRequestDto.getMissionStartAt();
+//            LocalDate roomEndDate = setRoomRequestDto.getRoomEndAt().toLocalDate();
+
+            Period diff = Period.between(missionStartDate, roomEndDateTime.toLocalDate());
             int totalDays = diff.getDays();
             log.info("시작일과 종료일의 날짜 차이 : " + totalDays);
 
             for(int i=0; i<totalDays; i+=period) {
 
-                LocalDateTime missionStartDateTime = LocalDateTime.of(missionStartDate, setRoomRequestDto.getMissionSubmitTime());
+                LocalDateTime missionStartDateTime = LocalDateTime.of(missionStartDate, missionSubmitTime);
                 LocalDateTime date = missionStartDateTime.plusDays(i);
                 MissionSchedule missionSchedule = MissionSchedule.builder().room(room).missionSubmitAt(date).build();
                 missionScheduleCommandRepository.save(missionSchedule);
             }
 
+            log.info("미션 스케쥴 저장 완료");
 
             // 방 미션에 미션 추가
             List<MissionDto> missionList = setRoomRequestDto.getMissionList();
@@ -188,7 +203,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             int keys[] = new int[roomUsers.size()];
             Random r = new Random();
             for(int i=0; i<roomUsers.size(); i++) {
-                keys[i] = r.nextInt(roomUsers.size()) + 1;
+                keys[i] = r.nextInt(roomUsers.size());
 
                 for(int j=0; j<i; j++) {
                     if(keys[i] == keys[j]) {
@@ -253,18 +268,16 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 //            }
 
             // 방 정보 수정
-            room.startRoom(LocalDateTime.now(), setRoomRequestDto.getRoomEndAt(),
+            room.startRoom(LocalDateTime.now(), roomEndDateTime,
                     setRoomRequestDto.getHostParticipantYn(), setRoomRequestDto.getCommonYn(),
-                    setRoomRequestDto.getMissionSubmitTime(), setRoomRequestDto.getMissionStartAt(), true);
+                    missionSubmitTime, missionStartDate, true);
 
             SetRoomResponseDto result = SetRoomResponseDto.builder().roomNo(setRoomRequestDto.getRoomNo()).build();
             return result;
 
         } catch (Exception e) {
-            e.getStackTrace();
+            throw new RoomException("방 생성 중 오류 발생");
         }
-
-        return null;
 
     }
 
