@@ -58,4 +58,6 @@ public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, 
     @Query("select ru from RoomUser ru where ru.room.id = :roomNo and ru.usersManiti = :usersManito")
     List<RoomUser> findAllByUsersManito(Long roomNo, Long usersManito);
 
+//    @Query("select ru from RoomUser ru where ru.room.id = :roomNo limit 1")
+//    RoomUser findByRoomNoLimitOne(Long roomNo);
 }
