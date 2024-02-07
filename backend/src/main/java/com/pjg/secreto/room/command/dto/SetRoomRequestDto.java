@@ -10,6 +10,8 @@ import java.util.List;
 @Data
 public class SetRoomRequestDto {
 
+    private Long userNo;
+
     private Long roomNo;
 
 //    private LocalDateTime roomEndAt;

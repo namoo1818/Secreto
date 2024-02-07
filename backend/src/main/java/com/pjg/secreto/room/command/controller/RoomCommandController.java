@@ -56,6 +56,8 @@ public class RoomCommandController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
+        Long userNo = AuthUtils.getAuthenticatedUserId();
+        setRoomRequestDto.setUserNo(userNo);
         setRoomRequestDto.setRoomNo(roomNo);
         SetRoomResponseDto result = roomCommandService.setRoom(setRoomRequestDto);
 

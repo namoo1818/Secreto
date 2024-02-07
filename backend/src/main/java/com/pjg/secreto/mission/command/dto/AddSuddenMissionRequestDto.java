@@ -10,7 +10,5 @@ public class AddSuddenMissionRequestDto {
 
     private Long roomNo;
 
-//    private LocalDateTime missionSubmitAt;
-
     private String content;
 }

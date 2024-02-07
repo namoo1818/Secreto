@@ -17,9 +17,8 @@ public class BasicProviderUser implements ProviderUser{
     private String username;
     private String password;
     private String email;
-
     private String profileUrl;
-    private String provider;
+    private String provider = "None";
     private List<? extends GrantedAuthority> authorities;
 
     @Override
@@ -44,7 +43,7 @@ public class BasicProviderUser implements ProviderUser{
 
     @Override
     public String getProvider() {
-        return "None";
+        return provider;
     }
 
     @Override
