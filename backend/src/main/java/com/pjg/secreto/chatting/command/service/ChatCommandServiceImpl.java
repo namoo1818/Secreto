@@ -15,6 +15,17 @@ public class ChatCommandServiceImpl implements ChatCommandService {
 
     private ChatQueryRepository chatQueryRepository;
     private ChatCommandRepository chatCommandRepository;
+
+    @Override
+    public Long createChat(Long manitoNo, Long manitiNo) {
+        return null;
+    }
+
+    @Override
+    public Long createGroupChat(Long roomNo) {
+        return null;
+    }
+
     @Override
     public void saveMessage(ChatMessage chatMessage) throws Exception {
 

@@ -100,13 +100,13 @@ public class BoardQueryServiceImpl implements BoardQueryService{
                         .imgUrl(board.getImgUrl());
 
                     if(board.getBoardCategory()==BoardCategory.CERTIFICATE){
-                        Matching matching = matchingQueryRepository.findByRoomUser(roomUser).orElseThrow(
-                                ()->new BoardException("매칭된 마니띠가 없습니다.")
-                        );
-                        Long manitiNo =matching.getManitiNo();
-                        RoomUser maniti = roomUserQueryRepository.findByUserNoAndRoomNo(manitiNo, roomNo).orElseThrow(()->new BoardException("해당 유저가 없습니다."));
-                        String manitiNickname = maniti.getNickname();
-                        builder.writer(manitiNickname+"님의 마니또");
+//                        Matching matching = matchingQueryRepository.findByRoomUser(roomUser).orElseThrow(
+//                                ()->new BoardException("매칭된 마니띠가 없습니다.")
+//                        );
+//                        Long manitiNo =matching.getManitiNo();
+//                        RoomUser maniti = roomUserQueryRepository.findByUserNoAndRoomNo(manitiNo, roomNo).orElseThrow(()->new BoardException("해당 유저가 없습니다."));
+//                        String manitiNickname = maniti.getNickname();
+//                        builder.writer(manitiNickname+"님의 마니또");
                     }
 
                     return builder.build();
@@ -141,13 +141,13 @@ public class BoardQueryServiceImpl implements BoardQueryService{
             }
 
             if(board.getBoardCategory()==BoardCategory.CERTIFICATE){
-                Matching matching = matchingQueryRepository.findByRoomUser(roomUser).orElseThrow(
-                        ()->new BoardException("매칭된 마니띠가 없습니다.")
-                );
-                Long manitiNo =matching.getManitiNo();
-                RoomUser maniti = roomUserQueryRepository.findByUserNoAndRoomNo(manitiNo, roomNo).orElseThrow(()->new BoardException("해당 유저가 없습니다."));
-                String manitiNickname = maniti.getNickname();
-                writer = manitiNickname+"님의 마니또";
+//                Matching matching = matchingQueryRepository.findByRoomUser(roomUser).orElseThrow(
+//                        ()->new BoardException("매칭된 마니띠가 없습니다.")
+//                );
+//                Long manitiNo =matching.getManitiNo();
+//                RoomUser maniti = roomUserQueryRepository.findByUserNoAndRoomNo(manitiNo, roomNo).orElseThrow(()->new BoardException("해당 유저가 없습니다."));
+//                String manitiNickname = maniti.getNickname();
+//                writer = manitiNickname+"님의 마니또";
                 writerEmail = null;
                 writerProfileUrl = null;
             }
@@ -199,13 +199,13 @@ public class BoardQueryServiceImpl implements BoardQueryService{
 
                 Boolean anonymityYn = reply.getAnonymityYn();
                 if (anonymityYn && reply.getRoomUser().equals(reply.getBoard().getRoomUser())) {
-                    Matching matching = matchingQueryRepository.findByRoomUser(roomUser).orElseThrow(
-                            ()->new BoardException("매칭된 마니띠가 없습니다.")
-                    );
-                    Long manitiNo =matching.getManitiNo();
-                    RoomUser maniti = roomUserQueryRepository.findByUserNoAndRoomNo(manitiNo, roomNo).orElseThrow(()->new BoardException("해당 유저가 없습니다."));
-                    String manitiNickname = maniti.getNickname();
-                    writer=manitiNickname+"님의 마니또";
+//                    Matching matching = matchingQueryRepository.findByRoomUser(roomUser).orElseThrow(
+//                            ()->new BoardException("매칭된 마니띠가 없습니다.")
+//                    );
+//                    Long manitiNo =matching.getManitiNo();
+//                    RoomUser maniti = roomUserQueryRepository.findByUserNoAndRoomNo(manitiNo, roomNo).orElseThrow(()->new BoardException("해당 유저가 없습니다."));
+//                    String manitiNickname = maniti.getNickname();
+//                    writer=manitiNickname+"님의 마니또";
                     writerEmail = null;
                     writerProfileUrl = null;
                 }

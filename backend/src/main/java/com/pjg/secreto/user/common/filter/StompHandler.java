@@ -6,6 +6,8 @@ import com.pjg.secreto.user.common.service.CustomUserDetailService;
 import com.pjg.secreto.user.common.service.JwtService;
 import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class StompHandler implements ChannelInterceptor {
     private final JwtService jwtService;
     private final UserQueryRepository userQueryRepository;
