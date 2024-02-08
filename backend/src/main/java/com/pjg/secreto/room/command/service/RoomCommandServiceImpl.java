@@ -145,6 +145,13 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         try {
 
+            // 수락된 유저들 조회
+            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomIdWhereNotStandby(setRoomRequestDto.getRoomNo());
+
+            if(roomUsers.size() < 3) {
+                throw new RoomException("참여 유저가 3명 이상일 때부터 시작할 수 있습니다.");
+            }
+
             Room room = roomQueryRepository.findById(setRoomRequestDto.getRoomNo()).orElseThrow(() -> new RoomException("해당 방이 없습니다."));
 
             RoomUser findRoomUserNo = roomUserQueryRepository.findByUserNoAndRoomNo(setRoomRequestDto.getUserNo(), room.getId())
@@ -199,9 +206,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             /**
              * 매칭 정보 추가를 위한 로직
-              */
-            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(setRoomRequestDto.getRoomNo());
-
+             */
             // key 랜덤으로 섞기
             int keys[] = new int[roomUsers.size()];
             Random r = new Random();
@@ -256,7 +261,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             return result;
 
         } catch (Exception e) {
-            throw new RoomException("방 생성 중 오류 발생");
+            throw new RoomException(e.getMessage());
         }
 
     }
