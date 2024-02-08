@@ -47,6 +47,7 @@ public class RoomQueryController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
+        Long userNo = getAuthenticatedUserId();
         List<SearchRoomUserListResponseDto> result = roomQueryService.searchRoomUserList(roomNo);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "유저 리스트를 조회하였습니다.", result));
