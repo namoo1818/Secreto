@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @RequiredArgsConstructor
 @Transactional
@@ -229,7 +228,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
             Board board = boardQueryRepository.findById(boardNo)
                     .orElseThrow(() -> new BoardException("해당 게시글이 없습니다. id=" + boardNo));
 
-            Long parentReplyNo = null;
+            Long parentReplyNo = writeReplyRequestDto.getParentReplyNo();
             Long tagUserNo = null;
 
             if(writeReplyRequestDto.getParentReplyNo()!=null) {
