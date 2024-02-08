@@ -55,7 +55,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
             Room findRoom = roomQueryRepository.findById(roomNo)
                     .orElseThrow(() -> new RoomException("해당 방이 없습니다."));
 
-            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(roomNo);
+            List<RoomUser> roomUsers = roomUserQueryRepository.findAllWithUserByRoomId(roomNo);
 
             List<SearchRoomUserListResponseDto> result = roomUsers.stream()
                     .map(SearchRoomUserListResponseDto::of).toList();

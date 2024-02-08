@@ -60,4 +60,7 @@ public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, 
 
     @Query("select ru from RoomUser ru where ru.room.id = :roomNo and ru.standbyYn = false")
     List<RoomUser> findAllByRoomIdWhereNotStandby(Long roomNo);
+
+    @Query("select ru from RoomUser ru join fetch ru.user u where ru.room.id = :roomNo")
+    List<RoomUser> findAllWithUserByRoomId(Long roomNo);
 }
