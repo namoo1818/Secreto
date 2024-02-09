@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @Data
 public class SearchUserMissionListResponseDto {
 
+    private Long userMissionNo;
+
     private String content;
 
     private LocalDateTime missionReceivedAt;

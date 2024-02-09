@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Data
 public class SearchSuddenMissionResponseDto {
 
+    private Long suddenMissionNo;
+
     private LocalDateTime missionSubmitAt;
 
     private String content;

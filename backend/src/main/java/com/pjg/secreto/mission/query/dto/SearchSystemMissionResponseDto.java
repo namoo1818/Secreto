@@ -8,5 +8,7 @@ import lombok.Data;
 @Data
 public class SearchSystemMissionResponseDto {
 
+    private Long systemMissionNo;
+
     private String content;
 }

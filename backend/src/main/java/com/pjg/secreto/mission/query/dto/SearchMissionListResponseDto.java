@@ -8,5 +8,6 @@ import lombok.Data;
 @Data
 public class SearchMissionListResponseDto {
 
+    private Long roomMissionNo;
     private String content;
 }
