@@ -50,7 +50,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
     @Override
     public Map<String, Object> getMyManitoActivity(Long roomId, Long roomUserId) {
         Long authenticatedUserId = roomUserId;
-        RoomUser principal = roomUserQueryRepository.findById(authenticatedUserId).orElseThrow();
+//        RoomUser principal = roomUserQueryRepository.findById(authenticatedUserId).orElseThrow();
+        RoomUser principal = roomUserQueryRepository.findByUserNoAndRoomNo(authenticatedUserId, roomId).orElseThrow();
         List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManiti(roomId, authenticatedUserId);
 
         List<PostDto> myCerticiationActivity = manitoActivityRepository
@@ -81,7 +82,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
     @Override
     public Map<String, Object> getMyManitiActivity(Long roomId, Long roomUserId) {
         Long authenticatedUserId = roomUserId;
-        RoomUser principal = roomUserQueryRepository.findById(authenticatedUserId).orElseThrow();
+        RoomUser principal = roomUserQueryRepository.findByUserNoAndRoomNo(authenticatedUserId, roomId).orElseThrow();
         List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManito(roomId, authenticatedUserId);
 
         List<PostDto> myCerticiationActivity = manitoActivityRepository
