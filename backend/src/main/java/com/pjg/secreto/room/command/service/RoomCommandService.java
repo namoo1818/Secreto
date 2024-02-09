@@ -28,5 +28,7 @@ public interface RoomCommandService {
     void initMatching(InitMatchingRequestDto initMatchingRequestDto);
 
     void insertMatching(InsertMatchingRequestDto insertMatchingRequestDto);
+
+    List<Long> standByUser(StandByUserRequestDto standByUserRequestDto);
 }
 

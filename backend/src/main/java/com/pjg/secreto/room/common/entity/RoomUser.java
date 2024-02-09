@@ -107,6 +107,11 @@ public class RoomUser {
         this.standbyYn = false;
     }
 
+    public void standBy(){
+        this.userEntryAt = null;
+        this.standbyYn = true;
+    }
+
     public Boolean bookmark() {
         this.bookmarkYn = !this.bookmarkYn;
 

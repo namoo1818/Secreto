@@ -25,7 +25,6 @@ import com.pjg.secreto.user.common.exception.UserException;
 import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -665,6 +664,49 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 .toString();
 
         return generatedCode;
+    }
+
+    @Override
+    public List<Long> standByUser(StandByUserRequestDto standByUserRequestDto) {
+
+        log.info("유저 대기중으로 변경 api");
+        try {
+
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findByRoomUserNos(standByUserRequestDto.getRoomUserNos());
+
+            List<Long> roomUserNos = new ArrayList<>();
+
+            // 방 유저 정보 변경
+            for(RoomUser ru : findRoomUsers) {
+                ru.standBy();
+                roomUserNos.add(ru.getId());
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content("방 입장 상태가 대기 중으로 변경되었습니다.")
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author(ru.getRoom().getRoomName() + " 방")
+                        .roomUserNo(ru.getId()).build();
+
+                emitterService.alarm(ru.getId(), alarmDataDto, "방 입장 상태가 대기중으로 변경 되었습니다.", "standBy");
+
+                Alarm alarm = Alarm.builder()
+                        .author(alarmDataDto.getAuthor())
+                        .content(alarmDataDto.getContent())
+                        .readYn(alarmDataDto.getReadYn())
+                        .generatedAt(alarmDataDto.getGeneratedAt())
+                        .roomUser(ru).build();
+
+                alarmRepository.save(alarm);
+            }
+
+            return roomUserNos;
+
+        } catch (Exception e) {
+
+            throw new RoomException(e.getMessage());
+        }
     }
 
 }
