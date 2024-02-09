@@ -44,6 +44,7 @@ public class MissionQueryServiceImpl implements MissionQueryService {
 
             List<SearchSystemMissionResponseDto> result = systemMissions.stream()
                     .map(sm -> new SearchSystemMissionResponseDto(
+                            sm.getId(),
                             sm.getContent())).toList();
 
             return result;
@@ -63,6 +64,7 @@ public class MissionQueryServiceImpl implements MissionQueryService {
 
             List<SearchSuddenMissionResponseDto> result = suddenMissions.stream()
                     .map(sm -> new SearchSuddenMissionResponseDto(
+                            sm.getId(),
                             sm.getMissionSubmitAt(),
                             sm.getContent()
                     )).toList();
@@ -83,6 +85,7 @@ public class MissionQueryServiceImpl implements MissionQueryService {
 
             List<SearchMissionListResponseDto> result = roomMissions.stream()
                     .map(rm -> new SearchMissionListResponseDto(
+                            rm.getId(),
                             rm.getContent()
                     )).toList();
 
@@ -108,6 +111,7 @@ public class MissionQueryServiceImpl implements MissionQueryService {
 
             List<SearchUserMissionListResponseDto> result = userMissions.stream()
                     .map(um -> SearchUserMissionListResponseDto.builder()
+                            .userMissionNo(um.getId())
                             .missionReceivedAt(um.getMissionReceivedAt())
                             .content(um.getContent())
                             .missionType(um.getMissionType())
