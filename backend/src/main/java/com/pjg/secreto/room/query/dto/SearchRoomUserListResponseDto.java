@@ -29,6 +29,10 @@ public class SearchRoomUserListResponseDto {
 
     private String nickname;
 
+    private Long usersManito;
+
+    private Long usersManiti;
+
     private String profileUrl;
 
     private String email;
@@ -44,6 +48,8 @@ public class SearchRoomUserListResponseDto {
                 .nickname(roomUser.getNickname())
                 .profileUrl(roomUser.getUser().getProfileUrl())
                 .email(roomUser.getUser().getEmail())
+                .usersManito(roomUser.getUsersManito())
+                .usersManiti(roomUser.getUsersManiti())
                 .build();
     }
 }
