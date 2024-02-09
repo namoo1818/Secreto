@@ -11,8 +11,9 @@ import java.util.Optional;
 @Repository
 public interface UserMemoQueryRepository extends JpaRepository<UserMemo, Long> {
 
-    @Query("select um from UserMemo um where um.roomUser.id = :roomUserNo")
-    UserMemo findByRoomUserNo(Long roomUserNo);
-
     Optional<UserMemo> findByMemoTo(Long memoTo);
+
+    @Query("select um from UserMemo um where um.roomUser.id = :roomUserNo and um.memoTo = :memoTo")
+    UserMemo findByRoomUserNoAndMemoTo(Long roomUserNo, Long memoTo);
+
 }

@@ -39,4 +39,9 @@ public class UserMemo {
         this.memoTo = memoTo;
     }
 
+    public void updateMemo(String memo, ManitoPredictType manitoPredictType) {
+        this.memo = memo;
+        this.manitoPredictType = manitoPredictType;
+    }
+
 }
