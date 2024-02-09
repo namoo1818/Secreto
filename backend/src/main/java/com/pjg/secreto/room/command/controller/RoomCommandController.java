@@ -4,18 +4,13 @@ import com.pjg.secreto.common.Util.AuthUtils;
 import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.room.command.dto.*;
 import com.pjg.secreto.room.command.service.RoomCommandService;
-import com.pjg.secreto.user.common.dto.PrincipalUser;
-import com.pjg.secreto.user.common.dto.ProviderUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -169,6 +164,17 @@ public class RoomCommandController {
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "매칭을 완료하였습니다.", null));
 
+    }
+
+    @PutMapping("/standby")
+    public ResponseEntity<?> acceptUser(@RequestBody StandByUserRequestDto standByUserRequestDto) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        List<Long> roomUserNos = roomCommandService.standByUser(standByUserRequestDto);
+
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "유저를 수락하였습니다.", roomUserNos));
     }
 
 }
