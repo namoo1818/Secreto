@@ -250,6 +250,28 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             }
 
+            for(RoomUser ru : roomUsers) {
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content("방이 시작되었습니다.")
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author(ru.getRoom().getRoomName() + " 방이 시작되었습니다.")
+                        .roomUserNo(ru.getId()).build();
+
+                emitterService.alarm(ru.getId(), alarmDataDto, "방이 시작되었습니다.", "start");
+
+                Alarm alarm = Alarm.builder()
+                        .author(alarmDataDto.getAuthor())
+                        .content(alarmDataDto.getContent())
+                        .readYn(alarmDataDto.getReadYn())
+                        .generatedAt(alarmDataDto.getGeneratedAt())
+                        .roomUser(ru).build();
+
+                alarmRepository.save(alarm);
+            }
+
 
             // 방 정보 수정
             room.startRoom(LocalDateTime.now(), roomEndDateTime,
@@ -369,6 +391,26 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             for(RoomUser ru : findRoomUsers) {
                 ru.accepted();
                 roomUserNos.add(ru.getId());
+
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content("방 입장이 수락되었습니다.")
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author(ru.getRoom().getRoomName() + " 방")
+                        .roomUserNo(ru.getId()).build();
+
+                emitterService.alarm(ru.getId(), alarmDataDto, "방 입장이 수락되었습니다.", "accept");
+
+                Alarm alarm = Alarm.builder()
+                        .author(alarmDataDto.getAuthor())
+                        .content(alarmDataDto.getContent())
+                        .readYn(alarmDataDto.getReadYn())
+                        .generatedAt(alarmDataDto.getGeneratedAt())
+                        .roomUser(ru).build();
+
+                alarmRepository.save(alarm);
             }
 
 
