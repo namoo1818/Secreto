@@ -354,7 +354,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 throw new RoomException("방 시작 여부가 null입니다. 데이터를 고쳐주세요.");
             }
 
-            if(findRoom.getRoomStartYn()) {
+            // 방이 시작한 상태이고 종료되지 않은 상태일 경우에만 마니또 마니띠 관계 변경
+            if(findRoom.getRoomStartYn() && findRoom.getRoomEndAt().isAfter(LocalDateTime.now())) {
 
                 // 나간 유저의 마니또와 마니띠 매칭
                 RoomUser usersManito = roomUserQueryRepository.findById(findRoomUser.getUsersManito())
