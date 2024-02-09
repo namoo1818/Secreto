@@ -94,6 +94,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             // 방 생성
             Room room = Room.builder().roomName(createRoomRequestDto.getRoomName())
+                    .roomStartYn(false)
                     .entryCode(newToken)
                     .roomEndAt(LocalDateTime.now().plusWeeks(1)).build();
             roomCommandRepository.save(room);
@@ -351,7 +352,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             log.info("방 유저 정보 변경 완료");
 
             if(findRoom.getRoomStartYn() == null) {
-                throw new RoomException("방 시작 여부가 null입니다. 데이터를 고쳐주세요.");
+//                throw new RoomException("방 시작 여부가 null입니다. 데이터를 고쳐주세요.");
+
             }
 
             // 방이 시작한 상태이고 종료되지 않은 상태일 경우에만 마니또 마니띠 관계 변경
