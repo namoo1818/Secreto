@@ -223,7 +223,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             log.info("keys = " + Arrays.toString(keys));
 
             // 매칭 정보 저장
-
             for(int i=0; i<keys.length; i++) {
 
                 RoomUser findRoomUser = roomUserQueryRepository.findById(roomUsers.get(keys[i]).getId())
@@ -350,11 +349,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             log.info("방 유저 정보 변경 완료");
 
-            if(findRoom.getRoomStartYn() == null) {
-//                throw new RoomException("방 시작 여부가 null입니다. 데이터를 고쳐주세요.");
-
-            }
-
             // 방이 시작한 상태이고 종료되지 않은 상태일 경우에만 마니또 마니띠 관계 변경
             if(findRoom.getRoomStartYn() && findRoom.getRoomEndAt().isAfter(LocalDateTime.now())) {
 
@@ -391,6 +385,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             }
 
         } catch (Exception e) {
+
             throw new RoomException(e.getMessage());
         }
     }
