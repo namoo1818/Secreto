@@ -91,14 +91,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "돌발 미션이 생성되었습니다.", "message");
 
-                Alarm alarm = Alarm.builder()
-                        .author(alarmDataDto.getAuthor())
-                        .content(alarmDataDto.getContent())
-                        .readYn(alarmDataDto.getReadYn())
-                        .generatedAt(alarmDataDto.getGeneratedAt())
-                        .roomUser(ru).build();
-
-                alarmRepository.save(alarm);
             }
 
         } catch (Exception e) {
@@ -255,14 +247,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "message");
 
-                Alarm alarm = Alarm.builder()
-                        .author(alarmDataDto.getAuthor())
-                        .content(alarmDataDto.getContent())
-                        .readYn(alarmDataDto.getReadYn())
-                        .generatedAt(alarmDataDto.getGeneratedAt())
-                        .roomUser(ru).build();
-
-                alarmRepository.save(alarm);
             }
 
         }

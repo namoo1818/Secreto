@@ -148,8 +148,10 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             // 수락된 유저들 조회
             List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomIdWhereNotStandby(setRoomRequestDto.getRoomNo());
 
+            log.info("수락된 유저들 조회");
             // 방장이 참여를 하지 않는 경우
-            if(!roomUsers.get(0).getRoom().getHostParticipantYn()) {
+            if(!setRoomRequestDto.getHostParticipantYn()) {
+
                 Long hostNo = roomUsers.get(0).getRoom().getHostNo();
 
                 for(RoomUser ru : roomUsers) {
@@ -272,15 +274,9 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "방이 시작되었습니다.", "start");
 
-                Alarm alarm = Alarm.builder()
-                        .author(alarmDataDto.getAuthor())
-                        .content(alarmDataDto.getContent())
-                        .readYn(alarmDataDto.getReadYn())
-                        .generatedAt(alarmDataDto.getGeneratedAt())
-                        .roomUser(ru).build();
-
-                alarmRepository.save(alarm);
             }
+
+            log.info("알림 날리기 완료");
 
             // 방 정보 수정
             room.startRoom(LocalDateTime.now(),
@@ -290,6 +286,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                     missionSubmitTime,
                     missionStartDate,
                     true);
+
 
             SetRoomResponseDto result = SetRoomResponseDto.builder().roomNo(setRoomRequestDto.getRoomNo()).build();
 
@@ -430,14 +427,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "방 입장이 수락되었습니다.", "accept");
 
-                Alarm alarm = Alarm.builder()
-                        .author(alarmDataDto.getAuthor())
-                        .content(alarmDataDto.getContent())
-                        .readYn(alarmDataDto.getReadYn())
-                        .generatedAt(alarmDataDto.getGeneratedAt())
-                        .roomUser(ru).build();
-
-                alarmRepository.save(alarm);
             }
 
 
@@ -719,14 +708,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "방 입장 상태가 대기중으로 변경 되었습니다.", "standBy");
 
-                Alarm alarm = Alarm.builder()
-                        .author(alarmDataDto.getAuthor())
-                        .content(alarmDataDto.getContent())
-                        .readYn(alarmDataDto.getReadYn())
-                        .generatedAt(alarmDataDto.getGeneratedAt())
-                        .roomUser(ru).build();
-
-                alarmRepository.save(alarm);
             }
 
             return roomUserNos;
