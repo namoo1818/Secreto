@@ -135,8 +135,7 @@ public class MissionQueryServiceImpl implements MissionQueryService {
             RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(searchMemoRequestDto.getUserNo(),
                     searchMemoRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("유저가 해당 방에 속해있지 않습니다."));
 
-            UserMemo findUserMemo = userMemoQueryRepository.findById(searchMemoRequestDto.getUserMemoNo())
-                    .orElseThrow(() -> new MissionException("작성된 메모가 존재하지 않습니다."));
+            UserMemo findUserMemo = userMemoQueryRepository.findByRoomUserNoAndMemoTo(findRoomUser.getId(), searchMemoRequestDto.getMemoTo());
 
             SearchMemoResponseDto result = SearchMemoResponseDto.builder()
                     .memo(findUserMemo.getMemo())

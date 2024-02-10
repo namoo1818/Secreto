@@ -69,15 +69,18 @@ public class MissionQueryController {
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "유저 별 미션 리스트를 조회하였습니다.", result));
     }
 
-    @GetMapping("/memo_user/{userMemoNo}")
-    public ResponseEntity<?> searchMemo(@PathVariable Long userMemoNo, @RequestBody SearchMemoRequestDto searchMemoRequestDto) {
+    @GetMapping("/memo_user/{roomNo}")
+    public ResponseEntity<?> searchMemo(@PathVariable Long roomNo, @RequestParam Long memoTo) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         Long userNo = AuthUtils.getAuthenticatedUserId();
-        searchMemoRequestDto.setUserNo(userNo);
-        searchMemoRequestDto.setUserMemoNo(userMemoNo);
+        SearchMemoRequestDto searchMemoRequestDto = SearchMemoRequestDto.builder()
+                .userNo(userNo)
+                .roomNo(roomNo)
+                .memoTo(memoTo).build();
+
         SearchMemoResponseDto result = missionQueryService.searchMemo(searchMemoRequestDto);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "메모를 조회하였습니다.", result));
