@@ -148,6 +148,17 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             // 수락된 유저들 조회
             List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomIdWhereNotStandby(setRoomRequestDto.getRoomNo());
 
+            // 방장이 참여를 하지 않는 경우
+            if(!roomUsers.get(0).getRoom().getHostParticipantYn()) {
+                Long hostNo = roomUsers.get(0).getRoom().getHostNo();
+
+                for(RoomUser ru : roomUsers) {
+                    if(Objects.equals(ru.getId(), hostNo)) {
+                        roomUsers.remove(ru);
+                    }
+                }
+            }
+
             if(roomUsers.size() < 3) {
                 throw new RoomException("참여 유저가 3명 이상일 때부터 시작할 수 있습니다.");
             }
@@ -271,11 +282,14 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 alarmRepository.save(alarm);
             }
 
-
             // 방 정보 수정
-            room.startRoom(LocalDateTime.now(), roomEndDateTime,
-                    setRoomRequestDto.getHostParticipantYn(), setRoomRequestDto.getCommonYn(),
-                    missionSubmitTime, missionStartDate, true);
+            room.startRoom(LocalDateTime.now(),
+                    roomEndDateTime,
+                    setRoomRequestDto.getHostParticipantYn(),
+                    setRoomRequestDto.getCommonYn(),
+                    missionSubmitTime,
+                    missionStartDate,
+                    true);
 
             SetRoomResponseDto result = SetRoomResponseDto.builder().roomNo(setRoomRequestDto.getRoomNo()).build();
 
