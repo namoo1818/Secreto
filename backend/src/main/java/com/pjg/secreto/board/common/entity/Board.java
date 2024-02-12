@@ -25,13 +25,13 @@ public class Board {
     @JoinColumn(name = "room_user_no")
     private RoomUser roomUser;
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Liked> likeds = new ArrayList<>();
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Reply> replies = new ArrayList<>();
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<BoardEntryLog> boardEntryLogs = new ArrayList<>();
 
     private String title;
@@ -73,13 +73,12 @@ public class Board {
         this.missionCategory = missionCategory;
     }
 
-    public void updateBoard(Long id, String title, String content, String imgUrl, Boolean publicYn, UserMission userMission){
+    public void updateBoard(Long id, String title, String content, String imgUrl, Boolean publicYn){
         this.id = id;
         this.title = title;
         this.content = content;
         this.imgUrl = imgUrl;
         this.publicYn = publicYn;
-        this.userMission = userMission;
     }
     public void updateLikedCount(Long likedCount){
         this.likedCount = likedCount;

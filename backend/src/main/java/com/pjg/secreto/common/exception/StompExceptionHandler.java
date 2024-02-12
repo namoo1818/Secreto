@@ -1,10 +1,21 @@
-package com.pjg.secreto.common.exception;
-
-import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
-
-@Component
-public class StompExceptionHandler extends StompSubProtocolErrorHandler {
+//package com.pjg.secreto.common.exception;
+//
+//import com.pjg.secreto.user.common.exception.UserException;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.messaging.Message;
+//import org.springframework.messaging.MessageDeliveryException;
+//import org.springframework.messaging.simp.stomp.StompCommand;
+//import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+//import org.springframework.messaging.support.MessageBuilder;
+//import org.springframework.messaging.support.MessageHeaderAccessor;
+//import org.springframework.stereotype.Component;
+//import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
+//
+//import java.nio.charset.StandardCharsets;
+//import java.util.Objects;
+//
+//@Component
+//public class StompExceptionHandler extends StompSubProtocolErrorHandler {
 //    private static final byte[] EMPTY_PAYLOAD = new byte[0];
 //    public StompExceptionHandler() {
 //        super();
@@ -16,7 +27,7 @@ public class StompExceptionHandler extends StompSubProtocolErrorHandler {
 //
 //        final Throwable exception = converterTrowException(ex);
 //
-//        if (exception instanceof UnauthorizedException) {
+//        if (exception instanceof UserException) {
 //            return handleUnauthorizedException(clientMessage, exception);
 //        }
 //
@@ -80,4 +91,4 @@ public class StompExceptionHandler extends StompSubProtocolErrorHandler {
 //
 ////        return super.handleInternal(errorHeaderAccessor, errorPayload, cause, clientHeaderAccessor);
 //    }
-}
+//}
