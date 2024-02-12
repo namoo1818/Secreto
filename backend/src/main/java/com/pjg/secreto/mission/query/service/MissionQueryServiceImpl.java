@@ -81,7 +81,7 @@ public class MissionQueryServiceImpl implements MissionQueryService {
 
         try {
 
-            List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNO(roomNo);
+            List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNo(roomNo);
 
             List<SearchMissionListResponseDto> result = roomMissions.stream()
                     .map(rm -> new SearchMissionListResponseDto(

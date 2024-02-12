@@ -149,17 +149,34 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomIdWhereNotStandby(setRoomRequestDto.getRoomNo());
 
             log.info("수락된 유저들 조회");
+            for(RoomUser ru : roomUsers) {
+                log.info("유저 식별키 : " + ru.getId());
+            }
             // 방장이 참여를 하지 않는 경우
             if(!setRoomRequestDto.getHostParticipantYn()) {
 
                 Long hostNo = roomUsers.get(0).getRoom().getHostNo();
+                log.info("방장 식별키 : " + hostNo);
+
+//                for(int i=0; i< roomUsers.size(); i++) {
+//                    log.info("유저 식별키 : " + roomUsers.get(i).getId());
+//                    if(Objects.equals(roomUsers.get(i).getId(), hostNo)) {
+//                        log.info("유저 제거 : " + roomUsers.get(i).getId());
+//                        roomUsers.remove(roomUsers.get(i));
+//                    }
+//                }
 
                 for(RoomUser ru : roomUsers) {
+                    log.info("유저 식별키 : " + ru.getId());
                     if(Objects.equals(ru.getId(), hostNo)) {
+                        log.info("유저 제거 : " + ru.getId());
                         roomUsers.remove(ru);
+                        break;
                     }
                 }
             }
+
+            log.info("방장 제외 로직");
 
             if(roomUsers.size() < 3) {
                 throw new RoomException("참여 유저가 3명 이상일 때부터 시작할 수 있습니다.");
