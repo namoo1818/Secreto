@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface MatchingQueryRepository extends JpaRepository<Matching, Long> {
     Optional<Matching> findByRoomUser(RoomUser roomUser);
+
 }

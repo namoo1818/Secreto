@@ -71,4 +71,14 @@ public class BoardQueryController {
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "댓글 조회 성공", result));
     }
+    
+    // 자기 미션글 조회
+    @GetMapping(value = "mission/{userMissionNo}/room/{roomNo}")
+    public ResponseEntity<?> readMissionPost(@PathVariable("userMissionNo") Long userMissionNo, @PathVariable("roomNo")Long roomNo){
+        Long userNo = AuthUtils.getAuthenticatedUserId();
+
+        Long result = boardQueryService.getMissionPostNo(userMissionNo, roomNo, userNo);
+
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "인증글 조회 성공", result));
+    }
 }
