@@ -13,12 +13,12 @@ public class PredictBoardDto {
 
     @JsonProperty("maniti")
     private PlayerDto maniti;
-    private boolean predict_result;
+    private boolean predictResult;
 
     @QueryProjection
-    public PredictBoardDto(PlayerDto manito, PlayerDto maniti, boolean predict_result) {
+    public PredictBoardDto(PlayerDto manito, PlayerDto maniti, boolean predictResult) {
         this.manito = manito;
         this.maniti = maniti;
-        this.predict_result = predict_result;
+        this.predictResult = predictResult;
     }
 }

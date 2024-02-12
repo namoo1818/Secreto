@@ -19,12 +19,15 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Repository
@@ -32,91 +35,62 @@ import java.util.List;
 @Slf4j
 public class ManitoExpectRepository {
     private final JPAQueryFactory query;
+    private final ManitoExpectJdbcRepository manitoExpectJdbcRepository;
+
 
     public List<PredictBoardDto> getMatchingResult(Long roomId) {
-        QManitoExpectLog manitoExpectLog = QManitoExpectLog.manitoExpectLog;
-        QMatching matching = QMatching.matching;
-        QMatching subMatching = new QMatching("subMatching");
-        QManitoExpectLog subManitoExpectedLog = new QManitoExpectLog("subManitoExpectedLog");
+        List<ManitoExpectedBoard> manitoExpectedBoards = manitoExpectJdbcRepository.find(roomId);
+        Map<Long, Integer> indexer = new HashMap<>();
 
-        QRoomUser maniti = matching.roomUser;
-        QRoomUser manito = new QRoomUser("manito");
-        QUser manitiUser = new QUser("manitiUser");
-        QUser manitoUser = new QUser("manitoUser");
+        int userCount = manitoExpectedBoards.size();
+        for (int i = 0; i < userCount; ++i) {
+            ManitoExpectedBoard b = manitoExpectedBoards.get(i);
+            indexer.put(b.getRoomUserNo(), i);
+        }
 
-        JPQLQuery<Long> expectedbymanito = JPAExpressions.select(subManitoExpectedLog.expectedUser)
-                .from(subManitoExpectedLog)
-                .where(subManitoExpectedLog.roomUser.id.eq(matching.manitoNo))
-                .where(subManitoExpectedLog.id.eq(JPAExpressions.select(subManitoExpectedLog.id.max())
-                        .from(subManitoExpectedLog)
-                        .where(subManitoExpectedLog.roomUser.id.eq(matching.manitoNo)))
-                )
-                .where(subManitoExpectedLog.expectedAt.before(matching.roomUser.room.roomEndAt))
-                .groupBy(subManitoExpectedLog.roomUser)
-                .orderBy(subManitoExpectedLog.expectedAt.desc());
+        List<Long> roomUsers = manitoExpectedBoards.stream()
+                .map(r -> r.getManitoRoomUserNo())
+                .collect(Collectors.toList());
 
-        List<PredictBoardDto> result = query
-                .select(
-                        new QPredictBoardDto(
-                                new QPlayerDto(maniti),
-                                new QPlayerDto(manito),
-                                new CaseBuilder().when(expectedbymanito.eq(matching.roomUser.id)).then(true).otherwise(false)
-                        )
-                )
-                .distinct()
-                .from(matching)
-                .leftJoin(manitoExpectLog).on(matching.roomUser.eq(manitoExpectLog.roomUser))
-                .join(maniti.user, manitiUser).fetchJoin()
-                .join(manito).on(matching.manitoNo.eq(manito.id))
-                .join(manito.user, manitoUser).fetchJoin()
-                .where(manitoExpectLog.roomUser.room.id.eq(roomId),
-                        manitoExpectLog.expectedAt.in(
-                                JPAExpressions.select(manitoExpectLog.expectedAt.max())
-                                        .from(manitoExpectLog)
-                                        .where(manitoExpectLog.roomUser.room.id.eq(roomId))
-                                        .groupBy(manitoExpectLog.roomUser)
-                                        .orderBy(manitoExpectLog.expectedAt.desc())
-                        ),
-                        matching.deprecatedAt.isNull()
-                )
-                .where(manitoExpectLog.expectedAt.before(matching.roomUser.room.roomEndAt))
+        QRoomUser roomUser = new QRoomUser("roomUser");
+        QUser user = new QUser("user");
+
+        List<RoomUser> players = query.select(roomUser)
+                .from(roomUser)
+                .join(roomUser.user, user).fetchJoin()
+                .where(roomUser.id.in(roomUsers))
                 .fetch();
+
+        Map<Long, RoomUser> playerMap = players.stream()
+                .collect(Collectors.toMap(RoomUser::getId, Function.identity()));
+
+        List<PredictBoardDto> result = new ArrayList<>();
+
+        List<ManitoExpectedBoard> reassembled = new ArrayList<>(userCount);
+        Long curr = manitoExpectedBoards.get(0).getRoomUserNo();
+        for (int i = 0; i < userCount; ++i) {
+            reassembled.add(
+                    manitoExpectedBoards.get(indexer.get(curr))
+            );
+            curr = manitoExpectedBoards.get(indexer.get(curr)).getManitoRoomUserNo();
+        }
+
+        for (ManitoExpectedBoard manito: reassembled){
+            PlayerDto giver = new PlayerDto(playerMap.get(manito.getRoomUserNo()));
+            PlayerDto given = new PlayerDto(playerMap.get(manito.getManitoRoomUserNo()));
+            boolean predictCorrect = manito.isPredictCorrect();
+
+            PredictBoardDto predictBoardDto = new PredictBoardDto(giver, given, predictCorrect);
+            result.add(predictBoardDto);
+        }
 
         return result;
     }
 
     public SummaryResultData getFastestCorrectManito(Long roomId) {
-        QManitoExpectLog manitoExpectLog = QManitoExpectLog.manitoExpectLog;
-        QMatching matching = QMatching.matching;
 
-        QRoomUser manito = new QRoomUser("manito");
-        QUser manitoUser = new QUser("manitoUser");
 
-        SummaryResultData result = query.select(
-                        new QSummaryResultData(
-                                matching.roomUser.nickname,
-                                manitoExpectLog.expectedAt,
-                                matching.roomUser.user.profileUrl
-                        ))
-                .from(matching)
-                .join(manitoExpectLog).on(matching.roomUser.eq(manitoExpectLog.roomUser))
-                .join(manito).on(matching.manitoNo.eq(manito.id))
-                .join(manito.user, manitoUser)
-                .where(manitoExpectLog.roomUser.room.id.eq(roomId),
-                        manitoExpectLog.expectedAt.in(
-                                JPAExpressions.select(manitoExpectLog.expectedAt.max())
-                                        .from(manitoExpectLog)
-                                        .groupBy(manitoExpectLog.roomUser)
-                                        .orderBy(manitoExpectLog.expectedAt.desc())
-                        ),
-                        matching.deprecatedAt.isNull(),
-                        matching.manitiNo.eq(manitoExpectLog.expectedUser)
-                )
-                .where(manitoExpectLog.expectedAt.before(matching.roomUser.room.roomEndAt))
-                .orderBy(manitoExpectLog.expectedAt.asc())
-                .fetchFirst();
-
-        return result;
+        return null;
     }
 
 
