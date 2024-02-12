@@ -44,19 +44,6 @@ public class MissionCommandController {
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "돌발 미션을 삭제하였습니다.", null));
     }
 
-    @PostMapping("/predict")
-    public ResponseEntity<?> predictManito(@RequestBody PredictManitoRequestDto predictManitoRequestDto) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-
-        Long userNo = AuthUtils.getAuthenticatedUserId();
-        predictManitoRequestDto.setUserNo(userNo);
-        missionCommandService.predictManito(predictManitoRequestDto);
-
-        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "마니또 추리가 완료되었습니다.", null));
-    }
-
     @PostMapping("/memo_user")
     public ResponseEntity<?> memoUser(@RequestBody MemoUserRequestDto memoUserRequestDto) {
 
@@ -69,20 +56,6 @@ public class MissionCommandController {
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "메모가 작성되었습니다.", result));
     }
-
-    @PutMapping("/memo_user")
-    public ResponseEntity<?> updateMemo(@RequestBody UpdateMemoRequestDto updateMemoRequestDto) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-
-        Long userNo = AuthUtils.getAuthenticatedUserId();
-        updateMemoRequestDto.setUserNo(userNo);
-        UpdateMemoResponseDto result = missionCommandService.updateMemo(updateMemoRequestDto);
-
-        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "메모가 수정되었습니다.", result));
-    }
-
 
 }
 

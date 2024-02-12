@@ -111,6 +111,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
                         .participantCnt(findRoomUserCnt)
                         .bookmarkYn(ru.getBookmarkYn())
                         .roomStatus(roomStatus)
+                        .roomStartYn(ru.getRoom().getRoomStartYn())
                         .hostUserNo(findRoomUser.getUser().getId()).build());
             }
 

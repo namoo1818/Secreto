@@ -7,10 +7,7 @@ public interface MissionCommandService {
 
     void deleteSuddenMission(DeleteSuddenMissionRequestDto deleteSuddenMissionRequestDto);
 
-    void predictManito(PredictManitoRequestDto predictManitoRequestDto);
-
     MemoUserResponseDto memoUser(MemoUserRequestDto memoUserRequestDto);
 
-    UpdateMemoResponseDto updateMemo(UpdateMemoRequestDto updateMemoRequestDto);
 }
 

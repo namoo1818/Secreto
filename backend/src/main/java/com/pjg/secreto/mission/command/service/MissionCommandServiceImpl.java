@@ -91,14 +91,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "돌발 미션이 생성되었습니다.", "message");
 
-                Alarm alarm = Alarm.builder()
-                        .author(alarmDataDto.getAuthor())
-                        .content(alarmDataDto.getContent())
-                        .readYn(alarmDataDto.getReadYn())
-                        .generatedAt(alarmDataDto.getGeneratedAt())
-                        .roomUser(ru).build();
-
-                alarmRepository.save(alarm);
             }
 
         } catch (Exception e) {
@@ -124,74 +116,46 @@ public class MissionCommandServiceImpl implements MissionCommandService {
     }
 
     @Override
-    public void predictManito(PredictManitoRequestDto predictManitoRequestDto) {
-
-        try {
-
-            Long userNo = predictManitoRequestDto.getUserNo();
-
-            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, predictManitoRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
-            UserMemo userMemo = userMemoQueryRepository.findByMemoTo(predictManitoRequestDto.getExpectedManito())
-                    .orElseGet(() -> {
-                        return UserMemo.builder()
-                                .memoTo(predictManitoRequestDto.getExpectedManito())
-                                .memo("사유 없음")
-                                .build();
-            });
-
-            ManitoExpectLog manitoExpectLog = ManitoExpectLog.builder()
-                    .roomUser(findRoomUser)
-                    .expectedUser(predictManitoRequestDto.getExpectedManito())
-                    .expectedReason(userMemo.getMemo())
-                    .expectedAt(LocalDateTime.now()).build();
-
-            manitoExpectLogCommandRepository.save(manitoExpectLog);
-
-        } catch (Exception e) {
-
-            throw new MissionException(e.getMessage());
-        }
-    }
-
-    @Override
     public MemoUserResponseDto memoUser(MemoUserRequestDto memoUserRequestDto) {
 
         try {
 
-            Long userNo = memoUserRequestDto.getUserNo();
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(memoUserRequestDto.getUserNo(),
+                    memoUserRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
 
-            RoomUser roomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, memoUserRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
+            UserMemo findUserMemo = userMemoQueryRepository.findByRoomUserNoAndMemoTo(findRoomUser.getId(), memoUserRequestDto.getMemoTo());
 
-            UserMemo userMemo = UserMemo.builder()
-                    .roomUser(roomUser).memo(memoUserRequestDto.getMemo())
-                    .manitoPredictType(memoUserRequestDto.getManitoPredictType())
-                    .memoTo(memoUserRequestDto.getMemoTo()).build();
+            MemoUserResponseDto result;
 
-            userMemoCommandRepository.save(userMemo);
+            if(findUserMemo == null) {
 
-            MemoUserResponseDto result = MemoUserResponseDto.builder().userMemoNo(userMemo.getId()).build();
+                log.info("메모가 없으므로 새로 생성");
+                UserMemo userMemo = UserMemo.builder()
+                        .roomUser(findRoomUser)
+                        .memo(memoUserRequestDto.getMemo())
+                        .manitoPredictType(memoUserRequestDto.getManitoPredictType())
+                        .memoTo(memoUserRequestDto.getMemoTo()).build();
 
-            return result;
+                userMemoCommandRepository.save(userMemo);
 
-        } catch (Exception e) {
+                result = MemoUserResponseDto.builder().userMemoNo(userMemo.getId()).build();
+            }
 
-            throw new MissionException(e.getMessage());
-        }
-    }
+            else {
 
-    @Override
-    public UpdateMemoResponseDto updateMemo(UpdateMemoRequestDto updateMemoRequestDto) {
+                log.info("기존의 메모 수정");
+                findUserMemo.updateMemo(memoUserRequestDto.getMemo(), memoUserRequestDto.getManitoPredictType());
 
-        try {
+                result = MemoUserResponseDto.builder().userMemoNo(findUserMemo.getId()).build();
+            }
 
-            Long userNo = updateMemoRequestDto.getUserNo();
+            ManitoExpectLog manitoExpectLog = ManitoExpectLog.builder()
+                    .roomUser(findRoomUser)
+                    .expectedUser(memoUserRequestDto.getMemoTo())
+                    .expectedReason(memoUserRequestDto.getMemo())
+                    .expectedAt(LocalDateTime.now()).build();
 
-            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, updateMemoRequestDto.getRoomNo()).orElseThrow(() -> new MissionException("해당 방 유저가 없습니다."));
-
-            UserMemo findUserMemo = userMemoQueryRepository.findByRoomUserNo(findRoomUser.getId());
-
-            UpdateMemoResponseDto result = UpdateMemoResponseDto.builder()
-                    .userMemoNo(findUserMemo.getId()).build();
+            manitoExpectLogCommandRepository.save(manitoExpectLog);
 
             return result;
 
@@ -283,14 +247,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "message");
 
-                Alarm alarm = Alarm.builder()
-                        .author(alarmDataDto.getAuthor())
-                        .content(alarmDataDto.getContent())
-                        .readYn(alarmDataDto.getReadYn())
-                        .generatedAt(alarmDataDto.getGeneratedAt())
-                        .roomUser(ru).build();
-
-                alarmRepository.save(alarm);
             }
 
         }
