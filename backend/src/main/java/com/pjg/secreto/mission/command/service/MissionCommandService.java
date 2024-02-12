@@ -9,5 +9,6 @@ public interface MissionCommandService {
 
     MemoUserResponseDto memoUser(MemoUserRequestDto memoUserRequestDto);
 
+    void rerollMission(RerollMissionRequestDto rerollMissionRequestDto);
 }
 

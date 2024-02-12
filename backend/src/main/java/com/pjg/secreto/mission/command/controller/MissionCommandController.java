@@ -57,5 +57,18 @@ public class MissionCommandController {
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "메모가 작성되었습니다.", result));
     }
 
+    @PutMapping("/reroll")
+    public ResponseEntity<?> rerollMission(@RequestBody RerollMissionRequestDto rerollMissionRequestDto) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        Long userNo = AuthUtils.getAuthenticatedUserId();
+        rerollMissionRequestDto.setUserNo(userNo);
+        missionCommandService.rerollMission(rerollMissionRequestDto);
+
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "미션 수정이 완료되었습니다.", null));
+    }
+
 }
 

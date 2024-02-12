@@ -8,6 +8,7 @@ import com.pjg.secreto.alarm.service.EmitterService;
 import com.pjg.secreto.history.command.repository.ManitoExpectLogCommandRepository;
 import com.pjg.secreto.history.command.repository.UserMemoCommandRepository;
 import com.pjg.secreto.history.common.entity.ManitoExpectLog;
+import com.pjg.secreto.history.common.entity.ManitoPredictType;
 import com.pjg.secreto.history.common.entity.UserMemo;
 import com.pjg.secreto.history.query.repository.UserMemoQueryRepository;
 import com.pjg.secreto.mission.command.dto.*;
@@ -18,8 +19,10 @@ import com.pjg.secreto.mission.common.entity.*;
 import com.pjg.secreto.mission.common.exception.MissionException;
 import com.pjg.secreto.mission.query.repository.RoomMissionQueryRepository;
 import com.pjg.secreto.mission.query.repository.SuddenMissionQueryRepository;
+import com.pjg.secreto.mission.query.repository.UserMissionQueryRepository;
 import com.pjg.secreto.room.common.entity.Room;
 import com.pjg.secreto.room.common.entity.RoomUser;
+import com.pjg.secreto.room.common.exception.RoomException;
 import com.pjg.secreto.room.query.repository.RoomQueryRepository;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -50,7 +50,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
     private final RoomMissionQueryRepository roomMissionQueryRepository;
     private final UserMissionCommandRepository userMissionCommandRepository;
     private final EmitterService emitterService;
-    private final AlarmRepository alarmRepository;
+    private final UserMissionQueryRepository userMissionQueryRepository;
 
     @Override
     public void addSuddenMission(AddSuddenMissionRequestDto addSuddenMissionRequestDto) {
@@ -149,18 +149,71 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                 result = MemoUserResponseDto.builder().userMemoNo(findUserMemo.getId()).build();
             }
 
-            ManitoExpectLog manitoExpectLog = ManitoExpectLog.builder()
-                    .roomUser(findRoomUser)
-                    .expectedUser(memoUserRequestDto.getMemoTo())
-                    .expectedReason(memoUserRequestDto.getMemo())
-                    .expectedAt(LocalDateTime.now()).build();
+            if(memoUserRequestDto.getManitoPredictType().equals(ManitoPredictType.YES)) {
 
-            manitoExpectLogCommandRepository.save(manitoExpectLog);
+                ManitoExpectLog manitoExpectLog = ManitoExpectLog.builder()
+                        .roomUser(findRoomUser)
+                        .expectedUser(memoUserRequestDto.getMemoTo())
+                        .expectedReason(memoUserRequestDto.getMemo())
+                        .expectedAt(LocalDateTime.now()).build();
+
+                manitoExpectLogCommandRepository.save(manitoExpectLog);
+            }
 
             return result;
 
         } catch (Exception e) {
 
+            throw new MissionException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void rerollMission(RerollMissionRequestDto rerollMissionRequestDto) {
+
+        try {
+
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(rerollMissionRequestDto.getUserNo(),
+                    rerollMissionRequestDto.getRoomNo()).orElseThrow(() -> new RoomException("해당 유저는 방에 속해있지 않습니다."));
+
+            UserMission findUserMission = userMissionQueryRepository.findById(rerollMissionRequestDto.getUserMissionNo())
+                    .orElseThrow(() -> new MissionException("해당 미션은 존재하지 않습니다."));
+
+            UserMission latestMission = userMissionQueryRepository.findWhereLatestByRoomUserNo(findRoomUser.getId());
+
+            if(!Objects.equals(findUserMission.getId(), latestMission.getId())) {
+                throw new MissionException("가장 최근에 받은 미션만 리롤할 수 있습니다.");
+            }
+
+            List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNo(rerollMissionRequestDto.getRoomNo());
+            log.info("미션 리스트 찾기");
+
+            // 공통 미션이면 리롤 막기
+            if(findRoomUser.getRoom().getCommonYn()) {
+                throw new MissionException("해당 미션은 공통 미션이므로 리롤이 불가능합니다.");
+            }
+
+            else {
+
+                Collections.shuffle(roomMissions);
+                log.info("셔플 완료");
+
+                for(RoomMission rm : roomMissions) {
+                    System.out.println(rm.getContent());
+                }
+
+                RoomMission newRoomMission = roomMissions.get(0);
+                log.info("미션 가져오기");
+
+                // 유저 미션 수정
+                findUserMission.rerollUserMission(newRoomMission.getContent(), findUserMission.getMissionRerollCount());
+
+                log.info("유저 미션 수정 완료");
+            }
+
+
+
+        } catch (Exception e) {
             throw new MissionException(e.getMessage());
         }
     }
@@ -205,7 +258,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
         log.info("룸 미션 가지고 있는 룸 조회 완료");
         for(Room r : hasMissionRooms) {
 
-            List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNO(r.getId());
+            List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNo(r.getId());
             log.info("방의 미션들 조회 완료");
 
             List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(r.getId());

@@ -1,5 +1,6 @@
 package com.pjg.secreto.mission.common.entity;
 
+import com.pjg.secreto.mission.common.exception.MissionException;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -55,6 +56,16 @@ public class UserMission {
 
     public void updateUserMission() {
         this.missionCertifyYn = !this.missionCertifyYn;
+    }
+
+    public void rerollUserMission(String content, int missionRerollCount) {
+
+        if(missionRerollCount == 3) {
+            throw new MissionException("해당 미션은 더 이상 리롤할 수 없습니다.");
+        }
+
+        this.content = content;
+        this.missionRerollCount = missionRerollCount + 1;
     }
 
 }
