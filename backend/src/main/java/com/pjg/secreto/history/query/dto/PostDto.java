@@ -39,6 +39,6 @@ public class PostDto {
         this.hit = board.getHit();
         this.thumbnail = board.getImgUrl();
         this.category = board.getBoardCategory();
-        this.mission = board.getUserMission().getContent();
+        this.mission = board.getUserMission() == null ? null : board.getUserMission().getContent();
     }
 }

@@ -22,7 +22,42 @@ public class ManitoExpectJdbcRepository {
         this.template = new NamedParameterJdbcTemplate(dataSource);
     }
 
-    public List<ManitoExpectedBoard> find(Long roomNo) {
+    public List<ManitoExpectedBoard> findManitoMatchingResult(Long roomNo) {
+        String sql = """
+            
+                SELECT ru.room_no, ru.room_user_no, ru.nickname, ru.users_manito,
+                   (SELECT mel.expected_at
+                    FROM tbl_manito_expect_log mel
+                             JOIN (SELECT room_user_no, MAX(expected_at) AS latest_expected_at
+                                   FROM tbl_manito_expect_log
+                                   GROUP BY room_user_no) sub
+                                  ON mel.room_user_no = sub.room_user_no AND mel.expected_at = sub.latest_expected_at
+                    where mel.room_user_no = ru.users_manito) as expected_at,
+                   (SELECT mel.expected_user
+                    FROM tbl_manito_expect_log mel
+                             JOIN (SELECT room_user_no, MAX(expected_at) AS latest_expected_at
+                                   FROM tbl_manito_expect_log
+                                   GROUP BY room_user_no) sub
+                                  ON mel.room_user_no = sub.room_user_no AND mel.expected_at = sub.latest_expected_at
+                    where mel.room_user_no = ru.users_manito) as expected_user,
+                   ifnull((SELECT mel.expected_user
+                           FROM tbl_manito_expect_log mel
+                                    JOIN (SELECT room_user_no, MAX(expected_at) AS latest_expected_at
+                                          FROM tbl_manito_expect_log
+                                          GROUP BY room_user_no) sub
+                                         ON mel.room_user_no = sub.room_user_no AND mel.expected_at = sub.latest_expected_at
+                           where mel.room_user_no = ru.users_manito) = ru.room_user_no, 0) as predict_correct
+            FROM tbl_room_user ru
+            WHERE ru.room_no = :room_no AND ru.users_manito IS NOT NULL;
+            """;
+
+        SqlParameterSource param = new MapSqlParameterSource()
+                .addValue("room_no", roomNo);
+        log.info("sql={}", sql);
+        return template.query(sql, param, manitoExpectedBoardRowMapper());
+    }
+
+    public List<ManitoExpectedBoard> findManitoPredictResult(Long roomNo) {
         String sql = "SELECT ru.room_no, ru.room_user_no, ru.nickname, ru.users_manito " +
                 "          , sub2.expected_user " +
                 "          , IFNULL((ru.users_manito = sub2.expected_user), FALSE) predict_correct " +
@@ -36,6 +71,7 @@ public class ManitoExpectJdbcRepository {
                 "                     ON mel.room_user_no = sub.room_user_no AND mel.expected_at = sub.latest_expected_at) sub2 " +
                 "        ON ru.room_user_no = sub2.room_user_no " +
                 "     WHERE ru.room_no = :room_no AND ru.users_manito IS NOT NULL";
+
 
         SqlParameterSource param = new MapSqlParameterSource()
                 .addValue("room_no", roomNo);

@@ -1,30 +1,17 @@
 package com.pjg.secreto.history.query.repository;
 
-import com.pjg.secreto.history.common.entity.ManitoExpectLog;
 import com.pjg.secreto.history.common.entity.QManitoExpectLog;
 import com.pjg.secreto.history.common.entity.QMatching;
 import com.pjg.secreto.history.query.dto.*;
-import com.pjg.secreto.room.common.entity.QRoom;
 import com.pjg.secreto.room.common.entity.QRoomUser;
-import com.pjg.secreto.room.common.entity.Room;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.user.common.entity.QUser;
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberTemplate;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -42,7 +29,7 @@ public class ManitoExpectRepository {
 
 
     public List<PredictBoardDto> getMatchingResult(Long roomId) {
-        List<ManitoExpectedBoard> manitoExpectedBoards = manitoExpectJdbcRepository.find(roomId);
+        List<ManitoExpectedBoard> manitoExpectedBoards = manitoExpectJdbcRepository.findManitoMatchingResult(roomId);
         Map<Long, Integer> indexer = new HashMap<>();
 
         int userCount = manitoExpectedBoards.size();
@@ -91,7 +78,7 @@ public class ManitoExpectRepository {
     }
 
     public SummaryResultData getFastestCorrectManito(Long roomId) {
-        List<ManitoExpectedBoard> manitoExpectedBoards = manitoExpectJdbcRepository.find(roomId);
+        List<ManitoExpectedBoard> manitoExpectedBoards = manitoExpectJdbcRepository.findManitoPredictResult(roomId);
         Optional<ManitoExpectedBoard> first = manitoExpectedBoards.stream()
                 .filter(ManitoExpectedBoard::isPredictCorrect)
                 .sorted(Comparator.comparing(ManitoExpectedBoard::getPredictAt))
@@ -112,7 +99,7 @@ public class ManitoExpectRepository {
             );
         }
 
-        return new SummaryResultData("아무도 없습니다.",LocalDateTime.of(0,0,0,0,0,0) , "");
+        return new SummaryResultData("", "선정자는 아무도 없습니다." , "");
     }
 
 
