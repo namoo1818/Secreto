@@ -28,15 +28,22 @@ public class StompHandler implements ChannelInterceptor {
     private final CustomUserDetailService userDetailService;
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+
         if(accessor.getCommand() == StompCommand.CONNECT) {
-            String auth = accessor.getFirstNativeHeader("AccessToken");
+            final String auth = accessor.getFirstNativeHeader("AccessToken");
+
+            System.out.println("##############");
+            System.out.println(auth);
 
             if (auth == null || !auth.startsWith("bearer ")) {
                 throw new UserException("접근권한이 없습니다.");
             }
 
             String accessToken = auth.split(" ")[1];
+
+            System.out.println("##############");
+            System.out.println(accessToken);
 
             if(!jwtService.validateToken(accessToken))
                 throw new UserException("접근권한이 없습니다.");
