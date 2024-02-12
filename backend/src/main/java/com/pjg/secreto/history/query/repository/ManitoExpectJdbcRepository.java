@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -25,8 +26,9 @@ public class ManitoExpectJdbcRepository {
         String sql = "SELECT ru.room_no, ru.room_user_no, ru.nickname, ru.users_manito " +
                 "          , sub2.expected_user " +
                 "          , IFNULL((ru.users_manito = sub2.expected_user), FALSE) predict_correct " +
+                "          , sub2.expected_at"+
                 "      FROM tbl_room_user ru " +
-                "      LEFT JOIN (SELECT mel.room_user_no, mel.expected_user " +
+                "      LEFT JOIN (SELECT mel.room_user_no, mel.expected_user, mel.expected_at " +
                 "                   FROM tbl_manito_expect_log mel " +
                 "                   JOIN (SELECT room_user_no, MAX(expected_at) AS latest_expected_at " +
                 "                           FROM tbl_manito_expect_log " +
@@ -47,6 +49,7 @@ public class ManitoExpectJdbcRepository {
                 .manitoRoomUserNo(rs.getLong("users_manito"))
                 .expectedRoomUserNo(rs.getLong("expected_user"))
                 .predictCorrect(rs.getBoolean("predict_correct"))
+                .predictAt(rs.getObject("expected_at", LocalDateTime.class))
                 .build();
     }
 }

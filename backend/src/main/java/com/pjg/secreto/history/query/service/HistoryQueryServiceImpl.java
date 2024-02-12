@@ -10,12 +10,14 @@ import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HistoryQueryServiceImpl implements HistoryQueryService {
@@ -52,7 +54,10 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
         Long authenticatedUserId = roomUserId;
 //        RoomUser principal = roomUserQueryRepository.findById(authenticatedUserId).orElseThrow();
         RoomUser principal = roomUserQueryRepository.findByUserNoAndRoomNo(authenticatedUserId, roomId).orElseThrow();
-        List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManiti(roomId, authenticatedUserId);
+        List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManiti(roomId, principal.getId());
+
+        log.info("마니또 : " + principal.getNickname() + " " + principal.getId());
+        targets.forEach(s -> log.info("놈 : " + s.getNickname() + " " + s.getId() + "\n"));
 
         List<PostDto> myCerticiationActivity = manitoActivityRepository
                 .getBoardActivity(roomId, targets, BoardCategory.CERTIFICATE);
@@ -60,6 +65,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
                 .getBoardActivity(roomId, List.of(principal), BoardCategory.BOAST);
 
         List<PredictorDto> targetsPredictor = manitoExpectRepository.getPredictResult(roomId, List.of(principal));
+        targetsPredictor.forEach(s -> System.out.println("마니또가 추리한 사람들 : "+ s.getId() + " " + s.getTargetNickName() + " \n"));
 
         List<? super Object> manitos = new ArrayList<>();
         manitos.addAll(targetsBoastActivity);
@@ -83,20 +89,22 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
     public Map<String, Object> getMyManitiActivity(Long roomId, Long roomUserId) {
         Long authenticatedUserId = roomUserId;
         RoomUser principal = roomUserQueryRepository.findByUserNoAndRoomNo(authenticatedUserId, roomId).orElseThrow();
-        List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManito(roomId, authenticatedUserId);
+        List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManito(roomId, principal.getId());
+        log.info("내가 마니띠 일때");
+        log.info("사람: " + principal.getNickname() + " " + principal.getId());
+        targets.forEach(s -> log.info("놈 : " + s.getNickname() + " " + s.getId() + "\n"));
+
 
         List<PostDto> myCerticiationActivity = manitoActivityRepository
                 .getBoardActivity(roomId, List.of(principal), BoardCategory.CERTIFICATE);
         List<PostDto> targetsBoastActivity = manitoActivityRepository
                 .getBoardActivity(roomId, targets, BoardCategory.BOAST);
 
-        System.out.println("타겟" + targetsBoastActivity);
         List<PredictorDto> targetsPredictor = manitoExpectRepository.getPredictResult(roomId, targets);
 
         List<? super Object> manitos = new ArrayList<>();
         manitos.addAll(targetsBoastActivity);
         manitos.addAll(targetsPredictor);
-
 
         List<? super Object> manitis = new ArrayList<>();
         manitis.addAll(myCerticiationActivity);
@@ -170,9 +178,9 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
             return new SummaryDto(
                     "최고의 맴버는?",
                     new SummaryResultData(
+                            null,
                             "선정된 사람이 없습니다.",
-                            "선정된 사람이 없습니다.",
-                            "선정된 사람이 없습니다."
+                            null
                     )
             );
         }

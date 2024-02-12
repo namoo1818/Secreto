@@ -2,6 +2,8 @@ package com.pjg.secreto.history.query.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @Builder
@@ -17,4 +19,5 @@ public class ManitoExpectedBoard {
     private Long manitoRoomUserNo;
     private Long expectedRoomUserNo;
     private boolean predictCorrect;
+    private LocalDateTime predictAt;
 }
