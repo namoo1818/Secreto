@@ -1,42 +1,24 @@
 package com.pjg.secreto.common.config;
 
-import com.pjg.secreto.common.exception.StompExceptionHandler;
-import com.pjg.secreto.user.common.filter.StompHandler;
+import com.pjg.secreto.common.handler.WebSocketHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.ChannelRegistration;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 @Configuration
-@EnableWebSocketMessageBroker
 @EnableWebSocket
 @RequiredArgsConstructor
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    private final StompHandler stompHandler;
-    private final StompExceptionHandler stompExceptionHandler;
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/sub", "/status");
-        config.setApplicationDestinationPrefixes("/pub");
-    }
+public class WebSocketConfig implements WebSocketConfigurer {
+
+    @Autowired
+    private final WebSocketHandler chatHandler;
 
     @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry
-                .setErrorHandler(stompExceptionHandler)
-                .addEndpoint("/chat")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(chatHandler, "/chat").setAllowedOrigins("*");
     }
 
-    // jwt 인증용
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(stompHandler);
-    }
 }
-

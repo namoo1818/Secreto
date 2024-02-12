@@ -5,7 +5,5 @@ import lombok.Data;
 @Data
 public class ChatRequest {
     private String sender;
-    private String msg;
-
-
+    private String message;
 }

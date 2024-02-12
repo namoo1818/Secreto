@@ -67,7 +67,6 @@ public class BoardCommandServiceImpl implements BoardCommandService {
             String newContent = updateBoardRequestDto.getContent();
             String newImgUrl = updateBoardRequestDto.getImgUrl();
             Boolean newPublicYn = updateBoardRequestDto.getPublicYn();
-            UserMission newUserMission = null;
 
             Board post = boardQueryRepository.findById(boardNo).orElseThrow(() -> new BoardException("해당 게시글이 존재하지 않습니다. id=" + boardNo));
 
@@ -83,25 +82,11 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                     throw new BoardException("공지는 공개 설정만 할 수 있습니다.");
                 }
                 //인증
-            } else if (post.getBoardCategory()== BoardCategory.CERTIFICATE) {
-                if(updateBoardRequestDto.getUserMissionNo()==null){
-                    throw new BoardException("미션을 선택해주세요.");
-                }
-
-                newUserMission = userMissionQueryRepository.findById(updateBoardRequestDto.getUserMissionNo()).orElseThrow(()->new BoardException("해당 미션이 존재하지 않습니다."));
-                if(newUserMission.getMissionCertifyYn()){
-                    throw new BoardException("이미 인증한 미션입니다.");
-                }
-                post.getUserMission().updateUserMission();
-                newUserMission.updateUserMission();
-                //자랑
-            } else {
-                if(!updateBoardRequestDto.getPublicYn()){
+            } else if(!updateBoardRequestDto.getPublicYn()){
                     throw new BoardException("자랑글은 공개 설정만 할 수 있습니다.");
-                }
             }
 
-            post.updateBoard(boardNo, newTitle, newContent, newImgUrl, newPublicYn, newUserMission);
+            post.updateBoard(boardNo, newTitle, newContent, newImgUrl, newPublicYn);
 
             return boardNo;
         }catch (Exception e) {
@@ -121,8 +106,9 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                 throw new BoardException("해당 게시글을 삭제할 권한이 없습니다.");
             }
 
-            if(board.getBoardCategory()==BoardCategory.CERTIFICATE)
+            if(board.getBoardCategory()==BoardCategory.CERTIFICATE) {
                 board.getUserMission().updateUserMission();
+            }
 
             boardCommandRepository.delete(board);
         } catch (Exception e){
