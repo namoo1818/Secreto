@@ -17,10 +17,12 @@ public class SearchPostResponseDto {
     Long hit;
     BoardCategory boardCategory;
     Boolean publicYn;
-    String missionCategory;
     Long likedCount;
     String writer;
     String writerEmail;
     String writerProfileUrl;
+    Boolean likedYn;
+    Long userMissionNo;
+    String userMission;
 
 }

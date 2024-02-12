@@ -9,5 +9,5 @@ import java.util.List;
 public interface RoomMissionQueryRepository extends JpaRepository<RoomMission, Long> {
 
     @Query("select rm from RoomMission rm where rm.room.id = :roomNo")
-    List<RoomMission> findAllByRoomNO(Long roomNo);
+    List<RoomMission> findAllByRoomNo(Long roomNo);
 }
