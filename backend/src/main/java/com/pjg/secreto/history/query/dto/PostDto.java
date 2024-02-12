@@ -39,6 +39,6 @@ public class PostDto {
         this.hit = board.getHit();
         this.thumbnail = board.getImgUrl();
         this.category = board.getBoardCategory();
-        this.mission = board.getMissionCategory();
+        this.mission = board.getUserMission().getContent();
     }
 }

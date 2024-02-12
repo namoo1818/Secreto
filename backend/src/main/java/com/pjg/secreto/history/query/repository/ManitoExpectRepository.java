@@ -29,6 +29,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.pjg.secreto.room.common.entity.QRoomUser.roomUser;
+import static com.pjg.secreto.user.common.entity.QUser.user;
+
 
 @Repository
 @RequiredArgsConstructor
@@ -88,13 +91,33 @@ public class ManitoExpectRepository {
     }
 
     public SummaryResultData getFastestCorrectManito(Long roomId) {
+        List<ManitoExpectedBoard> manitoExpectedBoards = manitoExpectJdbcRepository.find(roomId);
+        Optional<ManitoExpectedBoard> first = manitoExpectedBoards.stream()
+                .filter(ManitoExpectedBoard::isPredictCorrect)
+                .sorted(Comparator.comparing(ManitoExpectedBoard::getPredictAt))
+                .findFirst();
 
+        if(first.isPresent()){
+            ManitoExpectedBoard manitoExpectedBoard = first.orElseThrow();
+            PlayerDto playerDto = query.select(new QPlayerDto(roomUser))
+                    .from(roomUser)
+                    .join(roomUser.user, user).fetchJoin()
+                    .where(roomUser.id.eq(manitoExpectedBoard.getRoomUserNo()))
+                    .fetchOne();
 
-        return null;
+            return new SummaryResultData(
+                    playerDto.getNickname(),
+                    manitoExpectedBoard.getPredictAt(),
+                    playerDto.getProfileUrl()
+            );
+        }
+
+        return new SummaryResultData("아무도 없습니다.",LocalDateTime.of(0,0,0,0,0,0) , "");
     }
 
 
     public List<PredictorDto> getPredictResult(Long roomId, List<RoomUser> users) {
+        log.info("추론하기");
         QManitoExpectLog expectLog = QManitoExpectLog.manitoExpectLog;
         QMatching matching = QMatching.matching;
         QRoomUser targetRoomUser = new QRoomUser("targetRoomUser");
