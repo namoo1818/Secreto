@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Slf4j
@@ -238,6 +240,8 @@ public class MissionCommandServiceImpl implements MissionCommandService {
          * 정기 미션 날리기 로직
          */
         LocalDateTime now = LocalDateTime.now();
+        now = now.truncatedTo(ChronoUnit.HOURS);
+
         log.info("현재 시각 : " + now);
 
         // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
@@ -252,8 +256,10 @@ public class MissionCommandServiceImpl implements MissionCommandService {
             boolean hasMissionToday = false;
             for(MissionSchedule ms : r.getMissionSchedules()) {
 
+                LocalDateTime missionSubmitTime = ms.getMissionSubmitAt().truncatedTo(ChronoUnit.HOURS);
                 log.info("미션 던져지는 날짜 : " + ms.getMissionSubmitAt());
-                if(now.isEqual(ms.getMissionSubmitAt())) {
+                if(now.isEqual(missionSubmitTime)) {
+                    log.info("찾았다!");
                     hasMissionToday = true;
                     break;
                 }
@@ -288,6 +294,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                 RoomMission roomMission = roomMissions.get(0);
                 log.info("생성된 유저 미션 : " + roomMissions.get(0).getContent());
 
+
                 UserMission userMission = UserMission.builder()
                         .missionReceivedAt(LocalDateTime.now())
                         .missionCertifyYn(false)
@@ -318,8 +325,9 @@ public class MissionCommandServiceImpl implements MissionCommandService {
         List<Room> rooms = roomQueryRepository.findAll();
 
         for(Room r : rooms) {
+            LocalDateTime roomEndAt = r.getRoomEndAt().truncatedTo(ChronoUnit.HOURS);
 
-            if(r.getRoomEndAt().equals(now)) {
+            if(now.isEqual(roomEndAt)) {
                 r.terminateRoom();
             }
         }
