@@ -166,6 +166,17 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
                 .sorted()
                 .toList();
 
+        if(sortedBestMemberCandidate.isEmpty()){
+            return new SummaryDto(
+                    "최고의 맴버는?",
+                    new SummaryResultData(
+                            "선정된 사람이 없습니다.",
+                            "선정된 사람이 없습니다.",
+                            "선정된 사람이 없습니다."
+                    )
+            );
+        }
+
         BestMemberDto bestMember = sortedBestMemberCandidate.get(0);
 
         SummaryDto summaryDto = new SummaryDto(
