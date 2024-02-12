@@ -372,11 +372,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             log.info("방 유저 식별키 : " + findRoomUser.getId());
 
-            // 방 유저 정보 변경
-            findRoomUser.leave();
-
-            log.info("방 유저 정보 변경 완료");
-
             // 방이 시작한 상태이고 종료되지 않은 상태일 경우에만 마니또 마니띠 관계 변경
             if(findRoom.getRoomStartYn() && findRoom.getRoomEndAt().isAfter(LocalDateTime.now())) {
 
@@ -410,6 +405,10 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
                 matchingCommandRepository.save(manitosMatching);
                 matchingCommandRepository.save(manitisMatching);
+
+                // 방 유저 정보 변경
+                findRoomUser.leave();
+                log.info("방 유저 정보 변경 완료");
             }
 
         } catch (Exception e) {
@@ -460,6 +459,20 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         log.info("유저 거절 api");
         try {
+
+            for(Long roomUserNo : denyUserRequestDto.getRoomUserNos()) {
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content("방 입장이 거절되었습니다.")
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author("SYSTEM")
+                        .roomUserNo(roomUserNo).build();
+
+                emitterService.alarm(roomUserNo, alarmDataDto, "방 입장이 거절되었습니다.", "reject");
+            }
+
             roomUserCommandRepository.deleteAllByIds(denyUserRequestDto.getRoomUserNos());
 
         } catch (Exception e) {
@@ -477,6 +490,17 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                     .orElseThrow(() -> new RoomException("해당 방이 존재하지 않습니다."));
 
             findRoom.changeHost(deligateAdminRequestDto.getNewHost());
+
+            // 유저에게 알림 발송
+            AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                    .content("방장 권한을 위임받으셨습니다.")
+                    .readYn(false)
+                    .generatedAt(LocalDateTime.now())
+                    .author("SYSTEM")
+                    .roomUserNo(deligateAdminRequestDto.getNewHost()).build();
+
+            emitterService.alarm(deligateAdminRequestDto.getNewHost(), alarmDataDto,
+                    "방장 권한을 위임받으셨습니다.", "message");
 
         } catch (Exception e) {
             throw new RoomException(e.getMessage());
@@ -513,6 +537,22 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                     .orElseThrow(() -> new RoomException("방이 존재하지 않습니다."));
 
             findRoom.terminateRoom();
+
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(findRoom.getId());
+
+            for(RoomUser ru : findRoomUsers) {
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content("방이 종료되었습니다.")
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author("방장")
+                        .roomUserNo(ru.getId()).build();
+
+                emitterService.alarm(ru.getId(), alarmDataDto,
+                        "방이 종료되었습니다.", "terminate");
+            }
 
         } catch (Exception e) {
 

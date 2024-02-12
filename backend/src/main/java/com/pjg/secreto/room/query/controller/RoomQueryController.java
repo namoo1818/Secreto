@@ -2,10 +2,7 @@ package com.pjg.secreto.room.query.controller;
 
 import com.pjg.secreto.common.response.SuccessResponse;
 import com.pjg.secreto.room.command.dto.AcceptUserRequestDto;
-import com.pjg.secreto.room.query.dto.CheckCodeDto;
-import com.pjg.secreto.room.query.dto.SearchRoomListResponseDto;
-import com.pjg.secreto.room.query.dto.SearchRoomResponseDto;
-import com.pjg.secreto.room.query.dto.SearchRoomUserListResponseDto;
+import com.pjg.secreto.room.query.dto.*;
 import com.pjg.secreto.room.query.service.RoomQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -48,7 +45,7 @@ public class RoomQueryController {
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         Long userNo = getAuthenticatedUserId();
-        List<SearchRoomUserListResponseDto> result = roomQueryService.searchRoomUserList(roomNo);
+        List<SearchRoomUserListResponseDto> result = roomQueryService.searchRoomUserList(userNo, roomNo);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "유저 리스트를 조회하였습니다.", result));
     }
@@ -79,6 +76,19 @@ public class RoomQueryController {
         SearchRoomResponseDto result = roomQueryService.searchRoom(userNo, roomNo);
 
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "방 정보를 조회하였습니다.", result));
+    }
+
+    @GetMapping("/matching/{roomNo}")
+    public ResponseEntity<?> showMatchingLogs(@PathVariable Long roomNo) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        Long userNo = com.pjg.secreto.common.Util.AuthUtils.getAuthenticatedUserId();
+
+        List<ShowMatchingLogsResponseDto> result = roomQueryService.showMatchingLogs(userNo, roomNo);
+
+        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "매칭 기록을 조회하였습니다.", result));
     }
 
 }
