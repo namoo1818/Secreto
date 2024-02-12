@@ -125,6 +125,27 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
             UserMemo findUserMemo = userMemoQueryRepository.findByRoomUserNoAndMemoTo(findRoomUser.getId(), memoUserRequestDto.getMemoTo());
 
+            List<UserMemo> findUserMemos = userMemoQueryRepository.findByRoomUserNo(findRoomUser.getId());
+
+            // 예측 타입이 YES일 경우, 기존의 YES 유저는 UNKNOWN으로 바꾸고, YES로 예측한 유저의 마니또 예측 로그를 생성
+            if(memoUserRequestDto.getManitoPredictType().equals(ManitoPredictType.YES)) {
+
+                for(UserMemo um : findUserMemos) {
+                    if(um.getManitoPredictType().equals(ManitoPredictType.YES)) {
+                        um.updateToUnknown();
+                        break;
+                    }
+                }
+
+                ManitoExpectLog manitoExpectLog = ManitoExpectLog.builder()
+                        .roomUser(findRoomUser)
+                        .expectedUser(memoUserRequestDto.getMemoTo())
+                        .expectedReason(memoUserRequestDto.getMemo())
+                        .expectedAt(LocalDateTime.now()).build();
+
+                manitoExpectLogCommandRepository.save(manitoExpectLog);
+            }
+
             MemoUserResponseDto result;
 
             if(findUserMemo == null) {
@@ -147,17 +168,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                 findUserMemo.updateMemo(memoUserRequestDto.getMemo(), memoUserRequestDto.getManitoPredictType());
 
                 result = MemoUserResponseDto.builder().userMemoNo(findUserMemo.getId()).build();
-            }
-
-            if(memoUserRequestDto.getManitoPredictType().equals(ManitoPredictType.YES)) {
-
-                ManitoExpectLog manitoExpectLog = ManitoExpectLog.builder()
-                        .roomUser(findRoomUser)
-                        .expectedUser(memoUserRequestDto.getMemoTo())
-                        .expectedReason(memoUserRequestDto.getMemo())
-                        .expectedAt(LocalDateTime.now()).build();
-
-                manitoExpectLogCommandRepository.save(manitoExpectLog);
             }
 
             return result;
