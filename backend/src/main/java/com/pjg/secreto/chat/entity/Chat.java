@@ -24,13 +24,10 @@ public class Chat {
     @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY)
     private List<ChatMessage> chatMessages = new ArrayList<>();
 
-    private String name;
-
     private LocalDateTime firstTime;
 
     @Builder
-    public Chat(String name, LocalDateTime firstTime) {
-        this.name = name;
+    public Chat(LocalDateTime firstTime) {
         this.firstTime = firstTime;
     }
 

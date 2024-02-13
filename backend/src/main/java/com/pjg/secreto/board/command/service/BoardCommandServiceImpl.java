@@ -23,12 +23,14 @@ import com.pjg.secreto.room.common.entity.Room;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 
 @RequiredArgsConstructor
 @Transactional
@@ -275,6 +277,10 @@ public class BoardCommandServiceImpl implements BoardCommandService {
 
             // 댓글 작성자에게 대댓글 알림 발송
             else {
+
+                Reply findReply = replyQueryRepository.findById(reply.getParentReplyNo())
+                        .orElseThrow(() -> new BoardException("해당 댓글이 존재하지 않습니다."));
+
                 // 유저에게 알림 발송
                 AlarmDataDto alarmDataDto = AlarmDataDto.builder()
                         .content(writeReplyRequestDto.getContent())
@@ -283,7 +289,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                         .author(board.getId().toString())
                         .roomUserNo(roomUser.getId()).build();
 
-                emitterService.alarm(reply.getTagUserNo(), alarmDataDto, "대댓글이 달렸습니다.", "board");
+                emitterService.alarm(findReply.getRoomUser().getId(), alarmDataDto, "대댓글이 달렸습니다.", "board");
             }
 
 

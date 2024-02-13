@@ -251,12 +251,12 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
         for(Room r : findRoomsWithMissionSchedule) {
 
-            log.info("룸의 아이디 : " + r.getId());
             boolean hasMissionToday = false;
             for(MissionSchedule ms : r.getMissionSchedules()) {
 
                 LocalDateTime missionSubmitTime = ms.getMissionSubmitAt().truncatedTo(ChronoUnit.HOURS);
                 log.info("미션 던져지는 날짜 : " + ms.getMissionSubmitAt());
+
                 if(now.isEqual(missionSubmitTime)) {
                     hasMissionToday = true;
                     break;

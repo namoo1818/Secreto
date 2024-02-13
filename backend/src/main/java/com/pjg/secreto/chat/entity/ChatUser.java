@@ -3,6 +3,7 @@ package com.pjg.secreto.chat.entity;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,5 +30,11 @@ public class ChatUser {
     @Column(nullable = false)
     private ChattingUserType chattingUserType;
 
+    @Builder
+    public ChatUser(RoomUser roomUser, Chat chat, ChattingUserType chattingUserType) {
+        this.roomUser = roomUser;
+        this.chat = chat;
+        this.chattingUserType = chattingUserType;
+    }
 
 }

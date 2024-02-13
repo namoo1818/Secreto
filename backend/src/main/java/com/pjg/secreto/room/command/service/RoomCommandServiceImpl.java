@@ -4,6 +4,11 @@ import com.pjg.secreto.alarm.common.entity.Alarm;
 import com.pjg.secreto.alarm.dto.AlarmDataDto;
 import com.pjg.secreto.alarm.repository.AlarmRepository;
 import com.pjg.secreto.alarm.service.EmitterService;
+import com.pjg.secreto.chat.entity.Chat;
+import com.pjg.secreto.chat.entity.ChatUser;
+import com.pjg.secreto.chat.entity.ChattingUserType;
+import com.pjg.secreto.chat.repository.ChatRepository;
+import com.pjg.secreto.chat.repository.ChatUserRepository;
 import com.pjg.secreto.chat.service.ChatService;
 import com.pjg.secreto.history.command.repository.MatchingCommandRepository;
 import com.pjg.secreto.history.common.entity.Matching;
@@ -51,7 +56,8 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     private final RoomUserQueryRepository roomUserQueryRepository;
     private final MatchingCommandRepository matchingCommandRepository;
     private final EmitterService emitterService;
-    private final ChatService chatService;
+    private final ChatRepository chatRepository;
+    private final ChatUserRepository chatUserRepository;
 
 
     // 방 생성 api (user 개발 완료 시 개발 예정)
@@ -146,38 +152,30 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
         try {
 
+            Room findRoom = roomQueryRepository.findById(setRoomRequestDto.getRoomNo())
+                    .orElseThrow(() -> new RoomException("해당 방은 존재하지 않습니다."));
+
+            if(!findRoom.getRoomStartYn()) {
+                throw new RoomException("해당 방은 이미 시작되었습니다.");
+            }
+
             // 수락된 유저들 조회
             List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomIdWhereNotStandby(setRoomRequestDto.getRoomNo());
 
-            log.info("수락된 유저들 조회");
-            for(RoomUser ru : roomUsers) {
-                log.info("유저 식별키 : " + ru.getId());
-            }
             // 방장이 참여를 하지 않는 경우
             if(!setRoomRequestDto.getHostParticipantYn()) {
 
                 Long hostNo = roomUsers.get(0).getRoom().getHostNo();
-                log.info("방장 식별키 : " + hostNo);
-
-//                for(int i=0; i< roomUsers.size(); i++) {
-//                    log.info("유저 식별키 : " + roomUsers.get(i).getId());
-//                    if(Objects.equals(roomUsers.get(i).getId(), hostNo)) {
-//                        log.info("유저 제거 : " + roomUsers.get(i).getId());
-//                        roomUsers.remove(roomUsers.get(i));
-//                    }
-//                }
 
                 for(RoomUser ru : roomUsers) {
-                    log.info("유저 식별키 : " + ru.getId());
                     if(Objects.equals(ru.getId(), hostNo)) {
-                        log.info("유저 제거 : " + ru.getId());
                         roomUsers.remove(ru);
                         break;
                     }
                 }
-            }
 
-            log.info("방장 제외 로직");
+                log.info("방장 제외 완료");
+            }
 
             if(roomUsers.size() < 3) {
                 throw new RoomException("참여 유저가 3명 이상일 때부터 시작할 수 있습니다.");
@@ -280,6 +278,51 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             }
 
+            /**
+             * 채팅 관련 로직 수행
+             */
+            // 단체 채팅 방 생성
+            Chat allChat = Chat.builder()
+                    .firstTime(null).build();
+
+            chatRepository.save(allChat);
+
+            for(RoomUser ru : roomUsers) {
+
+                // 1:1 채팅 방 생성
+                Chat oneToOneChat = Chat.builder()
+                        .firstTime(null).build();
+
+                chatRepository.save(oneToOneChat);
+
+                // 마니또, 마니띠 채팅방 별 유저 생성
+                RoomUser manitoUser = roomUserQueryRepository.findById(ru.getUsersManito())
+                        .orElseThrow(() -> new RoomException("해당 유저가 존재하지 않습니다."));
+
+                ChatUser manitoChatUser = ChatUser.builder()
+                        .chat(oneToOneChat)
+                        .roomUser(manitoUser)
+                        .chattingUserType(ChattingUserType.MANITO).build();
+
+                ChatUser manitiChatUser = ChatUser.builder()
+                        .chat(oneToOneChat)
+                        .roomUser(ru)
+                        .chattingUserType(ChattingUserType.MANITI).build();
+
+                chatUserRepository.save(manitoChatUser);
+                chatUserRepository.save(manitiChatUser);
+
+
+                // 단체 채팅방 별 유저
+                ChatUser allChatUser = ChatUser.builder()
+                        .chat(allChat)
+                        .roomUser(ru)
+                        .chattingUserType(ChattingUserType.ALL).build();
+
+                chatUserRepository.save(allChatUser);
+            }
+
+
             for(RoomUser ru : roomUsers) {
 
                 // 유저에게 알림 발송
@@ -304,7 +347,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                     missionSubmitTime,
                     missionStartDate,
                     true);
-
 
             SetRoomResponseDto result = SetRoomResponseDto.builder().roomNo(setRoomRequestDto.getRoomNo()).build();
 
@@ -726,6 +768,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 matchingCommandRepository.save(matching);
 
             }
+
 
         } catch (Exception e) {
 
