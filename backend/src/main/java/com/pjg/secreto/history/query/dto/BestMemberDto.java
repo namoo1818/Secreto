@@ -1,7 +1,12 @@
 package com.pjg.secreto.history.query.dto;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -23,15 +28,23 @@ public class BestMemberDto implements Comparable<BestMemberDto> {
     }
 
     public String contents(){
-        return new StringBuilder()
-                .append("좋아요 수: ")
-                .append(staticsTotalCountDto.getLikeCount())
-                .append(" 조회수: ")
-                .append(staticsTotalCountDto.getHitCount())
-                .append(" 작성한 댓글 수 : ")
-                .append(staticsTotalCountDto.getRepliesCount())
-                .append(" 작성한 게시글 수 : ")
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("좋아요 수", staticsTotalCountDto.getLikeCount());
+        hashMap.put("조회수", staticsTotalCountDto.getLikeCount());
+        hashMap.put("작성한 댓글 수", staticsTotalCountDto.getLikeCount());
+        hashMap.put("작성한 게시글 수", staticsTotalCountDto.getLikeCount());
+
+        String contents = new StringBuilder()
+                .append("좋아요 수,")
+                .append("조회 수,")
+                .append("작성한 댓글 수,")
+                .append("작성한 게시글 수,")
+                .append(staticsTotalCountDto.getLikeCount() + ",")
+                .append(staticsTotalCountDto.getHitCount() + ",")
+                .append(staticsTotalCountDto.getRepliesCount() + ",")
                 .append(staticsTotalCountDto.getBoardCount())
                 .toString();
+
+        return contents;
     }
 }
