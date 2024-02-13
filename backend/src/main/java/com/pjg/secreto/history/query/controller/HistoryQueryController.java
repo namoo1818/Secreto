@@ -38,7 +38,7 @@ public class HistoryQueryController {
     public ResponseEntity<?> summaryManitoResult(@PathVariable Long roomId) {
         Map<String, Object> result = new HashMap<>();
         List<SummaryDto> manitoStaticResult = historyQueryService.getManitoStaticResult(roomId);
-        result.put("summary_result", manitoStaticResult);
+        result.put("summaryResult", manitoStaticResult);
         SuccessResponse response = new SuccessResponse(HttpStatus.OK, "정상적으로 데이터를 로드하였습니다.", result);
         return ResponseEntity.ok(response);
     }

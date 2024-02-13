@@ -1,5 +1,7 @@
 package com.pjg.secreto.board.command.service;
 
+import com.pjg.secreto.alarm.dto.AlarmDataDto;
+import com.pjg.secreto.alarm.service.EmitterService;
 import com.pjg.secreto.board.command.dto.UpdateBoardRequestDto;
 import com.pjg.secreto.board.command.dto.UpdateReplyRequestDto;
 import com.pjg.secreto.board.command.dto.WriteBoardRequestDto;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional
@@ -40,12 +43,15 @@ public class BoardCommandServiceImpl implements BoardCommandService {
     private LikedCommandRepository likedCommandRepository;
     private UserMissionQueryRepository userMissionQueryRepository;
 
+    private EmitterService emitterService;
+
     @Autowired
     public BoardCommandServiceImpl(RoomUserQueryRepository roomUserQueryRepository,
                                    BoardQueryRepository boardQueryRepository, BoardCommandRepository boardCommandRepository,
                                    ReplyQueryRepository replyQueryRepository, ReplyCommandRepository replyCommandRepository,
                                    LikedQueryRepository likedQueryRepository, LikedCommandRepository likedCommandRepository,
-                                   UserMissionQueryRepository userMissionQueryRepository
+                                   UserMissionQueryRepository userMissionQueryRepository,
+                                   EmitterService emitterService
 
     ) {
         this.roomUserQueryRepository = roomUserQueryRepository;
@@ -56,6 +62,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
         this.likedQueryRepository = likedQueryRepository;
         this.likedCommandRepository = likedCommandRepository;
         this.userMissionQueryRepository = userMissionQueryRepository;
+        this.emitterService = emitterService;
     }
 
     @Override
@@ -134,6 +141,22 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                 if(!writeBoardRequestDto.getPublicYn()){
                     throw new BoardException("공지는 공개 설정만 할 수 있습니다.");
                 }
+
+                List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(roomNo);
+
+                for(RoomUser ru : findRoomUsers) {
+
+                    // 유저에게 알림 발송
+                    AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                            .content(writeBoardRequestDto.getContent())
+                            .readYn(false)
+                            .generatedAt(LocalDateTime.now())
+                            .author("방장")
+                            .roomUserNo(ru.getId()).build();
+
+                    emitterService.alarm(ru.getId(), alarmDataDto, "방장이 공지를 등록하였습니다.", "message");
+                }
+
                 //인증
             } else if (boardCategory == BoardCategory.CERTIFICATE) {
                     if(writeBoardRequestDto.getUserMissionNo()==null){
@@ -235,6 +258,34 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                     .anonymityYn(writeReplyRequestDto.isAnonymityYn())
                     .deleteYn(false)
                     .build();
+
+            // 게시판 작성자에게 알림 발송
+            if(reply.getParentReplyNo() == null) {
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content(writeReplyRequestDto.getContent())
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author(board.getId().toString())
+                        .roomUserNo(roomUser.getId()).build();
+
+                emitterService.alarm(board.getRoomUser().getId(), alarmDataDto, "게시판에 댓글이 달렸습니다.", "board");
+            }
+
+            // 댓글 작성자에게 대댓글 알림 발송
+            else {
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content(writeReplyRequestDto.getContent())
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author(board.getId().toString())
+                        .roomUserNo(roomUser.getId()).build();
+
+                emitterService.alarm(reply.getTagUserNo(), alarmDataDto, "대댓글이 달렸습니다.", "board");
+            }
+
 
             replyCommandRepository.save(reply);
         }catch (Exception e){

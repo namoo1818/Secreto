@@ -24,9 +24,9 @@ public class BestMemberDto implements Comparable<BestMemberDto> {
 
     public String contents(){
         return new StringBuilder()
-                .append("좋아요 수 : ")
+                .append("좋아요 수: ")
                 .append(staticsTotalCountDto.getLikeCount())
-                .append("조회수: ")
+                .append(" 조회수: ")
                 .append(staticsTotalCountDto.getHitCount())
                 .toString();
     }

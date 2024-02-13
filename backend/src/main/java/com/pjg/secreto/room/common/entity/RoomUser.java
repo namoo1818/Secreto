@@ -99,6 +99,8 @@ public class RoomUser {
     public void leave() {
         this.userLeaveAt = LocalDateTime.now();
         this.bookmarkYn = false;
+        this.usersManito = null;
+        this.usersManiti = null;
     }
 
     // 유저가 방 참여를 수락받았을 때
