@@ -41,6 +41,16 @@ public class EmitterService {
 
     }
 
+    public void alarmWithNoStore(Long userId, AlarmDataDto alarmDataDto, String comment, String type) {
+        try {
+            sendToClient(userId, alarmDataDto, comment, type);
+
+        } catch (Exception e) {
+            throw new AlarmException(e.getMessage());
+        }
+
+    }
+
     public void alarm(Long userId, AlarmDataDto alarmDataDto, String comment, String type) {
         try {
             sendToClient(userId, alarmDataDto, comment, type);

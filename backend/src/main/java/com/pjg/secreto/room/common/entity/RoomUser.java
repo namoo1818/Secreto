@@ -3,8 +3,7 @@ package com.pjg.secreto.room.common.entity;
 import com.pjg.secreto.board.common.entity.Board;
 import com.pjg.secreto.board.common.entity.BoardEntryLog;
 import com.pjg.secreto.board.common.entity.Liked;
-import com.pjg.secreto.chatting.common.entity.ChatUser;
-import com.pjg.secreto.chatting.common.entity.GroupChat;
+import com.pjg.secreto.chat.entity.ChatUser;
 import com.pjg.secreto.history.common.entity.ManitoExpectLog;
 import com.pjg.secreto.history.common.entity.Matching;
 import com.pjg.secreto.history.common.entity.UserMemo;
@@ -54,8 +53,8 @@ public class RoomUser {
     @OneToMany(mappedBy = "roomUser", fetch = FetchType.LAZY)
     private List<ChatUser> chatUsers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "roomUser", fetch = FetchType.LAZY)
-    private List<GroupChat> groupChats = new ArrayList<>();
+//    @OneToMany(mappedBy = "roomUser", fetch = FetchType.LAZY)
+//    private List<GroupChat> groupChats = new ArrayList<>();
 
     @OneToMany(mappedBy = "roomUser", fetch = FetchType.LAZY)
     private List<Board> boards = new ArrayList<>();
