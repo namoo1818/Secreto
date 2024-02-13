@@ -1,12 +1,7 @@
 package com.pjg.secreto.history.query.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonClassDescription;
-import com.fasterxml.jackson.annotation.JsonRootName;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,52 +11,52 @@ import java.time.LocalDateTime;
 @Builder
 public class SummaryResultData {
     private String title;
-    private String nickName;
+    private String nickname;
     private Long amount;
     private String contents;
     private LocalDateTime dateTime;
-    private String profile_url;
+    private String imageUrl;
     private Long id;
 
     @QueryProjection
-    public SummaryResultData(String title, String nickName, Long amount, String contents, LocalDateTime dateTime, String profile_url) {
+    public SummaryResultData(String title, String nickname, Long amount, String contents, LocalDateTime dateTime, String imageUrl) {
         this.title = title;
-        this.nickName = nickName;
+        this.nickname = nickname;
         this.amount = amount;
         this.contents = contents;
         this.dateTime = dateTime;
-        this.profile_url = profile_url;
+        this.imageUrl = imageUrl;
     }
 
     @QueryProjection
-    public SummaryResultData(String title, String nickName, Long amount, String contents, LocalDateTime dateTime, String profile_url, Long id) {
+    public SummaryResultData(String title, String nickname, Long amount, String contents, LocalDateTime dateTime, String imageUrl, Long id) {
         this.title = title;
-        this.nickName = nickName;
+        this.nickname = nickname;
         this.amount = amount;
         this.contents = contents;
         this.dateTime = dateTime;
-        this.profile_url = profile_url;
+        this.imageUrl = imageUrl;
         this.id = id;
     }
 
     @QueryProjection
-    public SummaryResultData(String nickName, Long amount, String profile_url) {
-        this.nickName = nickName;
+    public SummaryResultData(String nickname, Long amount, String imageUrl) {
+        this.nickname = nickname;
         this.amount = amount;
-        this.profile_url = profile_url;
+        this.imageUrl = imageUrl;
     }
 
     @QueryProjection
-    public SummaryResultData(String nickName, LocalDateTime dateTime, String profile_url) {
-        this.nickName = nickName;
+    public SummaryResultData(String nickname, LocalDateTime dateTime, String imageUrl) {
+        this.nickname = nickname;
         this.dateTime = dateTime;
-        this.profile_url = profile_url;
+        this.imageUrl = imageUrl;
     }
 
     @QueryProjection
-    public SummaryResultData(String nickName, String contents, String profile_url) {
-        this.nickName = nickName;
+    public SummaryResultData(String nickname, String contents, String imageUrl) {
+        this.nickname = nickname;
         this.contents = contents;
-        this.profile_url = profile_url;
+        this.imageUrl = imageUrl;
     }
 }

@@ -28,6 +28,10 @@ public class BestMemberDto implements Comparable<BestMemberDto> {
                 .append(staticsTotalCountDto.getLikeCount())
                 .append(" 조회수: ")
                 .append(staticsTotalCountDto.getHitCount())
+                .append(" 작성한 댓글 수 : ")
+                .append(staticsTotalCountDto.getRepliesCount())
+                .append(" 작성한 게시글 수 : ")
+                .append(staticsTotalCountDto.getBoardCount())
                 .toString();
     }
 }
