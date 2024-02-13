@@ -4,6 +4,7 @@ import com.pjg.secreto.alarm.common.entity.Alarm;
 import com.pjg.secreto.alarm.dto.AlarmDataDto;
 import com.pjg.secreto.alarm.repository.AlarmRepository;
 import com.pjg.secreto.alarm.service.EmitterService;
+import com.pjg.secreto.chat.service.ChatService;
 import com.pjg.secreto.history.command.repository.MatchingCommandRepository;
 import com.pjg.secreto.history.common.entity.Matching;
 import com.pjg.secreto.mission.command.repository.MissionScheduleCommandRepository;
@@ -50,7 +51,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
     private final RoomUserQueryRepository roomUserQueryRepository;
     private final MatchingCommandRepository matchingCommandRepository;
     private final EmitterService emitterService;
-    private final AlarmRepository alarmRepository;
+    private final ChatService chatService;
 
 
     // 방 생성 api (user 개발 완료 시 개발 예정)
@@ -398,7 +399,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 usersManito.setManiti(usersManiti.getId());
                 usersManiti.setManito(usersManito.getId());
 
-
                 Matching manitosMatching = Matching.builder()
                         .roomUser(usersManito)
                         .matchingAt(LocalDateTime.now())
@@ -480,7 +480,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .author("SYSTEM")
                         .roomUserNo(roomUserNo).build();
 
-                emitterService.alarm(roomUserNo, alarmDataDto, "방 입장이 거절되었습니다.", "reject");
+                emitterService.alarmWithNoStore(roomUserNo, alarmDataDto, "방 입장이 거절되었습니다.", "reject");
             }
 
             roomUserCommandRepository.deleteAllByIds(denyUserRequestDto.getRoomUserNos());
