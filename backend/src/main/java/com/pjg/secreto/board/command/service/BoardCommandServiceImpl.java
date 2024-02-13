@@ -89,7 +89,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                     throw new BoardException("공지는 공개 설정만 할 수 있습니다.");
                 }
                 //인증
-            } else if(!updateBoardRequestDto.getPublicYn()){
+            } else if(post.getBoardCategory() == BoardCategory.BOAST && !updateBoardRequestDto.getPublicYn()){
                     throw new BoardException("자랑글은 공개 설정만 할 수 있습니다.");
             }
 

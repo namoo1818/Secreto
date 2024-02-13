@@ -11,8 +11,6 @@ import com.pjg.secreto.board.query.repository.BoardEntryLogQueryRepository;
 import com.pjg.secreto.board.query.repository.BoardQueryRepository;
 import com.pjg.secreto.board.query.repository.LikedQueryRepository;
 import com.pjg.secreto.board.query.repository.ReplyQueryRepository;
-import com.pjg.secreto.history.common.entity.Matching;
-import com.pjg.secreto.history.query.repository.MatchingQueryRepository;
 import com.pjg.secreto.mission.common.entity.UserMission;
 import com.pjg.secreto.mission.query.repository.UserMissionQueryRepository;
 import com.pjg.secreto.room.common.entity.RoomUser;
@@ -39,7 +37,6 @@ public class BoardQueryServiceImpl implements BoardQueryService{
     private BoardQueryRepository boardQueryRepository;
     private ReplyQueryRepository replyQueryRepository;
     private RoomUserQueryRepository roomUserQueryRepository;
-    private MatchingQueryRepository matchingQueryRepository;
     private LikedQueryRepository likedQueryRepository;
     private UserMissionQueryRepository userMissionQueryRepository;
 
@@ -47,14 +44,13 @@ public class BoardQueryServiceImpl implements BoardQueryService{
     public BoardQueryServiceImpl(BoardEntryLogCommandRepository boardEntryLogCommandRepository, BoardEntryLogQueryRepository boardEntryLogQueryRepository,
                                  BoardQueryRepository boardQueryRepository,
                                  ReplyQueryRepository replyQueryRepository, RoomUserQueryRepository roomUserQueryRepository,
-                                 MatchingQueryRepository matchingQueryRepository, LikedQueryRepository likedQueryRepository,
+                                 LikedQueryRepository likedQueryRepository,
                                  UserMissionQueryRepository userMissionQueryRepository){
         this.boardEntryLogCommandRepository = boardEntryLogCommandRepository;
         this.boardEntryLogQueryRepository = boardEntryLogQueryRepository;
         this.boardQueryRepository = boardQueryRepository;
         this.replyQueryRepository = replyQueryRepository;
         this.roomUserQueryRepository = roomUserQueryRepository;
-        this.matchingQueryRepository = matchingQueryRepository;
         this.likedQueryRepository = likedQueryRepository;
         this.userMissionQueryRepository = userMissionQueryRepository;
     }
@@ -105,7 +101,7 @@ public class BoardQueryServiceImpl implements BoardQueryService{
                         .userMission(board.getUserMission()!=null?board.getUserMission().getContent():null);
 
                     if(board.getBoardCategory()==BoardCategory.CERTIFICATE){
-                        Long manitiNo = roomUser.getUsersManiti();
+                        Long manitiNo = board.getRoomUser().getUsersManiti();
                         if(manitiNo!=null) {
                             RoomUser maniti = roomUserQueryRepository.findById(manitiNo).orElseThrow(() -> new BoardException("해당 유저가 없습니다."));
                             String manitiNickname = maniti.getNickname();
@@ -150,7 +146,7 @@ public class BoardQueryServiceImpl implements BoardQueryService{
             }
 
             if(board.getBoardCategory()==BoardCategory.CERTIFICATE){
-                Long manitiNo = roomUser.getUsersManiti();
+                Long manitiNo = board.getRoomUser().getUsersManiti();
                 if(manitiNo!=null) {
                     RoomUser maniti = roomUserQueryRepository.findById(manitiNo).orElseThrow(() -> new BoardException("해당 유저가 없습니다."));
                     String manitiNickname = maniti.getNickname();

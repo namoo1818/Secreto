@@ -29,7 +29,7 @@ public class ManitoExpectRepository {
 
 
     public List<PredictBoardDto> getMatchingResult(Long roomId) {
-        List<ManitoExpectedBoard> manitoExpectedBoards = manitoExpectJdbcRepository.findManitoMatchingResult(roomId);
+        List<ManitoExpectedBoard> manitoExpectedBoards = manitoExpectJdbcRepository.findManitoPredictResult(roomId);
         Map<Long, Integer> indexer = new HashMap<>();
 
         int userCount = manitoExpectedBoards.size();
@@ -70,7 +70,7 @@ public class ManitoExpectRepository {
             PlayerDto given = new PlayerDto(playerMap.get(manito.getManitoRoomUserNo()));
             boolean predictCorrect = manito.isPredictCorrect();
 
-            PredictBoardDto predictBoardDto = new PredictBoardDto(giver, given, predictCorrect);
+            PredictBoardDto predictBoardDto = new PredictBoardDto(given, giver, predictCorrect);
             result.add(predictBoardDto);
         }
 

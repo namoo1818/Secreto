@@ -176,7 +176,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
         if(sortedBestMemberCandidate.isEmpty()){
             return new SummaryDto(
-                    "최고의 맴버는?",
+                    "최고의 유저",
+                    SummaryType.USER_BEST,
                     new SummaryResultData(
                             null,
                             "선정된 사람이 없습니다.",
@@ -188,7 +189,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
         BestMemberDto bestMember = sortedBestMemberCandidate.get(0);
 
         SummaryDto summaryDto = new SummaryDto(
-                "최고의 맴버는?",
+                "최고의 유저",
+                SummaryType.USER_BEST,
                 new SummaryResultData(
                         bestMember.getPlayer().getNickname(),
                         bestMember.contents(),
@@ -203,7 +205,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
         if (mostViewPost == null){
             return new SummaryDto(
-                    "조회수가 가장 높은 게시글을 작성한 사람",
+                    "조회수가 가장 높은 게시글",
+                    SummaryType.BOARD_VIEWS,
                     new SummaryResultData(
                             "",
                             "선정자는 없습니다.",
@@ -214,7 +217,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
 
         return new SummaryDto(
-                "조회수가 가장 높은 게시글을 작성한 사람",
+                "조회수가 가장 높은 게시글",
+                SummaryType.BOARD_VIEWS,
                 mostViewPost
         );
     }
@@ -224,7 +228,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
         if (mostLikedPost == null){
             return new SummaryDto(
-                    "가장 많이 좋아요를 받은 사람",
+                    "가장 많이 좋아요를 받은 게시글",
+                    SummaryType.BOARD_LIKES,
                     new SummaryResultData(
                             "",
                             "선정자는 없습니다.",
@@ -234,7 +239,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
         }
 
         return new SummaryDto(
-                "가장 많이 좋아요를 받은 사람",
+                "가장 많이 좋아요를 받은 게시글",
+                SummaryType.BOARD_LIKES,
                 mostLikedPost
         );
     }
@@ -244,7 +250,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
         if (mostWroteCertificationUser == null){
             return new SummaryDto(
-                    "가장 많이 인증글을 작성한 사람",
+                    "가장 많이 인증글을 작성한 유저",
+                    SummaryType.USER_CERT,
                     new SummaryResultData(
                             "",
                             "선정자는 없습니다.",
@@ -254,7 +261,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
         }
 
         return new SummaryDto(
-                "가장 많이 인증글을 작성한 사람",
+                "가장 많이 인증글을 작성한 유저",
+                SummaryType.USER_CERT,
                 mostWroteCertificationUser
         );
     }
@@ -264,7 +272,8 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
         if (mostWroteBoastUser == null){
             return new SummaryDto(
-                    "가장 많이 자랑글을 작성한 사람",
+                    "가장 많이 자랑글을 작성한 유저",
+                    SummaryType.USER_BOAST,
                     new SummaryResultData(
                             "",
                             "선정자는 없습니다.",
@@ -274,17 +283,18 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
         }
 
         return new SummaryDto(
-                "가장 많은 자랑글을 작성한 사람",
+                "가장 많은 자랑글을 작성한 유저",
+                SummaryType.USER_BOAST,
                 mostWroteBoastUser
         );
     }
 
     private SummaryDto getFastestCorrectManito(Long roomId){
         SummaryResultData fastestCorrectManito = manitoExpectRepository.getFastestCorrectManito(roomId);
-
-
+        
         return new SummaryDto(
-                "가장 빠르게 마니또를 맞춘 사람",
+                "가장 빠르게 마니또를 맞춘 유저",
+                SummaryType.USER_FAST,
                 fastestCorrectManito
         );
     }
