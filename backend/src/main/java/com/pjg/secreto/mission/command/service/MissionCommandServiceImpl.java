@@ -245,7 +245,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
         log.info("현재 시각 : " + now);
 
         // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
-//        List<Room> findRooms = roomQueryRepository.findAllWithMissionScheduleAndRoomMission();
         List<Room> findRoomsWithMissionSchedule = roomQueryRepository.findAllWithMissionSchedule();
 
         List<Room> hasMissionRooms = new ArrayList<>();
@@ -259,7 +258,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                 LocalDateTime missionSubmitTime = ms.getMissionSubmitAt().truncatedTo(ChronoUnit.HOURS);
                 log.info("미션 던져지는 날짜 : " + ms.getMissionSubmitAt());
                 if(now.isEqual(missionSubmitTime)) {
-                    log.info("찾았다!");
                     hasMissionToday = true;
                     break;
                 }
