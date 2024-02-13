@@ -44,4 +44,8 @@ public class UserMemo {
         this.manitoPredictType = manitoPredictType;
     }
 
+    public void updateToUnknown() {
+        this.manitoPredictType = ManitoPredictType.UNKNOWN;
+    }
+
 }

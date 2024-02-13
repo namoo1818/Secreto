@@ -1,5 +1,10 @@
 package com.pjg.secreto.room.query.service;
 
+import com.pjg.secreto.history.common.entity.ManitoPredictType;
+import com.pjg.secreto.history.common.entity.Matching;
+import com.pjg.secreto.history.common.entity.UserMemo;
+import com.pjg.secreto.history.query.repository.MatchingQueryRepository;
+import com.pjg.secreto.history.query.repository.UserMemoQueryRepository;
 import com.pjg.secreto.room.common.entity.Room;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.room.common.exception.RoomException;
@@ -9,6 +14,7 @@ import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import com.pjg.secreto.user.common.entity.User;
 import com.pjg.secreto.user.query.repository.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -25,6 +32,8 @@ public class RoomQueryServiceImpl implements RoomQueryService{
 
     private final RoomQueryRepository roomQueryRepository;
     private final RoomUserQueryRepository roomUserQueryRepository;
+    private final UserMemoQueryRepository userMemoQueryRepository;
+    private final MatchingQueryRepository matchingQueryRepository;
 
     @Override
     public boolean enterRoom(CheckCodeDto checkCodeDto) {
@@ -48,17 +57,47 @@ public class RoomQueryServiceImpl implements RoomQueryService{
     }
 
     @Override
-    public List<SearchRoomUserListResponseDto> searchRoomUserList(Long roomNo) {
+    public List<SearchRoomUserListResponseDto> searchRoomUserList(Long userNo, Long roomNo) {
 
         try {
 
-            Room findRoom = roomQueryRepository.findById(roomNo)
-                    .orElseThrow(() -> new RoomException("해당 방이 없습니다."));
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo)
+                    .orElseThrow(() -> new RoomException("유저가 해당 방에 속해있지 않습니다."));
 
             List<RoomUser> roomUsers = roomUserQueryRepository.findAllWithUserByRoomId(roomNo);
 
-            List<SearchRoomUserListResponseDto> result = roomUsers.stream()
-                    .map(SearchRoomUserListResponseDto::of).toList();
+            List<SearchRoomUserListResponseDto> result = new ArrayList<>();
+            for(RoomUser ru : roomUsers) {
+
+
+                UserMemo findUserMemo = userMemoQueryRepository.findByRoomUserNoAndMemoTo(findRoomUser.getId(), ru.getId());
+
+                ManitoPredictType findManitoPredictType;
+                if(findUserMemo == null) {
+                    findManitoPredictType = null;
+                }
+                else {
+
+                    findManitoPredictType = findUserMemo.getManitoPredictType();
+                }
+
+                result.add(SearchRoomUserListResponseDto.builder()
+                        .roomUserNo(ru.getId())
+                        .userNo(ru.getUser().getId())
+                        .roomNo(ru.getRoom().getId())
+                        .userEntryAt(ru.getUserEntryAt())
+                        .userLeaveAt(ru.getUserLeaveAt())
+                        .standbyYn(ru.getStandbyYn())
+                        .nickname(ru.getNickname())
+                        .usersManito(ru.getUsersManito())
+                        .usersManiti(ru.getUsersManiti())
+                        .profileUrl(ru.getUser().getProfileUrl())
+                        .email(ru.getUser().getEmail())
+                        .manitoPredictType(findManitoPredictType).build());
+            }
+
+//            List<SearchRoomUserListResponseDto> result = roomUsers.stream()
+//                    .map(SearchRoomUserListResponseDto::of).toList();
 
             return result;
 
@@ -163,6 +202,31 @@ public class RoomQueryServiceImpl implements RoomQueryService{
             throw new RoomException(e.getMessage());
         }
 
+    }
+
+    @Override
+    public List<ShowMatchingLogsResponseDto> showMatchingLogs(Long userNo, Long roomNo) {
+
+        try {
+
+            RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo)
+                    .orElseThrow(() -> new RoomException("해당 유저는 방에 속해있지 않습니다."));
+
+            List<Matching> matchings = matchingQueryRepository.findAllByRoomUserNo(findRoomUser.getId());
+
+            List<ShowMatchingLogsResponseDto> result = matchings.stream().map(m -> ShowMatchingLogsResponseDto.builder()
+                    .matchingNo(m.getId())
+                    .roomUserNo(m.getRoomUser().getId())
+                    .matchingAt(m.getMatchingAt())
+                    .manitoNo(m.getManitoNo())
+                    .manitiNo(m.getManitiNo()).build()).toList();
+
+            return result;
+
+        } catch (Exception e) {
+
+            throw new RoomException(e.getMessage());
+        }
     }
 
 }
