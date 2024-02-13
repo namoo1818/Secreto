@@ -2,7 +2,7 @@ package com.pjg.secreto.common.exception;
 
 import com.pjg.secreto.alarm.common.exception.AlarmException;
 import com.pjg.secreto.board.common.exception.BoardException;
-import com.pjg.secreto.chatting.common.exception.ChatException;
+import com.pjg.secreto.chat.common.exception.ChatException;
 import com.pjg.secreto.common.response.ErrorResponse;
 import com.pjg.secreto.mission.common.exception.MissionException;
 import com.pjg.secreto.room.common.exception.RoomException;

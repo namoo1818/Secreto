@@ -1,24 +1,28 @@
-//package com.pjg.secreto.common.config;
-//
-//import com.pjg.secreto.common.handler.WebSocketHandler;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.web.socket.config.annotation.EnableWebSocket;
-//import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-//import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-//
-//@Configuration
-//@EnableWebSocket
-//@RequiredArgsConstructor
-//public class WebSocketConfig implements WebSocketConfigurer {
-//
-//    @Autowired
-//    private final WebSocketHandler chatHandler;
-//
-//    @Override
-//    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-//        registry.addHandler(chatHandler, "/chat").setAllowedOrigins("*");
-//    }
-//
-//}
+package com.pjg.secreto.common.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+
+        //해당 파라미터의 접두사가 붙은 목적지(구독자)에 메시지를 보낼
+        registry.enableSimpleBroker("/topic");
+
+        //전역적인 주소 접두사. 지정 하기싫으면 ("/")
+        registry.setApplicationDestinationPrefixes("/app");
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        //"/chatting" 이라는 엔드포인트 추가 등록
+        registry.addEndpoint("/chatting").addInterceptors().withSockJS();
+    }
+}
