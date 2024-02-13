@@ -44,7 +44,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
                 getMostViewPost(roomId),
                 getBestMember(roomId),
                 getFastestCorrectManito(roomId),
-                getMostWroteCerticationUser(roomId),
+                getMostWroteCertificationUser(roomId),
                 getMostWroteBoastUser(roomId)
         );
     }
@@ -60,9 +60,9 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
         targets.forEach(s -> log.info("놈 : " + s.getNickname() + " " + s.getId() + "\n"));
 
         List<PostDto> myCerticiationActivity = manitoActivityRepository
-                .getBoardActivity(roomId, targets, BoardCategory.CERTIFICATE);
+                .getCertBoardActivity(roomId, targets, BoardCategory.CERTIFICATE);
         List<PostDto> targetsBoastActivity = manitoActivityRepository
-                .getBoardActivity(roomId, List.of(principal), BoardCategory.BOAST);
+                .getBoastBoardActivity(roomId, List.of(principal), BoardCategory.BOAST);
 
         List<PredictorDto> targetsPredictor = manitoExpectRepository.getPredictResult(roomId, List.of(principal));
         targetsPredictor.forEach(s -> System.out.println("마니또가 추리한 사람들 : "+ s.getId() + " " + s.getTargetNickName() + " \n"));
@@ -96,9 +96,9 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
 
         List<PostDto> myCerticiationActivity = manitoActivityRepository
-                .getBoardActivity(roomId, List.of(principal), BoardCategory.CERTIFICATE);
+                .getCertBoardActivity(roomId, List.of(principal), BoardCategory.CERTIFICATE);
         List<PostDto> targetsBoastActivity = manitoActivityRepository
-                .getBoardActivity(roomId, targets, BoardCategory.BOAST);
+                .getBoastBoardActivity(roomId, targets, BoardCategory.BOAST);
 
         List<PredictorDto> targetsPredictor = manitoExpectRepository.getPredictResult(roomId, targets);
 
@@ -200,6 +200,19 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
     private SummaryDto getMostViewPost(Long roomId){
         SummaryResultData mostViewPost = staticRepository.getMostViewPost(roomId);
+
+        if (mostViewPost == null){
+            return new SummaryDto(
+                    "조회수가 가장 높은 게시글을 작성한 사람",
+                    new SummaryResultData(
+                            "",
+                            "선정자는 없습니다.",
+                            ""
+                    )
+            );
+        }
+
+
         return new SummaryDto(
                 "조회수가 가장 높은 게시글을 작성한 사람",
                 mostViewPost
@@ -209,22 +222,57 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
     private SummaryDto getMostLikedPost(Long roomId){
         SummaryResultData mostLikedPost = staticRepository.getMostLikedPost(roomId);
 
+        if (mostLikedPost == null){
+            return new SummaryDto(
+                    "가장 많이 좋아요를 받은 사람",
+                    new SummaryResultData(
+                            "",
+                            "선정자는 없습니다.",
+                            ""
+                    )
+            );
+        }
+
         return new SummaryDto(
                 "가장 많이 좋아요를 받은 사람",
                 mostLikedPost
         );
     }
 
-    private SummaryDto getMostWroteCerticationUser(Long roomId){
-        SummaryResultData mostWroteCerticationUser = staticRepository.getMostWroteCerticationUser(roomId);
+    private SummaryDto getMostWroteCertificationUser(Long roomId){
+        SummaryResultData mostWroteCertificationUser = staticRepository.getMostWroteCerticationUser(roomId);
+
+        if (mostWroteCertificationUser == null){
+            return new SummaryDto(
+                    "가장 많이 인증글을 작성한 사람",
+                    new SummaryResultData(
+                            "",
+                            "선정자는 없습니다.",
+                            ""
+                    )
+            );
+        }
+
         return new SummaryDto(
                 "가장 많이 인증글을 작성한 사람",
-                mostWroteCerticationUser
+                mostWroteCertificationUser
         );
     }
 
     private SummaryDto getMostWroteBoastUser(Long roomId){
         SummaryResultData mostWroteBoastUser = staticRepository.getMostWroteBoastUser(roomId);
+
+        if (mostWroteBoastUser == null){
+            return new SummaryDto(
+                    "가장 많이 자랑글을 작성한 사람",
+                    new SummaryResultData(
+                            "",
+                            "선정자는 없습니다.",
+                            ""
+                    )
+            );
+        }
+
         return new SummaryDto(
                 "가장 많은 자랑글을 작성한 사람",
                 mostWroteBoastUser
@@ -233,6 +281,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
     private SummaryDto getFastestCorrectManito(Long roomId){
         SummaryResultData fastestCorrectManito = manitoExpectRepository.getFastestCorrectManito(roomId);
+
 
         return new SummaryDto(
                 "가장 빠르게 마니또를 맞춘 사람",
