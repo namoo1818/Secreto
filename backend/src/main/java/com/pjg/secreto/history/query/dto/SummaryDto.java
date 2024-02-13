@@ -12,6 +12,8 @@ import lombok.Data;
 public class SummaryDto {
     private String header;
 
+    private SummaryType type;
+
     @JsonProperty("summary")
     private SummaryResultData summaryResultData;
 
