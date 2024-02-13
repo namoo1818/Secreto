@@ -70,7 +70,7 @@ public class ManitoExpectRepository {
             PlayerDto given = new PlayerDto(playerMap.get(manito.getManitoRoomUserNo()));
             boolean predictCorrect = manito.isPredictCorrect();
 
-            PredictBoardDto predictBoardDto = new PredictBoardDto(giver, given, predictCorrect);
+            PredictBoardDto predictBoardDto = new PredictBoardDto(given, giver, predictCorrect);
             result.add(predictBoardDto);
         }
 
