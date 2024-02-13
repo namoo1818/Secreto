@@ -22,7 +22,7 @@ import java.util.List;
 public class ManitoActivityRepository {
     private final JPAQueryFactory query;
 
-    public List<PostDto> getBoardActivity(Long roomId, List<RoomUser> users, BoardCategory category){
+    public List<PostDto> getCertBoardActivity(Long roomId, List<RoomUser> users, BoardCategory category){
         QMatching matching = QMatching.matching;
         QBoard board = QBoard.board;
         QRoomUser roomUser = QRoomUser.roomUser;
@@ -34,7 +34,27 @@ public class ManitoActivityRepository {
                 .from(board)
                 .leftJoin(board.roomUser, roomUser).fetchJoin()
                 .leftJoin(board.roomUser.user, user).fetchJoin()
-                .leftJoin(userMission).on(userMission.eq(board.userMission))
+                .innerJoin(userMission).on(userMission.eq(board.userMission))
+                .where(board.roomUser.room.id.eq(roomId))
+                .where(board.roomUser.in(users))
+                .where(board.boardCategory.eq(category))
+                .where(board.registerAt.before(board.roomUser.room.roomEndAt))
+                .fetch();
+
+        return result;
+    }
+
+    public List<PostDto> getBoastBoardActivity(Long roomId, List<RoomUser> users, BoardCategory category){
+        QMatching matching = QMatching.matching;
+        QBoard board = QBoard.board;
+        QRoomUser roomUser = QRoomUser.roomUser;
+        QUser user = QUser.user;
+        QRoom room = QRoom.room;
+
+        List<PostDto> result = query.select(new QPostDto(board))
+                .from(board)
+                .leftJoin(board.roomUser, roomUser).fetchJoin()
+                .leftJoin(board.roomUser.user, user).fetchJoin()
                 .where(board.roomUser.room.id.eq(roomId))
                 .where(board.roomUser.in(users))
                 .where(board.boardCategory.eq(category))
