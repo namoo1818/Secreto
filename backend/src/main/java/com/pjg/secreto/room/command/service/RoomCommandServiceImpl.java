@@ -346,6 +346,16 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .build();
 
                 roomUserCommandRepository.save(roomUser);
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content("유저가 방에 입장하였습니다.")
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author(roomUser.getNickname())
+                        .roomUserNo(findRoom.getHostNo()).build();
+
+                emitterService.alarm(findRoom.getHostNo(), alarmDataDto, "유저가 방에 입장하였습니다.", "enter");
             }
 
             return findRoom.getId();
