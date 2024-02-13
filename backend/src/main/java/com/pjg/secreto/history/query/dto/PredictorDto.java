@@ -22,7 +22,6 @@ public class PredictorDto {
     private String predictorNickname;
     private String targetNickName;
     private String predictReason;
-    private boolean isCorrect;
 
     @QueryProjection
     public PredictorDto(Long id, LocalDateTime entryAt,  String predictorNickname, String targetNickName, String predictReason) {

@@ -121,6 +121,7 @@ public class ManitoExpectRepository {
                                 expectLog.expectedReason
                         )
                 )
+                .distinct()
                 .from(expectLog)
                 .leftJoin(matching).on(expectLog.roomUser.eq(matching.roomUser))
                 .leftJoin(targetRoomUser).on(targetRoomUser.id.eq(expectLog.expectedUser)).fetchJoin()

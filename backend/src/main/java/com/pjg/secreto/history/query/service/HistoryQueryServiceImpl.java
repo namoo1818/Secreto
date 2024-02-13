@@ -54,7 +54,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
         Long authenticatedUserId = roomUserId;
 //        RoomUser principal = roomUserQueryRepository.findById(authenticatedUserId).orElseThrow();
         RoomUser principal = roomUserQueryRepository.findByUserNoAndRoomNo(authenticatedUserId, roomId).orElseThrow();
-        List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManiti(roomId, principal.getId());
+        List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManito(roomId, principal.getId());
 
         log.info("마니또 : " + principal.getNickname() + " " + principal.getId());
         targets.forEach(s -> log.info("놈 : " + s.getNickname() + " " + s.getId() + "\n"));
@@ -89,7 +89,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
     public Map<String, Object> getMyManitiActivity(Long roomId, Long roomUserId) {
         Long authenticatedUserId = roomUserId;
         RoomUser principal = roomUserQueryRepository.findByUserNoAndRoomNo(authenticatedUserId, roomId).orElseThrow();
-        List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManito(roomId, principal.getId());
+        List<RoomUser> targets = roomUserQueryRepository.findAllByUsersManiti(roomId, principal.getId());
         log.info("내가 마니띠 일때");
         log.info("사람: " + principal.getNickname() + " " + principal.getId());
         targets.forEach(s -> log.info("놈 : " + s.getNickname() + " " + s.getId() + "\n"));
@@ -291,7 +291,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
 
     private SummaryDto getFastestCorrectManito(Long roomId){
         SummaryResultData fastestCorrectManito = manitoExpectRepository.getFastestCorrectManito(roomId);
-        
+
         return new SummaryDto(
                 "가장 빠르게 마니또를 맞춘 유저",
                 SummaryType.USER_FAST,
