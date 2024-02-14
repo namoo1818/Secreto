@@ -260,11 +260,12 @@ public class MissionCommandServiceImpl implements MissionCommandService {
         log.info("현재 시각 : " + now);
 
         // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
-        List<Room> findRoomsWithMissionSchedule = roomQueryRepository.findAllWithMissionSchedule();
+        List<Room> findRooms = roomQueryRepository.findAll();
+//        List<Room> findRoomsWithMissionSchedule = roomQueryRepository.findAllWithMissionSchedule();
 
         List<Room> hasMissionRooms = new ArrayList<>();
 
-        for(Room r : findRoomsWithMissionSchedule) {
+        for(Room r : findRooms) {
 
             boolean hasMissionToday = false;
             for(MissionSchedule ms : r.getMissionSchedules()) {
