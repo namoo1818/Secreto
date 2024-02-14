@@ -304,12 +304,12 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 ChatUser manitoChatUser = ChatUser.builder()
                         .chat(oneToOneChat)
                         .roomUser(manitoUser)
-                        .chattingUserType(ChattingUserType.MANITO).build();
+                        .chattingUserType(ChattingUserType.MANITI).build();
 
                 ChatUser manitiChatUser = ChatUser.builder()
                         .chat(oneToOneChat)
                         .roomUser(ru)
-                        .chattingUserType(ChattingUserType.MANITI).build();
+                        .chattingUserType(ChattingUserType.MANITO).build();
 
                 chatUserRepository.save(manitoChatUser);
                 chatUserRepository.save(manitiChatUser);
