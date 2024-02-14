@@ -1,7 +1,6 @@
 package com.pjg.secreto.chat.dto;
 
 import com.pjg.secreto.chat.entity.ChattingUserType;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,31 +11,35 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ChatMessagesResponseDto {
     private String profileUrl;
-    private String nickname;
-    private Long writerId;
+    private String sender;
+    private Long senderId;
     private LocalDateTime registeredAt;
-    private String content;
+    private String message;
+    private String sendAt;
     private ChattingUserType type;
 
     @Builder
-    public ChatMessagesResponseDto(String profileUrl, String nickname, LocalDateTime registeredAt, String content, ChattingUserType type, Long writerId) {
+    public ChatMessagesResponseDto(String profileUrl, String sender, Long senderId, LocalDateTime registeredAt, String message, String sendAt, ChattingUserType type) {
         this.profileUrl = profileUrl;
-        this.nickname = nickname;
+        this.sender = sender;
+        this.senderId = senderId;
         this.registeredAt = registeredAt;
-        this.content = content;
-        this.writerId = writerId;
+        this.message = message;
+        this.sendAt = sendAt;
         this.type = type;
-        setNickName(nickname);
+        setSender(sender);
     }
 
-    public void setNickName(String nickName){
+
+
+    public void setSender(String sender){
         if (this.type.equals(ChattingUserType.ALL))
-            this.nickname = nickName;
+            this.sender = sender;
 
         else if (this.type.equals(ChattingUserType.MANITO))
-            this.nickname = nickName + "님의 마니또";
+            this.sender = sender + "님의 마니또";
 
         else
-            this.nickname = nickName + "님의 마니띠";
+            this.sender = sender + "님의 마니띠";
     }
 }

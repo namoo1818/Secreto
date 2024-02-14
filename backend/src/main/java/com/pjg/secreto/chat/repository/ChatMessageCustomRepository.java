@@ -46,20 +46,23 @@ public class ChatMessageCustomRepository {
                 .stream()
                 .collect(Collectors.toUnmodifiableMap(cu -> cu.getRoomUser().getNickname(), Function.identity()));
 
+
+        System.out.println(mapChatUser);
         List<ChatMessagesResponseDto> result = messages.stream()
                 .map(chatMessage -> {
                     String chats = chatMessage.getMessage();
                     LocalDateTime sendAt = chatMessage.getSendAt();
                     Long id = chatMessage.getId();
                     String sender = chatMessage.getSender();
+                    System.out.println(sender + " " + mapChatUser.get(sender));
                     RoomUser roomUsers = mapChatUser.get(sender).getRoomUser();
 
                     return ChatMessagesResponseDto.builder()
-                            .nickname(roomUsers.getNickname())
+                            .sender(roomUsers.getNickname())
                             .profileUrl(roomUsers.getUser().getProfileUrl())
                             .registeredAt(sendAt)
-                            .content(chats)
-                            .writerId(chatMessage.getSenderId())
+                            .message(chats)
+                            .senderId(chatMessage.getSenderId())
                             .type(roomType)
                             .build();
                 }).toList();
