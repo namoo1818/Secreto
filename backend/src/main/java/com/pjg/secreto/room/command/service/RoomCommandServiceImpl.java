@@ -377,7 +377,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             List<RoomUser> roomUsers = roomUserQueryRepository.findAllByUserNoAndRoomNo(findUser.getId(), findRoom.getId());
 
             if(!roomUsers.isEmpty()) {
-                throw new RoomException("해당 유저는 이미 방에 속해있습니다.");
+                throw new RoomException("해당 유저는 이미 방에 속해있거나 나간 방입니다.");
             }
             else {
 
