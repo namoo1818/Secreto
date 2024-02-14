@@ -64,7 +64,7 @@ public class RoomQueryServiceImpl implements RoomQueryService{
             RoomUser findRoomUser = roomUserQueryRepository.findByUserNoAndRoomNo(userNo, roomNo)
                     .orElseThrow(() -> new RoomException("유저가 해당 방에 속해있지 않습니다."));
 
-            List<RoomUser> roomUsers = roomUserQueryRepository.findAllWithUserByRoomNoWhereNotStandByAndNotLeave(roomNo);
+            List<RoomUser> roomUsers = roomUserQueryRepository.findAllWithUserByRoomNoWhereNotLeave(roomNo);
 
             List<SearchRoomUserListResponseDto> result = new ArrayList<>();
             for(RoomUser ru : roomUsers) {
