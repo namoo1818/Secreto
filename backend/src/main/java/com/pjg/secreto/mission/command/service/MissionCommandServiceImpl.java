@@ -192,7 +192,10 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                     .orElseThrow(() -> new MissionException("해당 미션은 존재하지 않습니다."));
 
             UserMission latestMission = userMissionQueryRepository.findWhereLatestByRoomUserNo(findRoomUser.getId());
-
+            log.info("가장 최근 미션 : " + latestMission.getContent());
+            log.info("가장 최근 미션 식별키 : " + latestMission.getId());
+            log.info("가장 최근 미션 : " + findUserMission.getContent());
+            log.info("가장 최근 미션 식별키 : " + findUserMission.getId());
             if(!Objects.equals(findUserMission.getId(), latestMission.getId())) {
                 throw new MissionException("가장 최근에 받은 미션만 리롤할 수 있습니다.");
             }
@@ -200,28 +203,43 @@ public class MissionCommandServiceImpl implements MissionCommandService {
             List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNo(rerollMissionRequestDto.getRoomNo());
             log.info("미션 리스트 찾기");
 
-            // 공통 미션이면 리롤 막기
-            if(findRoomUser.getRoom().getCommonYn()) {
-                throw new MissionException("해당 미션은 공통 미션이므로 리롤이 불가능합니다.");
+            Collections.shuffle(roomMissions);
+            log.info("셔플 완료");
+
+            for(RoomMission rm : roomMissions) {
+                System.out.println(rm.getContent());
             }
 
-            else {
+            RoomMission newRoomMission = roomMissions.get(0);
+            log.info("미션 가져오기");
 
-                Collections.shuffle(roomMissions);
-                log.info("셔플 완료");
+            // 유저 미션 수정
+            findUserMission.rerollUserMission(newRoomMission.getContent(), findUserMission.getMissionRerollCount());
 
-                for(RoomMission rm : roomMissions) {
-                    System.out.println(rm.getContent());
-                }
+            log.info("유저 미션 수정 완료");
 
-                RoomMission newRoomMission = roomMissions.get(0);
-                log.info("미션 가져오기");
-
-                // 유저 미션 수정
-                findUserMission.rerollUserMission(newRoomMission.getContent(), findUserMission.getMissionRerollCount());
-
-                log.info("유저 미션 수정 완료");
-            }
+//            // 공통 미션이면 리롤 막기
+//            if(findRoomUser.getRoom().getCommonYn()) {
+//                throw new MissionException("해당 미션은 공통 미션이므로 리롤이 불가능합니다.");
+//            }
+//
+//            else {
+//
+//                Collections.shuffle(roomMissions);
+//                log.info("셔플 완료");
+//
+//                for(RoomMission rm : roomMissions) {
+//                    System.out.println(rm.getContent());
+//                }
+//
+//                RoomMission newRoomMission = roomMissions.get(0);
+//                log.info("미션 가져오기");
+//
+//                // 유저 미션 수정
+//                findUserMission.rerollUserMission(newRoomMission.getContent(), findUserMission.getMissionRerollCount());
+//
+//                log.info("유저 미션 수정 완료");
+//            }
 
 
 
