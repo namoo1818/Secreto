@@ -31,7 +31,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         //"/chatting" 이라는 엔드포인트 추가 등록
         registry.addEndpoint("/chatting")
                 .addInterceptors()
-                .setAllowedOrigins("https://i10a805.p.ssafy.io", "http://localhost:5173", "*")
+//                .setAllowedOrigins("https://i10a805.p.ssafy.io", "http://localhost:5173", "*")
+                .setAllowedOriginPatterns("*")
                 .addInterceptors().withSockJS();
     }
 
