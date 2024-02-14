@@ -287,6 +287,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             chatRepository.save(allChat);
 
+            log.info("단체 채팅방 생성");
             for(RoomUser ru : roomUsers) {
 
                 // 1:1 채팅 방 생성
@@ -294,6 +295,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .firstTime(null).build();
 
                 chatRepository.save(oneToOneChat);
+                log.info("일대일 채팅방 생성");
 
                 // 마니또, 마니띠 채팅방 별 유저 생성
                 RoomUser manitoUser = roomUserQueryRepository.findById(ru.getUsersManito())
@@ -311,7 +313,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
                 chatUserRepository.save(manitoChatUser);
                 chatUserRepository.save(manitiChatUser);
-
+                log.info("일대일 채팅방 유저 저장");
 
                 // 단체 채팅방 별 유저
                 ChatUser allChatUser = ChatUser.builder()
@@ -320,6 +322,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .chattingUserType(ChattingUserType.ALL).build();
 
                 chatUserRepository.save(allChatUser);
+                log.info("단체 채팅방 유저 저장");
             }
 
 
