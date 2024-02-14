@@ -48,7 +48,7 @@ public class ManitoExpectRepository {
         List<RoomUser> players = query.select(roomUser)
                 .from(roomUser)
                 .join(roomUser.user, user).fetchJoin()
-                .where(roomUser.id.in(roomUsers))
+                .where(roomUser.room.id.eq(roomId))
                 .fetch();
 
         Map<Long, RoomUser> playerMap = players.stream()
