@@ -25,7 +25,7 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @MessageMapping("/{chatRoomNo}")    // 메서드 호출 경로
+    @MessageMapping("/chatting/{chatRoomNo}")    // 메서드 호출 경로
     @SendTo("/topic/{chatRoomNo}")    // 구독하고 있는 장소로 메시지 전송
     public ResponseEntity<?> chatting(@DestinationVariable Long chatRoomNo, ChatMessageDto chatMessageDto) {
 
