@@ -33,7 +33,7 @@ public class StaticRepository {
                         board.likedCount,
                         board.content,
                         board.registerAt,
-                        board.roomUser.user.profileUrl,
+                        board.imgUrl,
                         board.id
                 ))
                 .from(board)
@@ -58,7 +58,7 @@ public class StaticRepository {
                         board.hit,
                         board.content,
                         board.registerAt,
-                        board.roomUser.user.profileUrl,
+                        board.imgUrl,
                         board.id
                 ))
                 .from(board)
