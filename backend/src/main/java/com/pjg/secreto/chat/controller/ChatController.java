@@ -47,4 +47,17 @@ public class ChatController {
         return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "채팅방 별 유저 리스트를 조회하였습니다.", result));
     }
 
+//    @GetMapping(value="/chat/{roomNo}/chat_room/{chatNo}")
+//    public ResponseEntity<?> showChatList(@PathVariable("roomNo") Long roomNo){
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+//
+//        Long userNo = com.pjg.secreto.common.Util.AuthUtils.getAuthenticatedUserId();
+//
+//        List<ShowChatUserListResponseDto> result = chatService.showChatUserList(userNo, roomNo);
+//
+//        return ResponseEntity.ok().body(new SuccessResponse(HttpStatus.OK, "채팅방 별 유저 리스트를 조회하였습니다.", result));
+//    }
+
 }

@@ -192,10 +192,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                     .orElseThrow(() -> new MissionException("해당 미션은 존재하지 않습니다."));
 
             UserMission latestMission = userMissionQueryRepository.findWhereLatestByRoomUserNo(findRoomUser.getId());
-            log.info("가장 최근 미션 : " + latestMission.getContent());
-            log.info("가장 최근 미션 식별키 : " + latestMission.getId());
-            log.info("가장 최근 미션 : " + findUserMission.getContent());
-            log.info("가장 최근 미션 식별키 : " + findUserMission.getId());
+
             if(!Objects.equals(findUserMission.getId(), latestMission.getId())) {
                 throw new MissionException("가장 최근에 받은 미션만 리롤할 수 있습니다.");
             }
