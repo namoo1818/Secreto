@@ -32,13 +32,16 @@ public class ChatMessage {
 
     private String sender;
 
+    private Long senderId;
+
     @Builder
-    public ChatMessage(Chat chat, String message, LocalDateTime sendAt, Boolean readYn, String sender){
+    public ChatMessage(Chat chat, String message, LocalDateTime sendAt, Boolean readYn, String sender, Long senderId){
         this.chat = chat;
         this.message = message;
         this.sendAt = sendAt;
         this.readYn = readYn;
         this.sender = sender;
+        this.senderId = senderId;
     }
 
     public void update(Boolean readYn){
