@@ -76,7 +76,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                         .missionReceivedAt(LocalDateTime.now())
                         .missionCertifyYn(false)
                         .missionType(MissionType.SUDDEN)
-                        .missionRerollCount(0)
+                        .missionRerollCount(3)
                         .roomUser(ru)
                         .content(suddenMission.getContent())
                         .roomMissionNo(suddenMission.getId()).build();
@@ -200,28 +200,43 @@ public class MissionCommandServiceImpl implements MissionCommandService {
             List<RoomMission> roomMissions = roomMissionQueryRepository.findAllByRoomNo(rerollMissionRequestDto.getRoomNo());
             log.info("미션 리스트 찾기");
 
-            // 공통 미션이면 리롤 막기
-            if(findRoomUser.getRoom().getCommonYn()) {
-                throw new MissionException("해당 미션은 공통 미션이므로 리롤이 불가능합니다.");
+            Collections.shuffle(roomMissions);
+            log.info("셔플 완료");
+
+            for(RoomMission rm : roomMissions) {
+                System.out.println(rm.getContent());
             }
 
-            else {
+            RoomMission newRoomMission = roomMissions.get(0);
+            log.info("미션 가져오기");
 
-                Collections.shuffle(roomMissions);
-                log.info("셔플 완료");
+            // 유저 미션 수정
+            findUserMission.rerollUserMission(newRoomMission.getContent(), findUserMission.getMissionRerollCount());
 
-                for(RoomMission rm : roomMissions) {
-                    System.out.println(rm.getContent());
-                }
+            log.info("유저 미션 수정 완료");
 
-                RoomMission newRoomMission = roomMissions.get(0);
-                log.info("미션 가져오기");
-
-                // 유저 미션 수정
-                findUserMission.rerollUserMission(newRoomMission.getContent(), findUserMission.getMissionRerollCount());
-
-                log.info("유저 미션 수정 완료");
-            }
+//            // 공통 미션이면 리롤 막기
+//            if(findRoomUser.getRoom().getCommonYn()) {
+//                throw new MissionException("해당 미션은 공통 미션이므로 리롤이 불가능합니다.");
+//            }
+//
+//            else {
+//
+//                Collections.shuffle(roomMissions);
+//                log.info("셔플 완료");
+//
+//                for(RoomMission rm : roomMissions) {
+//                    System.out.println(rm.getContent());
+//                }
+//
+//                RoomMission newRoomMission = roomMissions.get(0);
+//                log.info("미션 가져오기");
+//
+//                // 유저 미션 수정
+//                findUserMission.rerollUserMission(newRoomMission.getContent(), findUserMission.getMissionRerollCount());
+//
+//                log.info("유저 미션 수정 완료");
+//            }
 
 
 
@@ -245,11 +260,12 @@ public class MissionCommandServiceImpl implements MissionCommandService {
         log.info("현재 시각 : " + now);
 
         // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
-        List<Room> findRoomsWithMissionSchedule = roomQueryRepository.findAllWithMissionSchedule();
+        List<Room> findRooms = roomQueryRepository.findAll();
+//        List<Room> findRoomsWithMissionSchedule = roomQueryRepository.findAllWithMissionSchedule();
 
         List<Room> hasMissionRooms = new ArrayList<>();
 
-        for(Room r : findRoomsWithMissionSchedule) {
+        for(Room r : findRooms) {
 
             boolean hasMissionToday = false;
             for(MissionSchedule ms : r.getMissionSchedules()) {
@@ -297,7 +313,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                         .missionReceivedAt(LocalDateTime.now())
                         .missionCertifyYn(false)
                         .missionType(MissionType.REGULAR)
-                        .missionRerollCount(0)
+                        .missionRerollCount(3)
                         .roomUser(ru)
                         .content(roomMission.getContent())
                         .roomMissionNo(roomMission.getId()).build();

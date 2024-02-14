@@ -155,7 +155,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             Room findRoom = roomQueryRepository.findById(setRoomRequestDto.getRoomNo())
                     .orElseThrow(() -> new RoomException("해당 방은 존재하지 않습니다."));
 
-            if(!findRoom.getRoomStartYn()) {
+            if(findRoom.getRoomStartYn()) {
                 throw new RoomException("해당 방은 이미 시작되었습니다.");
             }
 
@@ -287,6 +287,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             chatRepository.save(allChat);
 
+            log.info("단체 채팅방 생성");
             for(RoomUser ru : roomUsers) {
 
                 // 1:1 채팅 방 생성
@@ -294,6 +295,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .firstTime(null).build();
 
                 chatRepository.save(oneToOneChat);
+                log.info("일대일 채팅방 생성");
 
                 // 마니또, 마니띠 채팅방 별 유저 생성
                 RoomUser manitoUser = roomUserQueryRepository.findById(ru.getUsersManito())
@@ -302,16 +304,16 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 ChatUser manitoChatUser = ChatUser.builder()
                         .chat(oneToOneChat)
                         .roomUser(manitoUser)
-                        .chattingUserType(ChattingUserType.MANITO).build();
+                        .chattingUserType(ChattingUserType.MANITI).build();
 
                 ChatUser manitiChatUser = ChatUser.builder()
                         .chat(oneToOneChat)
                         .roomUser(ru)
-                        .chattingUserType(ChattingUserType.MANITI).build();
+                        .chattingUserType(ChattingUserType.MANITO).build();
 
                 chatUserRepository.save(manitoChatUser);
                 chatUserRepository.save(manitiChatUser);
-
+                log.info("일대일 채팅방 유저 저장");
 
                 // 단체 채팅방 별 유저
                 ChatUser allChatUser = ChatUser.builder()
@@ -320,6 +322,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .chattingUserType(ChattingUserType.ALL).build();
 
                 chatUserRepository.save(allChatUser);
+                log.info("단체 채팅방 유저 저장");
             }
 
 
@@ -628,7 +631,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             int keys[] = new int[roomUsers.size()];
             Random r = new Random();
             for(int i=0; i<roomUsers.size(); i++) {
-                keys[i] = r.nextInt(roomUsers.size()) + 1;
+                keys[i] = r.nextInt(roomUsers.size());
 
                 for(int j=0; j<i; j++) {
                     if(keys[i] == keys[j]) {
@@ -650,14 +653,17 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .manitoNo(null).manitiNo(null).build();
 
                 if(i == 0) {
+                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[keys.length-1]).getId(), roomUsers.get(keys[i+1]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[keys.length-1]).getId(), roomUsers.get(keys[i+1]).getId());
                 }
                 else if(i == keys.length-1) {
+                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[0]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[0]).getId());
                 }
                 else {
+                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[i+1]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[i+1]).getId());
                 }
@@ -681,8 +687,9 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         try {
 
             // 방 유저 전체 리스트 조회
-            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(insertMatchingRequestDto.getRoomNo());
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNoWhereManitoIsNotNull(insertMatchingRequestDto.getRoomNo());
 
+            log.info("기존 유저들 사이즈 = " + findRoomUsers.size());
             RoomUser firstRoomUser = findRoomUsers.get(0);
 
             List<RoomUser> existsRoomUserList = new ArrayList<>();
@@ -692,20 +699,28 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                     .orElseThrow(() -> new RoomException("해당 유저는 존재하지 않습니다."));
 
             // 마니또 -> 자신 -> 마니띠로 정렬
-            while(!Objects.equals(usersManiti.getUsersManiti(), firstRoomUser.getId())) {
+            while(!Objects.equals(usersManiti.getId(), firstRoomUser.getId())) {
+                log.info("유저의 마니띠 식별키 : " + usersManiti.getId());
+                log.info("첫 유저의 식별키 : " + firstRoomUser.getId());
                 existsRoomUserList.add(usersManiti);
                 usersManiti = roomUserQueryRepository.findById(usersManiti.getUsersManiti())
                         .orElseThrow(() -> new RoomException("해당 유저는 존재하지 않습니다."));
             }
-            existsRoomUserList.add(usersManiti);
 
+            log.info("수락 요청된 유저들 : " + insertMatchingRequestDto.getRoomUserNos().toString());
+//            Long acceptedUserNos[] = new Long[insertMatchingRequestDto.getRoomUserNos().size()];
+//            for(int i=0; i<acceptedUserNos.length; i++) {
+//                acceptedUserNos[i] = insertMatchingRequestDto.getRoomUserNos().get(i);
+//            }
             // 방 입장이 수락된 유저 리스트 조회
             List<RoomUser> acceptedUserList = roomUserQueryRepository
                     .findAllByRoomUserNosAndRoomNo(insertMatchingRequestDto.getRoomUserNos(), insertMatchingRequestDto.getRoomNo());
 
             int totalRoomUserCnt = existsRoomUserList.size() + acceptedUserList.size();
 
-            log.info("유저 수 : " + totalRoomUserCnt);
+            log.info("기존 유저 수 : " + existsRoomUserList.size());
+            log.info("수락한 유저 수 : " + acceptedUserList.size());
+            log.info("총 유저 수 : " + totalRoomUserCnt);
             // index 랜덤으로 섞기
             int indexs[] = new int[acceptedUserList.size()];
             Random r = new Random();

@@ -5,6 +5,7 @@ import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.user.common.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,4 +64,7 @@ public interface RoomUserQueryRepository extends JpaRepository<RoomUser, Long>, 
 
     @Query("select ru from RoomUser ru join fetch ru.user u where ru.room.id = :roomNo")
     List<RoomUser> findAllWithUserByRoomId(Long roomNo);
+
+    @Query("select ru from RoomUser ru where ru.room.id = :roomNo and ru.usersManito is not null")
+    List<RoomUser> findAllByRoomNoWhereManitoIsNotNull(Long roomNo);
 }

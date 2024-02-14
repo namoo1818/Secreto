@@ -37,7 +37,7 @@ public class ChatService {
         try {
 
             Chat findChat = chatRepository.findById(chatMessageDto.getChatNo())
-                    .orElseThrow(() -> new ChatException("ddd"));
+                    .orElseThrow(() -> new ChatException("채팅 예외 발생"));
 
             ChatMessage chatMessage = ChatMessage.builder()
                     .sender(chatMessageDto.getSender())
