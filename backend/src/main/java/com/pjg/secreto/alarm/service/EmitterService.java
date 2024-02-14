@@ -28,7 +28,7 @@ public class EmitterService {
     private final EmitterRepository emitterRepository;
     private final AlarmRepository alarmRepository;
 
-    private static final Long DEFAULT_TIMEOUT = 600L * 1000 * 60;
+    private static final Long DEFAULT_TIMEOUT = 600L * 1000 * 60 * 60;
     private static final long RECONNECTION_TIMEOUT = 1000L;
 
     public SseEmitter subscribe(Long roomUserNo) {
