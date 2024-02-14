@@ -1,17 +1,16 @@
 package com.pjg.secreto.chat.controller;
 
-import com.pjg.secreto.board.command.dto.WriteReplyRequestDto;
 import com.pjg.secreto.chat.dto.ChatMessageDto;
 import com.pjg.secreto.chat.dto.ShowChatUserListResponseDto;
 import com.pjg.secreto.chat.service.ChatService;
 import com.pjg.secreto.common.response.SuccessResponse;
-import com.pjg.secreto.mission.command.dto.MemoUserResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +25,9 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @MessageMapping("/chatting")    // 보내는 경로
-    @SendTo("/topic/{chatRoomNo}")    // 소켓 연결
-    public ResponseEntity<?> chatting(ChatMessageDto chatMessageDto) {
+    @MessageMapping("/{chatRoomNo}")    // 메서드 호출 경로
+    @SendTo("/topic/{chatRoomNo}")    // 구독하고 있는 장소로 메시지 전송
+    public ResponseEntity<?> chatting(@DestinationVariable Long chatRoomNo, ChatMessageDto chatMessageDto) {
 
         chatService.chatting(chatMessageDto);
 
