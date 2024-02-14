@@ -631,7 +631,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             int keys[] = new int[roomUsers.size()];
             Random r = new Random();
             for(int i=0; i<roomUsers.size(); i++) {
-                keys[i] = r.nextInt(roomUsers.size()) + 1;
+                keys[i] = r.nextInt(roomUsers.size());
 
                 for(int j=0; j<i; j++) {
                     if(keys[i] == keys[j]) {
@@ -653,14 +653,17 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .manitoNo(null).manitiNo(null).build();
 
                 if(i == 0) {
+                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[keys.length-1]).getId(), roomUsers.get(keys[i+1]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[keys.length-1]).getId(), roomUsers.get(keys[i+1]).getId());
                 }
                 else if(i == keys.length-1) {
+                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[0]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[0]).getId());
                 }
                 else {
+                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[i+1]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[i+1]).getId());
                 }
@@ -684,8 +687,9 @@ public class RoomCommandServiceImpl implements RoomCommandService {
         try {
 
             // 방 유저 전체 리스트 조회
-            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(insertMatchingRequestDto.getRoomNo());
+            List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNoWhereManitoIsNotNull(insertMatchingRequestDto.getRoomNo());
 
+            log.info("기존 유저들 사이즈 = " + findRoomUsers.size());
             RoomUser firstRoomUser = findRoomUsers.get(0);
 
             List<RoomUser> existsRoomUserList = new ArrayList<>();
@@ -702,15 +706,21 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 usersManiti = roomUserQueryRepository.findById(usersManiti.getUsersManiti())
                         .orElseThrow(() -> new RoomException("해당 유저는 존재하지 않습니다."));
             }
-            existsRoomUserList.add(usersManiti);
 
+            log.info("수락 요청된 유저들 : " + insertMatchingRequestDto.getRoomUserNos().toString());
+//            Long acceptedUserNos[] = new Long[insertMatchingRequestDto.getRoomUserNos().size()];
+//            for(int i=0; i<acceptedUserNos.length; i++) {
+//                acceptedUserNos[i] = insertMatchingRequestDto.getRoomUserNos().get(i);
+//            }
             // 방 입장이 수락된 유저 리스트 조회
             List<RoomUser> acceptedUserList = roomUserQueryRepository
                     .findAllByRoomUserNosAndRoomNo(insertMatchingRequestDto.getRoomUserNos(), insertMatchingRequestDto.getRoomNo());
 
             int totalRoomUserCnt = existsRoomUserList.size() + acceptedUserList.size();
 
-            log.info("유저 수 : " + totalRoomUserCnt);
+            log.info("기존 유저 수 : " + existsRoomUserList.size());
+            log.info("수락한 유저 수 : " + acceptedUserList.size());
+            log.info("총 유저 수 : " + totalRoomUserCnt);
             // index 랜덤으로 섞기
             int indexs[] = new int[acceptedUserList.size()];
             Random r = new Random();
