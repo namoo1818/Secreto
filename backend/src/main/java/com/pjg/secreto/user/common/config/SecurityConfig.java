@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/users/sign-up", "/users/log-in" ,"/users/refreshAccess",
                                 "/cert/**", "/users/password/**","/oauth2/**",
-                                "/chat/**" ,"/login/oauth2/code/**").permitAll()
+                                "/chatting/**" ,"/login/oauth2/code/**").permitAll()
                         .anyRequest().permitAll());
         http.sessionManagement(session -> session.sessionCreationPolicy(STATELESS));
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
