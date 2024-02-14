@@ -13,16 +13,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
 
-        //해당 파라미터의 접두사가 붙은 목적지(구독자)에 메시지를 보낼
-        registry.enableSimpleBroker("/topic");
+        //클라이언트에서 보낸 메세지를 받을 prefix
+        registry.setApplicationDestinationPrefixes("/send");
 
-        //전역적인 주소 접두사. 지정 하기싫으면 ("/")
-        registry.setApplicationDestinationPrefixes("/app");
+        //해당 주소를 구독하고 있는 클라이언트들에게 메세지 전달
+        registry.enableSimpleBroker("/topic");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         //"/chatting" 이라는 엔드포인트 추가 등록
-        registry.addEndpoint("/chatting").addInterceptors().withSockJS();
+        registry.addEndpoint("/chatting")
+                .setAllowedOrigins("*")
+                .addInterceptors().withSockJS();
     }
 }
