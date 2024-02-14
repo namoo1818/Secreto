@@ -631,7 +631,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             int keys[] = new int[roomUsers.size()];
             Random r = new Random();
             for(int i=0; i<roomUsers.size(); i++) {
-                keys[i] = r.nextInt(roomUsers.size()) + 1;
+                keys[i] = r.nextInt(roomUsers.size());
 
                 for(int j=0; j<i; j++) {
                     if(keys[i] == keys[j]) {
@@ -653,14 +653,17 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .manitoNo(null).manitiNo(null).build();
 
                 if(i == 0) {
+                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[keys.length-1]).getId(), roomUsers.get(keys[i+1]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[keys.length-1]).getId(), roomUsers.get(keys[i+1]).getId());
                 }
                 else if(i == keys.length-1) {
+                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[0]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[0]).getId());
                 }
                 else {
+                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[i+1]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[i+1]).getId());
                 }
