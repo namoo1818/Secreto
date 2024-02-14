@@ -76,7 +76,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                         .missionReceivedAt(LocalDateTime.now())
                         .missionCertifyYn(false)
                         .missionType(MissionType.SUDDEN)
-                        .missionRerollCount(0)
+                        .missionRerollCount(3)
                         .roomUser(ru)
                         .content(suddenMission.getContent())
                         .roomMissionNo(suddenMission.getId()).build();
@@ -315,7 +315,7 @@ public class MissionCommandServiceImpl implements MissionCommandService {
                         .missionReceivedAt(LocalDateTime.now())
                         .missionCertifyYn(false)
                         .missionType(MissionType.REGULAR)
-                        .missionRerollCount(0)
+                        .missionRerollCount(3)
                         .roomUser(ru)
                         .content(roomMission.getContent())
                         .roomMissionNo(roomMission.getId()).build();
