@@ -426,6 +426,10 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                     exitRoomRequestDto.getRoomNo())
                     .orElseThrow(() -> new RoomException("해당 유저는 방에 속해있지 않습니다."));
 
+            if(findRoomUser.getUserLeaveAt() != null) {
+                throw new RoomException("해당 유저는 방에서 나간 유저입니다.");
+            }
+
             log.info("방 유저 식별키 : " + findRoomUser.getId());
 
             // 방이 시작한 상태이고 종료되지 않은 상태일 경우에만 마니또 마니띠 관계 변경
