@@ -2,11 +2,13 @@ package com.pjg.secreto.chat.service;
 
 import com.pjg.secreto.chat.common.exception.ChatException;
 import com.pjg.secreto.chat.dto.ChatMessageDto;
-import com.pjg.secreto.chat.dto.CreateChatRoomRequestDto;
+import com.pjg.secreto.chat.dto.ChatMessagesResponseDto;
 import com.pjg.secreto.chat.dto.ShowChatUserListResponseDto;
 import com.pjg.secreto.chat.entity.Chat;
 import com.pjg.secreto.chat.entity.ChatMessage;
 import com.pjg.secreto.chat.entity.ChatUser;
+import com.pjg.secreto.chat.entity.ChattingUserType;
+import com.pjg.secreto.chat.repository.ChatMessageCustomRepository;
 import com.pjg.secreto.chat.repository.ChatMessageRepository;
 import com.pjg.secreto.chat.repository.ChatRepository;
 import com.pjg.secreto.chat.repository.ChatUserRepository;
@@ -28,6 +30,7 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatUserRepository chatUserRepository;
     private final RoomUserQueryRepository roomUserQueryRepository;
+    private final ChatMessageCustomRepository chatMessageCustomRepository;
 
     public void chatting(ChatMessageDto chatMessageDto) {
 
@@ -41,6 +44,7 @@ public class ChatService {
                     .message(chatMessageDto.getMessage())
                     .readYn(false)
                     .chat(findChat)
+                    .senderId(chatMessageDto.getSenderId())
                     .sendAt(LocalDateTime.now()).build();
 
             chatMessageRepository.save(chatMessage);
@@ -73,5 +77,10 @@ public class ChatService {
         } catch (Exception e) {
             throw new ChatException(e.getMessage());
         }
+    }
+
+    public List<ChatMessagesResponseDto> getChatHistory(String type, Long chatRoomNo){
+        ChattingUserType roomType = ChattingUserType.valueOf(type.toUpperCase());
+        return chatMessageCustomRepository.getChatHistory(roomType, chatRoomNo);
     }
 }
