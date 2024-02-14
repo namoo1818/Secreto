@@ -465,10 +465,11 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 matchingCommandRepository.save(manitosMatching);
                 matchingCommandRepository.save(manitisMatching);
 
-                // 방 유저 정보 변경
-                findRoomUser.leave();
-                log.info("방 유저 정보 변경 완료");
             }
+
+            // 방 유저 정보 변경
+            findRoomUser.leave();
+            log.info("방 유저 정보 변경 완료");
 
         } catch (Exception e) {
 
