@@ -14,6 +14,7 @@ public interface UserMissionQueryRepository extends JpaRepository<UserMission, L
 
     Optional<UserMission> findById(Long userMissionNo);
 
-    @Query("select um from UserMission um where um.missionReceivedAt = (select max(um.missionReceivedAt) from UserMission um)")
+    @Query("select um from UserMission um where um.missionReceivedAt = " +
+            "(select max(um.missionReceivedAt) from UserMission um where um.roomUser.id = :roomUserNo)")
     UserMission findWhereLatestByRoomUserNo(Long roomUserNo);
 }
