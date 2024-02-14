@@ -155,7 +155,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             Room findRoom = roomQueryRepository.findById(setRoomRequestDto.getRoomNo())
                     .orElseThrow(() -> new RoomException("해당 방은 존재하지 않습니다."));
 
-            if(!findRoom.getRoomStartYn()) {
+            if(findRoom.getRoomStartYn()) {
                 throw new RoomException("해당 방은 이미 시작되었습니다.");
             }
 
@@ -692,7 +692,9 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                     .orElseThrow(() -> new RoomException("해당 유저는 존재하지 않습니다."));
 
             // 마니또 -> 자신 -> 마니띠로 정렬
-            while(!Objects.equals(usersManiti.getUsersManiti(), firstRoomUser.getId())) {
+            while(!Objects.equals(usersManiti.getId(), firstRoomUser.getId())) {
+                log.info("유저의 마니띠 식별키 : " + usersManiti.getId());
+                log.info("첫 유저의 식별키 : " + firstRoomUser.getId());
                 existsRoomUserList.add(usersManiti);
                 usersManiti = roomUserQueryRepository.findById(usersManiti.getUsersManiti())
                         .orElseThrow(() -> new RoomException("해당 유저는 존재하지 않습니다."));
