@@ -180,7 +180,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
                     SummaryType.USER_BEST,
                     new SummaryResultData(
                             null,
-                            "선정된 사람이 없습니다.",
+                            "선정자는 없습니다.",
                             null
                     )
             );
