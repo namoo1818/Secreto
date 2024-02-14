@@ -99,7 +99,7 @@ public class ManitoExpectRepository {
             );
         }
 
-        return new SummaryResultData("", "선정자는 아무도 없습니다." , "");
+        return new SummaryResultData("", "선정자는 없습니다.", "");
     }
 
 

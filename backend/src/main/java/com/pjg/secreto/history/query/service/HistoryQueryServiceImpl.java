@@ -180,7 +180,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
                     SummaryType.USER_BEST,
                     new SummaryResultData(
                             null,
-                            "선정된 사람이 없습니다.",
+                            "선정자는 없습니다.",
                             null
                     )
             );
@@ -209,7 +209,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
                     SummaryType.BOARD_VIEWS,
                     new SummaryResultData(
                             "",
-                            "선정자는 없습니다.",
+                            "선정된 게시글이 없습니다.",
                             ""
                     )
             );
@@ -232,7 +232,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
                     SummaryType.BOARD_LIKES,
                     new SummaryResultData(
                             "",
-                            "선정자는 없습니다.",
+                            "선정된 게시글이 없습니다.",
                             ""
                     )
             );
