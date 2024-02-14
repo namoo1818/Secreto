@@ -333,14 +333,12 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .content("방이 시작되었습니다.")
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
-                        .author(ru.getRoom().getRoomName() + " 방이 시작되었습니다.")
+                        .author("알림 도착")
                         .roomUserNo(ru.getId()).build();
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "방이 시작되었습니다.", "start");
 
             }
-
-            log.info("알림 날리기 완료");
 
             // 방 정보 수정
             room.startRoom(LocalDateTime.now(),
@@ -398,10 +396,10 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .content("유저가 방에 입장하였습니다.")
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
-                        .author(roomUser.getNickname())
+                        .author("알림 도착")
                         .roomUserNo(findRoom.getHostNo()).build();
 
-                emitterService.alarm(findRoom.getHostNo(), alarmDataDto, "유저가 방에 입장하였습니다.", "enter");
+                emitterService.alarmWithNoStore(findRoom.getHostNo(), alarmDataDto, "유저가 방에 입장하였습니다.", "enter");
             }
 
             return findRoom.getId();
@@ -492,13 +490,12 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                 ru.accepted();
                 roomUserNos.add(ru.getId());
 
-
                 // 유저에게 알림 발송
                 AlarmDataDto alarmDataDto = AlarmDataDto.builder()
                         .content("방 입장이 수락되었습니다.")
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
-                        .author(ru.getRoom().getRoomName() + " 방")
+                        .author("알림 도착")
                         .roomUserNo(ru.getId()).build();
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "방 입장이 수락되었습니다.", "accept");
@@ -527,7 +524,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .content("방 입장이 거절되었습니다.")
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
-                        .author("SYSTEM")
+                        .author("알림 도착")
                         .roomUserNo(roomUserNo).build();
 
                 emitterService.alarmWithNoStore(roomUserNo, alarmDataDto, "방 입장이 거절되었습니다.", "reject");
@@ -553,14 +550,14 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             // 유저에게 알림 발송
             AlarmDataDto alarmDataDto = AlarmDataDto.builder()
-                    .content("방장 권한을 위임받으셨습니다.")
+                    .content("방장 권한을 위임받았습니다.")
                     .readYn(false)
                     .generatedAt(LocalDateTime.now())
-                    .author("SYSTEM")
+                    .author("알림 도착")
                     .roomUserNo(deligateAdminRequestDto.getNewHost()).build();
 
             emitterService.alarm(deligateAdminRequestDto.getNewHost(), alarmDataDto,
-                    "방장 권한을 위임받으셨습니다.", "message");
+                    "방장 권한을 위임받았습니다.", "message");
 
         } catch (Exception e) {
             throw new RoomException(e.getMessage());
@@ -607,7 +604,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .content("방이 종료되었습니다.")
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
-                        .author("방장")
+                        .author("방 종료 알림")
                         .roomUserNo(ru.getId()).build();
 
                 emitterService.alarm(ru.getId(), alarmDataDto,
@@ -658,17 +655,14 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .manitoNo(null).manitiNo(null).build();
 
                 if(i == 0) {
-                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[keys.length-1]).getId(), roomUsers.get(keys[i+1]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[keys.length-1]).getId(), roomUsers.get(keys[i+1]).getId());
                 }
                 else if(i == keys.length-1) {
-                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[0]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[0]).getId());
                 }
                 else {
-                    log.info("인덱스 : " + i);
                     matching.changeMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[i+1]).getId());
                     findRoomUser.setMatchingInfo(roomUsers.get(keys[i-1]).getId(), roomUsers.get(keys[i+1]).getId());
                 }
@@ -705,27 +699,19 @@ public class RoomCommandServiceImpl implements RoomCommandService {
 
             // 마니또 -> 자신 -> 마니띠로 정렬
             while(!Objects.equals(usersManiti.getId(), firstRoomUser.getId())) {
-                log.info("유저의 마니띠 식별키 : " + usersManiti.getId());
-                log.info("첫 유저의 식별키 : " + firstRoomUser.getId());
+
                 existsRoomUserList.add(usersManiti);
                 usersManiti = roomUserQueryRepository.findById(usersManiti.getUsersManiti())
                         .orElseThrow(() -> new RoomException("해당 유저는 존재하지 않습니다."));
             }
 
-            log.info("수락 요청된 유저들 : " + insertMatchingRequestDto.getRoomUserNos().toString());
-//            Long acceptedUserNos[] = new Long[insertMatchingRequestDto.getRoomUserNos().size()];
-//            for(int i=0; i<acceptedUserNos.length; i++) {
-//                acceptedUserNos[i] = insertMatchingRequestDto.getRoomUserNos().get(i);
-//            }
             // 방 입장이 수락된 유저 리스트 조회
             List<RoomUser> acceptedUserList = roomUserQueryRepository
                     .findAllByRoomUserNosAndRoomNo(insertMatchingRequestDto.getRoomUserNos(), insertMatchingRequestDto.getRoomNo());
 
             int totalRoomUserCnt = existsRoomUserList.size() + acceptedUserList.size();
 
-            log.info("기존 유저 수 : " + existsRoomUserList.size());
-            log.info("수락한 유저 수 : " + acceptedUserList.size());
-            log.info("총 유저 수 : " + totalRoomUserCnt);
+
             // index 랜덤으로 섞기
             int indexs[] = new int[acceptedUserList.size()];
             Random r = new Random();
@@ -833,7 +819,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .content("방 입장 상태가 대기 중으로 변경되었습니다.")
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
-                        .author(ru.getRoom().getRoomName() + " 방")
+                        .author("알림 도착")
                         .roomUserNo(ru.getId()).build();
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "방 입장 상태가 대기중으로 변경 되었습니다.", "standBy");

@@ -85,10 +85,10 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
                 // 유저에게 알림 발송
                 AlarmDataDto alarmDataDto = AlarmDataDto.builder()
-                        .content(userMission.getContent())
+                        .content("돌발 미션 : " + userMission.getContent())
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
-                        .author("방장")
+                        .author("돌발 미션 도착")
                         .roomUserNo(ru.getId()).build();
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "돌발 미션이 생성되었습니다.", "message");
@@ -203,10 +203,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
             Collections.shuffle(roomMissions);
             log.info("셔플 완료");
 
-            for(RoomMission rm : roomMissions) {
-                System.out.println(rm.getContent());
-            }
-
             RoomMission newRoomMission = roomMissions.get(0);
             log.info("미션 가져오기");
 
@@ -214,31 +210,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
             findUserMission.rerollUserMission(newRoomMission.getContent(), findUserMission.getMissionRerollCount());
 
             log.info("유저 미션 수정 완료");
-
-//            // 공통 미션이면 리롤 막기
-//            if(findRoomUser.getRoom().getCommonYn()) {
-//                throw new MissionException("해당 미션은 공통 미션이므로 리롤이 불가능합니다.");
-//            }
-//
-//            else {
-//
-//                Collections.shuffle(roomMissions);
-//                log.info("셔플 완료");
-//
-//                for(RoomMission rm : roomMissions) {
-//                    System.out.println(rm.getContent());
-//                }
-//
-//                RoomMission newRoomMission = roomMissions.get(0);
-//                log.info("미션 가져오기");
-//
-//                // 유저 미션 수정
-//                findUserMission.rerollUserMission(newRoomMission.getContent(), findUserMission.getMissionRerollCount());
-//
-//                log.info("유저 미션 수정 완료");
-//            }
-
-
 
         } catch (Exception e) {
             throw new MissionException(e.getMessage());
@@ -261,7 +232,6 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
         // 미션 제출 일정이 현재 일자와 같은 모든 룸 유저들 조회
         List<Room> findRooms = roomQueryRepository.findAll();
-//        List<Room> findRoomsWithMissionSchedule = roomQueryRepository.findAllWithMissionSchedule();
 
         List<Room> hasMissionRooms = new ArrayList<>();
 
@@ -323,10 +293,10 @@ public class MissionCommandServiceImpl implements MissionCommandService {
 
                 // 유저에게 알림 발송
                 AlarmDataDto alarmDataDto = AlarmDataDto.builder()
-                        .content(userMission.getContent())
+                        .content("정기 미션 : " + userMission.getContent())
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
-                        .author("시스템")
+                        .author("정기 미션 도착")
                         .roomUserNo(ru.getId()).build();
 
                 emitterService.alarm(ru.getId(), alarmDataDto, "정기 미션이 생성되었습니다.", "message");
@@ -342,7 +312,23 @@ public class MissionCommandServiceImpl implements MissionCommandService {
             LocalDateTime roomEndAt = r.getRoomEndAt().truncatedTo(ChronoUnit.HOURS);
 
             if(now.isEqual(roomEndAt)) {
+
                 r.terminateRoom();
+
+                List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNo(r.getId());
+
+                for(RoomUser ru : findRoomUsers) {
+
+                    // 유저에게 알림 발송
+                    AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                            .content("마니또 게임이 종료되었습니다.")
+                            .readYn(false)
+                            .generatedAt(LocalDateTime.now())
+                            .author("알림 도착")
+                            .roomUserNo(ru.getId()).build();
+
+                    emitterService.alarm(ru.getId(), alarmDataDto, "마니또 게임이 종료되었습니다.", "message");
+                }
             }
         }
 

@@ -3,6 +3,7 @@ package com.pjg.secreto.alarm.service;
 import com.pjg.secreto.alarm.common.entity.Alarm;
 import com.pjg.secreto.alarm.common.exception.AlarmException;
 import com.pjg.secreto.alarm.dto.AlarmDataDto;
+import com.pjg.secreto.alarm.dto.BoardAlarmDataDto;
 import com.pjg.secreto.alarm.repository.AlarmRepository;
 import com.pjg.secreto.alarm.repository.EmitterRepository;
 import com.pjg.secreto.room.common.entity.RoomUser;

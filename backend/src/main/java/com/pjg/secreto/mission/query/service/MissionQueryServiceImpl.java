@@ -124,7 +124,6 @@ public class MissionQueryServiceImpl implements MissionQueryService {
 
             throw new MissionException(e.getMessage());
         }
-
     }
 
     @Override

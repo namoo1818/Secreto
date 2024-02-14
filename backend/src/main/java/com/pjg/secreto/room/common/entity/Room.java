@@ -103,6 +103,7 @@ public class Room {
 
     public void terminateRoom() {
         this.roomEndAt = LocalDateTime.now();
+        this.entryCode = null;
     }
 
 }

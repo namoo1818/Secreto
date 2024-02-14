@@ -1,6 +1,7 @@
 package com.pjg.secreto.board.command.service;
 
 import com.pjg.secreto.alarm.dto.AlarmDataDto;
+import com.pjg.secreto.alarm.dto.BoardAlarmDataDto;
 import com.pjg.secreto.alarm.service.EmitterService;
 import com.pjg.secreto.board.command.dto.UpdateBoardRequestDto;
 import com.pjg.secreto.board.command.dto.UpdateReplyRequestDto;
@@ -266,7 +267,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
 
                 // 유저에게 알림 발송
                 AlarmDataDto alarmDataDto = AlarmDataDto.builder()
-                        .content(writeReplyRequestDto.getContent())
+                        .content("당신의 게시판에 댓글이 달렸습니다.")
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
                         .author(board.getId().toString())
@@ -283,7 +284,7 @@ public class BoardCommandServiceImpl implements BoardCommandService {
 
                 // 유저에게 알림 발송
                 AlarmDataDto alarmDataDto = AlarmDataDto.builder()
-                        .content(writeReplyRequestDto.getContent())
+                        .content("당신의 댓글에 답글이 달렸습니다.")
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
                         .author(board.getId().toString())
@@ -291,7 +292,6 @@ public class BoardCommandServiceImpl implements BoardCommandService {
 
                 emitterService.alarm(findReply.getRoomUser().getId(), alarmDataDto, "대댓글이 달렸습니다.", "board");
             }
-
 
             replyCommandRepository.save(reply);
         }catch (Exception e){
