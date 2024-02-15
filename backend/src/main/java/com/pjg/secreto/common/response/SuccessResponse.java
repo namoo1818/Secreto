@@ -10,12 +10,12 @@ import org.springframework.http.HttpStatus;
 @Builder
 public class SuccessResponse {
 
-    HttpStatus httpStatus;
-    String msg;
+    HttpStatus status;
+    String message;
     Object result;
 
-    public SuccessResponse(HttpStatus httpStatus, String msg){
-        this.httpStatus = httpStatus;
-        this.msg = msg;
+    public SuccessResponse(HttpStatus status, String message){
+        this.status = status;
+        this.message = message;
     }
 }
