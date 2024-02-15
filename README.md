@@ -59,7 +59,23 @@
 
 > <h3><font color="green">화면 명세서</font></h3>
 
-> ![image](./img/API명세서.gif) <br/>
+> <h4>서비스 온보딩</h4>
+> ![image](./img/서비스온보딩.png) <br/>
+
+> <h4>게임 진행</h4>
+> ![image](./img/게임진행.png) <br/>
+
+> <h4>게임 후기</h4>
+> ![image](./img/게임후기.png) <br/>
+
+> <h4>모바일 서비스 온보딩</h4>
+> ![image](./img/모바일서비스온보딩.png) <br/>
+
+> <h4>모바일 게임 진행</h4>
+> ![image](./img/모바일게임진행.png) <br/>
+
+> <h4>모바일 게임 후기</h4>
+> ![image](./img/모바일게임후기.png) <br/>
 
 > <br/>
 > <br/>
