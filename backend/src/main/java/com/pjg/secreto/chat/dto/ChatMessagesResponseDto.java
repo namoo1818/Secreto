@@ -13,19 +13,17 @@ public class ChatMessagesResponseDto {
     private String profileUrl;
     private String sender;
     private Long senderId;
-    private LocalDateTime registeredAt;
+    private LocalDateTime sendAt;
     private String message;
-    private String sendAt;
     private ChattingUserType type;
 
     @Builder
-    public ChatMessagesResponseDto(String profileUrl, String sender, Long senderId, LocalDateTime registeredAt, String message, String sendAt, ChattingUserType type) {
+    public ChatMessagesResponseDto(String profileUrl, String sender, Long senderId, LocalDateTime sendAt, String message, ChattingUserType type) {
         this.profileUrl = profileUrl;
         this.sender = sender;
         this.senderId = senderId;
-        this.registeredAt = registeredAt;
-        this.message = message;
         this.sendAt = sendAt;
+        this.message = message;
         this.type = type;
         setSender(sender);
     }
