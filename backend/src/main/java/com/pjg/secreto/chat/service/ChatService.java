@@ -61,7 +61,7 @@ public class ChatService {
                         .content("채팅 발생")
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
-                        .author("채팅 발생 알림")
+                        .author(cu.getChattingUserType().toString())
                         .roomUserNo(cu.getRoomUser().getId()).build();
 
                 emitterService.alarmWithNoStore(cu.getRoomUser().getId(), alarmDataDto, "채팅 발생", "chat");
