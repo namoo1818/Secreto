@@ -32,11 +32,11 @@
 ## 📝 Design
 > <h3><font color="green">전체 기술 스택</font></h3>
 
-> ![image](./img/전체기술스택.png) > <br/>
+> ![image](./img/전체기술스택.png) <br/>
 
 > <h3><font color="green">전체 시스템 구조</font></h3>
 
-> ![image](./img/전체시스템구조.png) > <br/>
+> ![image](./img/전체시스템구조.png) <br/>
 
 > <h3><font color="green">ERD 다이어그램</font></h3>
 
@@ -58,12 +58,90 @@
 > <br/>
 
 ## 💻Front-End
-> <h3><font color="green">사용한 라이브러리</font></h3>
 
-| 라이브러리       | 설명                                         |
-| ---------------- | -------------------------------------------- |
-|                  |                                              |
+### 1. 개발 환경(IDE)
 
+- 프로젝트 설정 CLI
+    
+    ```bash
+    # git bash
+    npm init vue@latest
+    Project name : secreto
+    Add TypeScrfipt? Yes
+    Add JSX Support? Yes
+    Add vue Router for SPA Development? Yes
+    Add Pinia for state management? Yes
+    Add Vitest for Unit Testing? option
+    Add ESLint for code quality? Yes
+    Add Prettier for code formatting? Yes
+    
+    # 프로젝트 VSC 열고 디펜던시 설치 및 실행하기 
+    code .
+    npm install
+    npm run dev
+    ```
+    
+- VisualStudioCode(VSC)
+    - 1.85.1
+    - Extensions
+        - Auto Rename Tag
+        - ESLint
+        - Prettier - Code formatter
+        - Git Lens
+        - TODO Highlight
+        - Material icon Theme
+        - Tailwind CSS Intellisense
+        - TypeScript Vue Plugin (Volar)
+        - Vue3 Snippets
+- Node.js
+    - 20.11.0 LTS
+- NPM
+    - 10.3.0
+- tailwind
+    - 테일 윈드 설치 방법
+        
+        ```
+        npm install -D tailwindcss postcss autoprefixer
+        
+        npx tailwindcss init -p
+        ```
+        
+    - 3.4.1
+
+### 2. 개발 언어 및 프레임 워크
+
+- vue
+    - 3.3.11
+- @vue/cli
+    - 5.0.8
+- TypeScript
+    - 5.3.3
+
+### 3. 기타 라이브러리
+
+- pinia (데이터 전역관리)
+    - 2.1.7
+- pinia-plugin-persistedstate (새로 고침시 피니아 데이터 초기화 문제 방지)
+    - 3.2.1
+- axios (api 통신)
+    - 1.6.5
+- ant-design-vue (아이콘, 이벤트 등)
+    - 4.1.2
+- quill-image-uploader (quill editor 이미지 S3 업로드 용)
+    - 1.3.0
+- @vueup/vue-quill (텍스트 에디터)
+    - 1.2.0
+- stompjs (소켓 연결용)
+    - 2.3.3
+- sockjs-client (소켓 연결용)
+    - 1.6.1
+- vuewordcloud (실시간 워드크라우드)
+    - 19.0.0
+
+### 4. 빌드 및 배포 도구
+
+- Vite
+- NginX
 <br/>
 
 > <h3><font color="green">디렉토리 구조</font></h3>
@@ -118,16 +196,60 @@
 
 <br/>
 
-> <h3><font color="green">아키텍처 구조</font></h3>
-
-> ![서비스소개](./img/11.아키텍처구조.png) > <br/> > <br/>
-
 ## 💻Back-End
-> <h3><font color="green">사용한 라이브러리</font></h3>
 
-| 라이브러리                                  | 설명                                                                    |
-| ------------------------------------------- | ----------------------------------------------------------------------- |
-|                                             |                                                                         |
+### 1. 개발 환경(IDE)
+
+- IntelliJ
+    
+    
+
+### 2. 개발 언어 및 프레임워크, 라이브러리
+
+- Java 17.0.10 2024-01-16 LTS
+- Spring Boot
+    - MVC Spring Boot Web boot-starter 3.2.2
+    - JPA
+        - Spring Data JPA 3.2.2
+        - QueryDSL 5.0.0
+    - WebSocket 6.1.3
+    - Scheduler
+    - SSE
+    - Spring Security 6.2.1
+        - OAuth2 Client 6.2.1
+    - Validation 3.0.2
+    - Java Mail Sender 2.0.2
+- io.jsonwebtoken:jjwt  0.11.5
+- Lombok 1.18.30
+- p6spy-spring-boot-starter 1..9.0
+- spring-cloud-aws-s3 3.0.2
+
+### 3. 데이터베이스
+
+- Redis 7.2.4
+- MariaDB 11.2.3
+
+### 4. 테스팅 도구
+
+- JUnit  5.10.1
+    - AssertJ 3.24.2
+- Mockito 5.7.0
+
+### 5. 빌드 및 배포 도구
+
+- Gradle
+- Docker 25.0.0
+- NginX 1.18.0
+- Jenkins 2.441
+- AWS Lightsail / S3
+- Prometheus 2.50
+- Grafana 10.3.1
+- Node Exporter 1.7.0
+
+### 6. 형상관리 도구
+
+- GitLab
+- Jira                                                                    |
 
 <br/>
 
@@ -513,21 +635,8 @@
  ┗ 📜settings.gradle
 ```
 
-<br/>
-
-> <h3><font color="green">패키지 다이어그램</font></h3>
-
-> ![image](./img/12.패키지다이어그램.png)
-
 > 도메인 기준으로 패키지를 구분하였다.
 > <br/>
-
-> <h3><font color="green">SNS 로그인 과정</font></h3>
-![image](./img/SNS로그인.png)
-> <h3><font color="green">방 생성 과정</font></h3>
-![image](./img/방생성및구성.png)
-> <h3><font color="green">히스토리 생성 과정</font></h3>
-![image](./img/히스토리생성.png)
 
 ## 👨‍👦‍👦 Team Member
 > <h3><font color="red">Front-End</font></h3>
