@@ -627,7 +627,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             /**
              * 매칭 정보 추가를 위한 로직
              */
-            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomId(initMatchingRequestDto.getRoomNo());
+            List<RoomUser> roomUsers = roomUserQueryRepository.findAllByRoomNoWhereNotLeave(initMatchingRequestDto.getRoomNo());
 
             // key 랜덤으로 섞기
             int keys[] = new int[roomUsers.size()];
