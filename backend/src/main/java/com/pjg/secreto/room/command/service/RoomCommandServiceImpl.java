@@ -498,7 +498,7 @@ public class RoomCommandServiceImpl implements RoomCommandService {
                         .author("알림 도착")
                         .roomUserNo(ru.getId()).build();
 
-                emitterService.alarm(ru.getId(), alarmDataDto, "방 입장이 수락되었습니다.", "accept");
+                emitterService.alarmWithNoStore(ru.getId(), alarmDataDto, "방 입장이 수락되었습니다.", "accept");
 
             }
 
@@ -688,7 +688,6 @@ public class RoomCommandServiceImpl implements RoomCommandService {
             // 방 유저 전체 리스트 조회
             List<RoomUser> findRoomUsers = roomUserQueryRepository.findAllByRoomNoWhereManitoIsNotNull(insertMatchingRequestDto.getRoomNo());
 
-            log.info("기존 유저들 사이즈 = " + findRoomUsers.size());
             RoomUser firstRoomUser = findRoomUsers.get(0);
 
             List<RoomUser> existsRoomUserList = new ArrayList<>();
