@@ -15,4 +15,5 @@ public class ChatMessageDto {
     private Long chatNo;
     private LocalDateTime sendAt;
     private Long senderId;
+    private String profileUrl;
 }
