@@ -59,6 +59,14 @@
 > <br/>
 > <br/>
 
+> <h3><font color="green">화면 명세서</font></h3>
+
+> ![image](./img/API명세서.gif) <br/>
+
+> <br/>
+> <br/>
+
+
 ## 💻Front-End
 > <h3><font color="green">사용한 라이브러리</font></h3>
 
