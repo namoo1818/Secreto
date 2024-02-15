@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Transactional
 @RequiredArgsConstructor
@@ -55,6 +56,10 @@ public class ChatService {
             List<ChatUser> chatUsers = chatUserRepository.findAllByChatNo(findChat.getId());
 
             for(ChatUser cu : chatUsers) {
+
+                if(Objects.equals(cu.getRoomUser().getId(), chatMessageDto.getSenderId())) {
+                    continue;
+                }
 
                 // 유저에게 알림 발송
                 AlarmDataDto alarmDataDto = AlarmDataDto.builder()
