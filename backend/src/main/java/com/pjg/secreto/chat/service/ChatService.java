@@ -1,5 +1,7 @@
 package com.pjg.secreto.chat.service;
 
+import com.pjg.secreto.alarm.dto.AlarmDataDto;
+import com.pjg.secreto.alarm.service.EmitterService;
 import com.pjg.secreto.chat.common.exception.ChatException;
 import com.pjg.secreto.chat.dto.ChatMessageDto;
 import com.pjg.secreto.chat.dto.ChatMessagesResponseDto;
@@ -31,6 +33,7 @@ public class ChatService {
     private final ChatUserRepository chatUserRepository;
     private final RoomUserQueryRepository roomUserQueryRepository;
     private final ChatMessageCustomRepository chatMessageCustomRepository;
+    private final EmitterService emitterService;
 
     public void chatting(ChatMessageDto chatMessageDto) {
 
@@ -48,6 +51,22 @@ public class ChatService {
                     .sendAt(LocalDateTime.now()).build();
 
             chatMessageRepository.save(chatMessage);
+
+            List<ChatUser> chatUsers = chatUserRepository.findAllByChatNo(findChat.getId());
+
+            for(ChatUser cu : chatUsers) {
+
+                // 유저에게 알림 발송
+                AlarmDataDto alarmDataDto = AlarmDataDto.builder()
+                        .content("채팅 발생")
+                        .readYn(false)
+                        .generatedAt(LocalDateTime.now())
+                        .author("채팅 발생 알림")
+                        .roomUserNo(cu.getRoomUser().getId()).build();
+
+                emitterService.alarmWithNoStore(cu.getRoomUser().getId(), alarmDataDto, "채팅 발생", "chat");
+            }
+
 
         } catch (Exception e) {
 
