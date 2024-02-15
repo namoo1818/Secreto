@@ -10,4 +10,7 @@ public interface ChatUserRepository extends JpaRepository<ChatUser, Long> {
 
     @Query("select cu from ChatUser cu where cu.roomUser.id = :roomUserNo")
     List<ChatUser> findAllByRoomUserNo(Long roomUserNo);
+
+    @Query("select cu from ChatUser cu where cu.chat.id = :chatNo")
+    List<ChatUser> findAllByChatNo(Long chatNo);
 }
