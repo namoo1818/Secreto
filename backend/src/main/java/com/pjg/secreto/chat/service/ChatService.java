@@ -17,6 +17,7 @@ import com.pjg.secreto.chat.repository.ChatUserRepository;
 import com.pjg.secreto.room.common.entity.RoomUser;
 import com.pjg.secreto.room.query.repository.RoomUserQueryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Transactional
 @RequiredArgsConstructor
 @Service
@@ -57,7 +59,9 @@ public class ChatService {
 
             for(ChatUser cu : chatUsers) {
 
+                log.info("채팅 발생 : " + cu.getRoomUser().getNickname());
                 if(Objects.equals(cu.getRoomUser().getId(), chatMessageDto.getSenderId())) {
+                    log.info("스킵");
                     continue;
                 }
 
@@ -71,7 +75,6 @@ public class ChatService {
 
                 emitterService.alarmWithNoStore(cu.getRoomUser().getId(), alarmDataDto, "채팅 발생", "chat");
             }
-
 
         } catch (Exception e) {
 
