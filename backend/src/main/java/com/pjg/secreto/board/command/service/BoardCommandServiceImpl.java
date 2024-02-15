@@ -267,19 +267,19 @@ public class BoardCommandServiceImpl implements BoardCommandService {
 
                 // 유저에게 알림 발송
                 AlarmDataDto alarmDataDto = AlarmDataDto.builder()
-                        .content("당신의 게시판에 댓글이 달렸습니다.")
+                        .content("당신의 게시글에 댓글이 달렸습니다.")
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
                         .author(board.getId().toString())
-                        .roomUserNo(roomUser.getId()).build();
+                        .roomUserNo(board.getRoomUser().getId()).build();
 
-                emitterService.alarm(board.getRoomUser().getId(), alarmDataDto, "게시판에 댓글이 달렸습니다.", "board");
+                emitterService.alarm(board.getRoomUser().getId(), alarmDataDto, "게시글에 댓글이 달렸습니다.", "board");
             }
 
             // 댓글 작성자에게 대댓글 알림 발송
             else {
 
-                Reply findReply = replyQueryRepository.findById(reply.getParentReplyNo())
+                Reply findParentReply = replyQueryRepository.findById(reply.getParentReplyNo())
                         .orElseThrow(() -> new BoardException("해당 댓글이 존재하지 않습니다."));
 
                 // 유저에게 알림 발송
@@ -288,9 +288,9 @@ public class BoardCommandServiceImpl implements BoardCommandService {
                         .readYn(false)
                         .generatedAt(LocalDateTime.now())
                         .author(board.getId().toString())
-                        .roomUserNo(roomUser.getId()).build();
+                        .roomUserNo(findParentReply.getRoomUser().getId()).build();
 
-                emitterService.alarm(findReply.getRoomUser().getId(), alarmDataDto, "대댓글이 달렸습니다.", "board");
+                emitterService.alarm(findParentReply.getRoomUser().getId(), alarmDataDto, "대댓글이 달렸습니다.", "board");
             }
 
             replyCommandRepository.save(reply);
