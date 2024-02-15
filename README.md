@@ -13,13 +13,10 @@
 ![image](./img/채팅.gif) <br/>
 
 <h5>히스토리 화면</h5>
-<br/>
+![image](./img/히스토리.gif) <br/>
 
 ## 📃 Description
-> <h3><font color="red">서비스 주요 기능</font></h3>
-
-<br/>
-> <h3><font color="green">서비스 전체 기능</font></h3>
+> <h3><font color="green">서비스 주요 기능</font></h3>
 <ul>
 	<li>매칭  기능 : 마니또를 매칭하는 기능</li>
 	<li>마니또 그룹 관리 : 방장이 게임할 인원들을 모집하게 게임을 관리하는 기능</li>
