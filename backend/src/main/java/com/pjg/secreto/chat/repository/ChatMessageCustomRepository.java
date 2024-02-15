@@ -60,7 +60,7 @@ public class ChatMessageCustomRepository {
                     return ChatMessagesResponseDto.builder()
                             .sender(roomUsers.getNickname())
                             .profileUrl(roomUsers.getUser().getProfileUrl())
-                            .registeredAt(sendAt)
+                            .sendAt(sendAt)
                             .message(chats)
                             .senderId(chatMessage.getSenderId())
                             .type(roomType)
