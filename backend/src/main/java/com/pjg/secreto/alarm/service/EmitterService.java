@@ -29,8 +29,8 @@ public class EmitterService {
     private final EmitterRepository emitterRepository;
     private final AlarmRepository alarmRepository;
 
-    private static final Long DEFAULT_TIMEOUT = 600L * 1000 * 60 * 60;
-    private static final long RECONNECTION_TIMEOUT = 1000L;
+    private static final Long DEFAULT_TIMEOUT = 300_000L;
+    private static final long RECONNECTION_TIMEOUT = 3000L;
 
     public SseEmitter subscribe(Long roomUserNo) {
 
@@ -39,7 +39,6 @@ public class EmitterService {
         sendToClient(roomUserNo, "roomUserNo : " + roomUserNo + "과의 알람 연결 성공", "sse 접속 성공");
 
         return emitter;
-
     }
 
     public void alarmWithNoStore(Long userId, AlarmDataDto alarmDataDto, String comment, String type) {
@@ -73,22 +72,6 @@ public class EmitterService {
         }
 
     }
-
-//    public <T> void broadcast(T data) {
-//        emitterMap.forEach((id, emitter) -> {
-//            try {
-//                emitter.send(SseEmitter.event()
-//                        .name("broadcast event")
-//                        .id("broadcast event 1")
-//                        .reconnectTime(RECONNECTION_TIMEOUT)
-//                        .data(data, MediaType.APPLICATION_JSON));
-//                log.info("sended notification, id={}, payload={}", id, data);
-//            } catch (IOException e) {
-//                //SSE 세션이 이미 해제된 경우
-//                log.error("fail to send emitter id={}, {}", id, e.getMessage());
-//            }
-//        });
-//    }
 
     private void sendToClient(Long roomUserNo, Object data, String comment) {
 
