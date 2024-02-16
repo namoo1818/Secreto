@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "forceConsistentCasingInFileNames": true,
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "lib": ["ESNext", "DOM"],
+        "composite": true,
+        "noEmit": true,
+        "types": ["node"],
+        "strict": true
+    },
+    "files": [],
+    "references": [
+        {
+            "path": "./tsconfig.node.json"
+        },
+        {
+            "path": "./tsconfig.app.json"
+        }
+    ]
+}
