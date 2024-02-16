@@ -186,50 +186,212 @@
 
 ```markdown
 📦frontend
- ┣ 📂.vscode
- ┃ ┗ 📜extensions.json
  ┣ 📂public
- ┃ ┗ 📜favicon.ico
+ ┃ ┗ 📜character.png
  ┣ 📂src
+ ┃ ┣ 📂api
+ ┃ ┃ ┣ 📜board.ts
+ ┃ ┃ ┣ 📜chatting.ts
+ ┃ ┃ ┣ 📜history.ts
+ ┃ ┃ ┣ 📜mission.ts
+ ┃ ┃ ┣ 📜notification.ts
+ ┃ ┃ ┣ 📜room.ts
+ ┃ ┃ ┣ 📜sse.ts
+ ┃ ┃ ┣ 📜upload.ts
+ ┃ ┃ ┗ 📜user.ts
  ┃ ┣ 📂assets
+ ┃ ┃ ┣ 📂images
+ ┃ ┃ ┃ ┣ 📂button
+ ┃ ┃ ┃ ┃ ┣ 📜login-google.png
+ ┃ ┃ ┃ ┃ ┗ 📜login-kakao.png
+ ┃ ┃ ┃ ┣ 📂guides
+ ┃ ┃ ┃ ┃ ┣ 📜master1.png
+ ┃ ┃ ┃ ┃ ┣ 📜master2.png
+ ┃ ┃ ┃ ┃ ┣ 📜master3.png
+ ┃ ┃ ┃ ┃ ┣ 📜master4.png
+ ┃ ┃ ┃ ┃ ┣ 📜master5.png
+ ┃ ┃ ┃ ┃ ┣ 📜master6.png
+ ┃ ┃ ┃ ┃ ┣ 📜master7.png
+ ┃ ┃ ┃ ┃ ┣ 📜master8.png
+ ┃ ┃ ┃ ┃ ┣ 📜user1.png
+ ┃ ┃ ┃ ┃ ┣ 📜user10.png
+ ┃ ┃ ┃ ┃ ┣ 📜user11.png
+ ┃ ┃ ┃ ┃ ┣ 📜user12.png
+ ┃ ┃ ┃ ┃ ┣ 📜user13.png
+ ┃ ┃ ┃ ┃ ┣ 📜user14.png
+ ┃ ┃ ┃ ┃ ┣ 📜user2.png
+ ┃ ┃ ┃ ┃ ┣ 📜user3.png
+ ┃ ┃ ┃ ┃ ┣ 📜user4.png
+ ┃ ┃ ┃ ┃ ┣ 📜user5.png
+ ┃ ┃ ┃ ┃ ┣ 📜user6.png
+ ┃ ┃ ┃ ┃ ┣ 📜user7.png
+ ┃ ┃ ┃ ┃ ┣ 📜user8.png
+ ┃ ┃ ┃ ┃ ┗ 📜user9.png
+ ┃ ┃ ┃ ┣ 📂member
+ ┃ ┃ ┃ ┃ ┣ 📜member1.png
+ ┃ ┃ ┃ ┃ ┣ 📜member2.png
+ ┃ ┃ ┃ ┃ ┣ 📜member3.png
+ ┃ ┃ ┃ ┃ ┣ 📜member4.jpg
+ ┃ ┃ ┃ ┃ ┣ 📜member5.jpg
+ ┃ ┃ ┃ ┃ ┗ 📜member6.png
+ ┃ ┃ ┃ ┣ 📜character.png
+ ┃ ┃ ┃ ┣ 📜character2.png
+ ┃ ┃ ┃ ┣ 📜default-avatar.png
+ ┃ ┃ ┃ ┣ 📜logo.png
+ ┃ ┃ ┃ ┗ 📜manito-avatar.png
  ┃ ┃ ┗ 📜main.css
  ┃ ┣ 📂components
- ┃ ┃ ┣ 📜TheWelcome.vue
- ┃ ┃ ┗ 📜WelcomeItem.vue
- ┃ ┣ 📂fonts
- ┃ ┃ ┣ 📜ICELAND-REGULAR.TTF
- ┃ ┃ ┣ 📜PRETENDARD-BLACK.OTF
- ┃ ┃ ┣ 📜PRETENDARD-BOLD.OTF
- ┃ ┃ ┣ 📜PRETENDARD-EXTRABOLD.OTF
- ┃ ┃ ┣ 📜PRETENDARD-EXTRALIGHT.OTF
- ┃ ┃ ┣ 📜PRETENDARD-LIGHT.OTF
- ┃ ┃ ┣ 📜PRETENDARD-MEDIUM.OTF
- ┃ ┃ ┣ 📜PRETENDARD-REGULAR.OTF
- ┃ ┃ ┣ 📜PRETENDARD-SEMIBOLD.OTF
- ┃ ┃ ┗ 📜PRETENDARD-THIN.OTF
+ ┃ ┃ ┣ 📂atoms
+ ┃ ┃ ┃ ┣ 📜AvatarAtom.vue
+ ┃ ┃ ┃ ┣ 📜BadgeAtom.vue
+ ┃ ┃ ┃ ┣ 📜ButtonAtom.vue
+ ┃ ┃ ┃ ┣ 📜CharacterAtom.vue
+ ┃ ┃ ┃ ┣ 📜CloseButtonAtom.vue
+ ┃ ┃ ┃ ┣ 📜InputImageAtom.vue
+ ┃ ┃ ┃ ┣ 📜LineAtom.vue
+ ┃ ┃ ┃ ┣ 📜LogoAtom.vue
+ ┃ ┃ ┃ ┗ 📜TextAtom.vue
+ ┃ ┃ ┣ 📂molecules
+ ┃ ┃ ┃ ┣ 📂board
+ ┃ ┃ ┃ ┃ ┣ 📜BoardDetailBottom.vue
+ ┃ ┃ ┃ ┃ ┣ 📜BoardDetailTop.vue
+ ┃ ┃ ┃ ┃ ┣ 📜BoardElement.vue
+ ┃ ┃ ┃ ┃ ┣ 📜BoardHeader.vue
+ ┃ ┃ ┃ ┃ ┣ 📜BoardTableHeader.vue
+ ┃ ┃ ┃ ┃ ┣ 📜BoardWriterInformation.vue
+ ┃ ┃ ┃ ┃ ┣ 📜LikeButton.vue
+ ┃ ┃ ┃ ┃ ┣ 📜MobileBoardElement.vue
+ ┃ ┃ ┃ ┃ ┣ 📜NestedReplyWriteForm.vue
+ ┃ ┃ ┃ ┃ ┣ 📜ReplyModifyForm.vue
+ ┃ ┃ ┃ ┃ ┗ 📜ReplyWriteForm.vue
+ ┃ ┃ ┃ ┣ 📂common
+ ┃ ┃ ┃ ┃ ┣ 📜ButtonInputBox.vue
+ ┃ ┃ ┃ ┃ ┣ 📜CheckBox.vue
+ ┃ ┃ ┃ ┃ ┣ 📜DateButton.vue
+ ┃ ┃ ┃ ┃ ┣ 📜HeaderLogo.vue
+ ┃ ┃ ┃ ┃ ┣ 📜HeaderProfile.vue
+ ┃ ┃ ┃ ┃ ┣ 📜InputBox.vue
+ ┃ ┃ ┃ ┃ ┣ 📜MainLogo.vue
+ ┃ ┃ ┃ ┃ ┣ 📜MenuItem.vue
+ ┃ ┃ ┃ ┃ ┗ 📜SelectBox.vue
+ ┃ ┃ ┃ ┣ 📂game
+ ┃ ┃ ┃ ┃ ┣ 📜ChatProfile.vue
+ ┃ ┃ ┃ ┃ ┣ 📜ExpectedMission.vue
+ ┃ ┃ ┃ ┃ ┣ 📜ManitoResultElement.vue
+ ┃ ┃ ┃ ┃ ┣ 📜MissionCard.vue
+ ┃ ┃ ┃ ┃ ┣ 📜PaticipateProfile.vue
+ ┃ ┃ ┃ ┃ ┣ 📜ProfileInfo.vue
+ ┃ ┃ ┃ ┃ ┣ 📜StatisticCard.vue
+ ┃ ┃ ┃ ┃ ┗ 📜StatisticLargeCard.vue
+ ┃ ┃ ┃ ┗ 📂main
+ ┃ ┃ ┃ ┃ ┣ 📜MainCardProfile.vue
+ ┃ ┃ ┃ ┃ ┣ 📜MobileInvitationCodeBox.vue
+ ┃ ┃ ┃ ┃ ┣ 📜MobileMiniHeader.vue
+ ┃ ┃ ┃ ┃ ┣ 📜RoomCard.vue
+ ┃ ┃ ┃ ┃ ┣ 📜RoomCreateCard.vue
+ ┃ ┃ ┃ ┃ ┗ 📜ServiceFeature.vue
+ ┃ ┃ ┣ 📂organisms
+ ┃ ┃ ┃ ┣ 📂board
+ ┃ ┃ ┃ ┃ ┣ 📜BoardSearchBox.vue
+ ┃ ┃ ┃ ┃ ┗ 📜ReplyElement.vue
+ ┃ ┃ ┃ ┣ 📂common
+ ┃ ┃ ┃ ┃ ┣ 📜ContactSection.vue
+ ┃ ┃ ┃ ┃ ┣ 📜FooterBar.vue
+ ┃ ┃ ┃ ┃ ┣ 📜HeaderBar.vue
+ ┃ ┃ ┃ ┃ ┣ 📜NavBar.vue
+ ┃ ┃ ┃ ┃ ┗ 📜ServiceGuide.vue
+ ┃ ┃ ┃ ┣ 📂game
+ ┃ ┃ ┃ ┃ ┣ 📜ApprovedUserList.vue
+ ┃ ┃ ┃ ┃ ┣ 📜ChatRoom.vue
+ ┃ ┃ ┃ ┃ ┣ 📜ExpectedMissionList.vue
+ ┃ ┃ ┃ ┃ ┣ 📜GameHeader.vue
+ ┃ ┃ ┃ ┃ ┣ 📜HistoryCard.vue
+ ┃ ┃ ┃ ┃ ┣ 📜MissionHeader.vue
+ ┃ ┃ ┃ ┃ ┣ 📜MissionList.vue
+ ┃ ┃ ┃ ┃ ┣ 📜PredictCard.vue
+ ┃ ┃ ┃ ┃ ┣ 📜UnapprovedUserList.vue
+ ┃ ┃ ┃ ┃ ┗ 📜UnexpectedMission.vue
+ ┃ ┃ ┃ ┣ 📂main
+ ┃ ┃ ┃ ┃ ┣ 📜ChangePasswordForm.vue
+ ┃ ┃ ┃ ┃ ┣ 📜FindPasswordForm.vue
+ ┃ ┃ ┃ ┃ ┣ 📜JoinForm.vue
+ ┃ ┃ ┃ ┃ ┣ 📜LoginForm.vue
+ ┃ ┃ ┃ ┃ ┣ 📜MainCard.vue
+ ┃ ┃ ┃ ┃ ┣ 📜MyPage.vue
+ ┃ ┃ ┃ ┃ ┣ 📜ResetPasswordForm.vue
+ ┃ ┃ ┃ ┃ ┗ 📜RoomListView.vue
+ ┃ ┃ ┃ ┗ 📂modal
+ ┃ ┃ ┃ ┃ ┣ 📜AccountDeleteModalContent1.vue
+ ┃ ┃ ┃ ┃ ┣ 📜AccountDeleteModalContent2.vue
+ ┃ ┃ ┃ ┃ ┣ 📜AccountDeleteModalContent3.vue
+ ┃ ┃ ┃ ┃ ┣ 📜InferenceModalContent.vue
+ ┃ ┃ ┃ ┃ ┣ 📜IntrudingModalContent.vue
+ ┃ ┃ ┃ ┃ ┣ 📜RoomCreateModalContent.vue
+ ┃ ┃ ┃ ┃ ┣ 📜RoomDeleteModalContent.vue
+ ┃ ┃ ┃ ┃ ┣ 📜RoomEnterModalContent.vue
+ ┃ ┃ ┃ ┃ ┣ 📜RoomMissionModalContent.vue
+ ┃ ┃ ┃ ┃ ┣ 📜YesModalContent.vue
+ ┃ ┃ ┃ ┃ ┗ 📜YesNoModalContent.vue
+ ┃ ┃ ┣ 📂pages
+ ┃ ┃ ┃ ┣ 📂board
+ ┃ ┃ ┃ ┃ ┣ 📜BoardDetailPage.vue
+ ┃ ┃ ┃ ┃ ┣ 📜BoardListPage.vue
+ ┃ ┃ ┃ ┃ ┣ 📜BoardModifyPage.vue
+ ┃ ┃ ┃ ┃ ┣ 📜BoardPage.vue
+ ┃ ┃ ┃ ┃ ┗ 📜BoardWritePage.vue
+ ┃ ┃ ┃ ┣ 📜EntranceWaitingPage.vue
+ ┃ ┃ ┃ ┣ 📜LoginView.vue
+ ┃ ┃ ┃ ┣ 📜MainView.vue
+ ┃ ┃ ┃ ┣ 📜NotificationPage.vue
+ ┃ ┃ ┃ ┣ 📜ParticipatePage.vue
+ ┃ ┃ ┃ ┣ 📜ResetPasswordPage.vue
+ ┃ ┃ ┃ ┣ 📜ReviewPage.vue
+ ┃ ┃ ┃ ┣ 📜RoomPage.vue
+ ┃ ┃ ┃ ┣ 📜RoomSetting.vue
+ ┃ ┃ ┃ ┣ 📜ServiceView.vue
+ ┃ ┃ ┃ ┣ 📜sswTest.vue
+ ┃ ┃ ┃ ┣ 📜StatisticPage.vue
+ ┃ ┃ ┃ ┣ 📜TimeLinePage.vue
+ ┃ ┃ ┃ ┣ 📜UserMission.vue
+ ┃ ┃ ┃ ┗ 📜WithdrawalSuccessPage.vue
+ ┃ ┃ ┗ 📂template
+ ┃ ┃ ┃ ┣ 📜ModalTemplate.vue
+ ┃ ┃ ┃ ┣ 📜RedirectTemplate.vue
+ ┃ ┃ ┃ ┗ 📜WideCardTemplate.vue
  ┃ ┣ 📂router
  ┃ ┃ ┗ 📜index.ts
  ┃ ┣ 📂stores
- ┃ ┃ ┗ 📜counter.ts
- ┃ ┣ 📂views
- ┃ ┃ ┣ 📜AboutView.vue
- ┃ ┃ ┗ 📜HomeView.vue
+ ┃ ┃ ┣ 📜menu.ts
+ ┃ ┃ ┗ 📜user.ts
+ ┃ ┣ 📂types
+ ┃ ┃ ┣ 📜board.ts
+ ┃ ┃ ┣ 📜chat.ts
+ ┃ ┃ ┣ 📜common.ts
+ ┃ ┃ ┣ 📜history.ts
+ ┃ ┃ ┣ 📜mission.ts
+ ┃ ┃ ┣ 📜notify.ts
+ ┃ ┃ ┣ 📜room.ts
+ ┃ ┃ ┗ 📜user.ts
+ ┃ ┣ 📂utils
+ ┃ ┃ ┣ 📜date.ts
+ ┃ ┃ ┣ 📜editor.ts
+ ┃ ┃ ┣ 📜http-commons.ts
+ ┃ ┃ ┣ 📜http-status.ts
+ ┃ ┃ ┗ 📜upload.ts
  ┃ ┣ 📜App.vue
  ┃ ┗ 📜main.ts
- ┣ 📜.eslintrc.cjs
- ┣ 📜.gitignore
+ ┣ 📜.env
  ┣ 📜.prettierrc.json
  ┣ 📜env.d.ts
  ┣ 📜index.html
  ┣ 📜package-lock.json
  ┣ 📜package.json
- ┣ 📜postcss.config.js
- ┣ 📜README.md
  ┣ 📜tailwind.config.js
  ┣ 📜tsconfig.app.json
  ┣ 📜tsconfig.json
  ┣ 📜tsconfig.node.json
- ┗ 📜vite.config.ts
+ ┣ 📜vite.config.ts
+ ┗ 📜yarn.lock
 ```
 
 <br/>
