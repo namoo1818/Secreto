@@ -858,7 +858,7 @@
   </tr>
 </table>
 
-> <h3><font color="red">Baek-End</font></h3>
+> <h3><font color="red">Back-End</font></h3>
 <table>
  <tr>
     <td align="center"><a href="https://github.com/yee950419"><img src="./img/이상학.png" width="130px;" alt=""></a></td>
