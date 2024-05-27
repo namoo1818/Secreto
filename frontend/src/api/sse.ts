@@ -12,8 +12,7 @@ function SSEConnect(roomUserNo: number) {
             headers: {
                 accessToken: 'bearer ' + accessToken.value,
                 'Content-Type': 'text/event-stream'
-            },
-            heartbeatTimeout: 36000000
+            }
         }
     )
     return eventSource
